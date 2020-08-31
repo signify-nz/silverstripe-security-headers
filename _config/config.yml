@@ -7,6 +7,7 @@ SilverStripe\Control\Controller:
     - Signify\Extensions\SecurityHeaderControllerExtension
 
 Signify\Extensions\SecurityHeaderControllerExtension:
+  report_uri: 'cspviolations/report'
   headers:
     Strict-Transport-Security: "max-age=31536000"
     X-Frame-Options: "deny"
