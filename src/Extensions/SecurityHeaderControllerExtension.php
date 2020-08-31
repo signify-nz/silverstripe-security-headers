@@ -34,6 +34,7 @@ class SecurityHeaderControllerExtension extends Extension
             if (empty($value)) {
                 continue;
             }
+            $value = preg_replace('/\v/', '', $value);
 
             // Add the report-uri directive.
             // TODO add or amend report-to directive and Report-To header.
@@ -41,7 +42,6 @@ class SecurityHeaderControllerExtension extends Extension
             // SEE https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/report-uri for report-uri deprecation
             // SEE https://canhas.report/csp-report-to
             if ($header === 'Content-Security-Policy') {
-                $value = preg_replace('/\v/', '', $value);
                 if (strpos($value, 'report-uri')) {
                     $value = str_replace('report-uri', "report-uri {$this->getReportURI()}", $value);
                 } else {
