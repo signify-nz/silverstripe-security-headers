@@ -60,6 +60,7 @@ class CSPViolationsController extends Controller
     {
         $violation = $this->getOrCreateViolation($cspReport);
         $this->setDocument($cspReport, $violation);
+        $violation->Violations++;
         $reportTime = $this->getDataForAttribute($cspReport, static::REPORT_TIME);
         if ($violation->{static::REPORT_TIME} === null || $violation->{static::REPORT_TIME} < $reportTime) {
             $violation->{static::REPORT_TIME} = $reportTime;
@@ -80,8 +81,6 @@ class CSPViolationsController extends Controller
             $violationData['Violations'] = 0;
             $violation = CSPViolation::create($violationData);
         }
-        $violation->Violations++;
-        $violation->write();
 
         return $violation;
     }
