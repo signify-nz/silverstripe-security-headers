@@ -78,7 +78,7 @@ class CSPViolationsController extends Controller
      * @param array $cspReport
      * @return CSPViolation
      */
-    public function getOrCreateViolation($cspReport)
+    protected function getOrCreateViolation($cspReport)
     {
         $violationData = [
             static::DISPOSITION => $this->getDataForAttribute($cspReport, static::DISPOSITION),
@@ -100,7 +100,7 @@ class CSPViolationsController extends Controller
      * @param array $cspReport
      * @param CSPViolation $violation
      */
-    public function setDocument($cspReport, $violation)
+    protected function setDocument($cspReport, $violation)
     {
         $documentURI = $this->getDataForAttribute($cspReport, static::DOCUMENT_URI);
         // If the document is already added to this violation, no need to re-add it.
