@@ -10,6 +10,7 @@ class CSPViolation extends DataObject
     private static $table_name = 'Signify_CSPViolation';
 
     private static $db = [
+        'ReportedTime' => 'Datetime',
         'Disposition' => 'Varchar(7)',
         'BlockedURI' => 'Varchar(255)',
         'EffectiveDirective' => 'Varchar(255)',
@@ -21,7 +22,7 @@ class CSPViolation extends DataObject
     ];
 
     private static $summary_fields = [
-        'LastEdited' => 'Latest Report',
+        'ReportedTime' => 'Latest Report',
         'Disposition',
         'BlockedURI',
         'DocumentURIs',
@@ -29,7 +30,7 @@ class CSPViolation extends DataObject
         'Violations',
     ];
 
-    private static $default_sort = 'LastEdited DESC';
+    private static $default_sort = 'ReportedTime DESC';
 
     public function getDocumentURIs()
     {
