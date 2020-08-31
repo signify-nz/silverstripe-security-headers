@@ -56,6 +56,11 @@ class CSPViolationsController extends Controller
         }
     }
 
+    /**
+     * Process a Content Security Policy violation report.
+     * Creates or updates the relevant CSPViolation object.
+     * @param array $cspReport
+     */
     public function processReport($cspReport)
     {
         $violation = $this->getOrCreateViolation($cspReport);
@@ -68,6 +73,11 @@ class CSPViolationsController extends Controller
         $violation->write();
     }
 
+    /**
+     * If this violation has been previously reported, get that violation object.  Otherwise, create a new one.
+     * @param array $cspReport
+     * @return CSPViolation
+     */
     public function getOrCreateViolation($cspReport)
     {
         $violationData = [
@@ -85,6 +95,11 @@ class CSPViolationsController extends Controller
         return $violation;
     }
 
+    /**
+     * Set the document-uri for a given violation based on the report.
+     * @param array $cspReport
+     * @param CSPViolation $violation
+     */
     public function setDocument($cspReport, $violation)
     {
         $documentURI = $this->getDataForAttribute($cspReport, static::DOCUMENT_URI);
@@ -169,6 +184,11 @@ class CSPViolationsController extends Controller
         return $origin == null || $origin == rtrim(Director::absoluteBaseURL(), '/');
     }
 
+    /**
+     * Returns true if the content-type of the request is a valid CSP report value.
+     * @param HTTPRequest $request
+     * @return boolean
+     */
     protected function isReport(HTTPRequest $request)
     {
         return in_array($request->getHeader('content-type'), [
