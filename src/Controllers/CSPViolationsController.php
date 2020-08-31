@@ -155,9 +155,18 @@ class CSPViolationsController extends Controller
         return null;
     }
 
+    /**
+     * If the origin header is set, return true if it is the same as the current absolute base URL.
+     *
+     * The origin header may not be set for report-to requests, so null must be considered sameorigin.
+     *
+     * @param HTTPRequest $request
+     * @return boolean
+     */
     protected function isSameOrigin(HTTPRequest $request)
     {
-        return $request->getHeader('origin') == rtrim(Director::absoluteBaseURL(), '/');
+        $origin = $request->getHeader('origin');
+        return $origin == null || $origin == rtrim(Director::absoluteBaseURL(), '/');
     }
 
     protected function isReport(HTTPRequest $request)
