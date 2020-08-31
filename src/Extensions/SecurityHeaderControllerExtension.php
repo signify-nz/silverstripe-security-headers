@@ -31,6 +31,10 @@ class SecurityHeaderControllerExtension extends Extension
         $headersToSend = (array) $this->config()->get('headers');
 
         foreach ($headersToSend as $header => $value) {
+            if (empty($value)) {
+                continue;
+            }
+
             // Add the report-uri directive.
             // TODO add or amend report-to directive and Report-To header.
             // SEE https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/report-to
