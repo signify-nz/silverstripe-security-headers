@@ -37,6 +37,9 @@ While some default headers are already set for your convenience, you may wish to
 In the below example, the `X-Frame-Options` header value is changed from the default. This same syntax is used to add new headers.
 
 ```yml
+---
+After: 'signify-security-headers'
+---
 Signify\SecurityHeaderControllerExtension:
   headers:
     X-Frame-Options: "allow-from https://example.com/"
@@ -48,6 +51,9 @@ In the following example, the value for the `Strict-Transport-Security` header i
 Note that either `null` or an empty string will have the same effect.
 
 ```yml
+---
+After: 'signify-security-headers'
+---
 Signify\SecurityHeaderControllerExtension:
   headers:
     Strict-Transport-Security: null
@@ -58,6 +64,6 @@ Signify\SecurityHeaderControllerExtension:
 To maintain configuration compatibility with the [Guttmann/silverstripe-security-headers](https://github.com/guttmann/silverstripe-security-headers) module, and to make it clearer what the policy for your specific application is, individual CSP attributes can't be overridden. Rather, you must declare the full value for the `Content-Security-Policy` header if you wish to override it.  
 We recommend copying the value we use in the packaged `_config/config.yml` file, and building onto it from there.
 
-### Content Security Reports
+### Content Security Policy Violation Reports
 
 Documentation for this is TBC as the functionality is still in development.
