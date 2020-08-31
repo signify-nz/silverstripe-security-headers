@@ -12,7 +12,6 @@ class CSPViolation extends DataObject
     private static $db = [
         'Disposition' => 'Varchar(7)',
         'BlockedURI' => 'Varchar(255)',
-        'ViolatedDirective' => 'Varchar(255)',
         'EffectiveDirective' => 'Varchar(255)',
         'Violations' => 'Int',
     ];
@@ -26,7 +25,6 @@ class CSPViolation extends DataObject
         'Disposition',
         'BlockedURI',
         'DocumentURIs',
-        'ViolatedDirective',
         'EffectiveDirective',
         'Violations',
     ];
