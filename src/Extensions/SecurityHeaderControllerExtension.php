@@ -1,6 +1,6 @@
 <?php
 
-namespace Guttmann\SilverStripe\Extensions;
+namespace Signify\Extensions;
 
 use SilverStripe\Core\Extension;
 use SilverStripe\Core\Config\Configurable;
