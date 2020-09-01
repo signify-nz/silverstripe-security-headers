@@ -22,7 +22,7 @@ Signify\Extensions\SecurityHeaderControllerExtension:
       base-uri 'self';
       form-action 'self';
       frame-ancestors 'self';
-      block-all-mixed-content
+      block-all-mixed-content;
 
 ---
 Only:
