@@ -7,6 +7,7 @@ use SilverStripe\Core\Config\Configurable;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
+use SilverStripe\Control\Director;
 
 class SecurityHeaderControllerExtension extends Extension
 {
@@ -27,11 +28,35 @@ class SecurityHeaderControllerExtension extends Extension
      */
     private static $report_uri = 'cspviolations/report';
 
+    /**
+     * Whether to use the report-to header and CSP directive.
+     * @config
+     * @var string
+     */
+    private static $use_report_to = false;
+
+    /**
+     * Whether subdomains should report to the same endpoint.
+     * @config
+     * @var string
+     */
+    private static $report_to_subdomains = false;
+
+    /**
+     * The group name for the report-to CSP directive.
+     * @config
+     * @var string
+     */
+    private static $report_to_group = 'signify-csp-violation';
+
     public function onAfterInit()
     {
         $response = $this->owner->getResponse();
 
         $headersToSend = (array) $this->config()->get('headers');
+        if ($this->config()->get('use_report_to')) {
+            $this->addReportToHeader($headersToSend);
+        }
 
         foreach ($headersToSend as $header => $value) {
             if (empty($value)) {
@@ -39,21 +64,24 @@ class SecurityHeaderControllerExtension extends Extension
             }
             $value = preg_replace('/\v/', '', $value);
 
-            // Add the report-uri directive.
-            // TODO add or amend report-to directive and Report-To header.
-            // SEE https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/report-to
-            // SEE https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/report-uri for report-uri deprecation
-            // SEE https://canhas.report/csp-report-to
-            // SEE https://w3c.github.io/reporting/
             if ($header === 'Content-Security-Policy') {
                 if ($this->isCSPReportingOnly()) {
                     $header = 'Content-Security-Policy-Report-Only';
                 }
 
+                // Add or update report-uri directive.
                 if (strpos($value, 'report-uri')) {
                     $value = str_replace('report-uri', "report-uri {$this->getReportURI()}", $value);
                 } else {
                     $value = rtrim($value, ';') . "; {$this->getReportURIDirective()}";
+                }
+
+                // Add report-to directive.
+                // Note that unlike report-uri, only the first endpoint is used if multiple are declared.
+                if ($this->config()->get('use_report_to')) {
+                    if (strpos($value, 'report-to') === false) {
+                        $value = rtrim($value, ';') . "; {$this->getReportToDirective()};";
+                    }
                 }
             }
 
@@ -81,9 +109,46 @@ class SecurityHeaderControllerExtension extends Extension
         return $this->config()->get('report_uri');
     }
 
+    protected function getIncludeSubdomains()
+    {
+        return $this->config()->get('report_to_subdomains');
+    }
+
+    protected function getReportToGroup()
+    {
+        return $this->config()->get('report_to_group');
+    }
+
     protected function getReportURIDirective()
     {
         return "report-uri {$this->getReportURI()};";
+    }
+
+    protected function getReportToDirective()
+    {
+        return "report-to {$this->getReportToGroup()}";
+    }
+
+    protected function addReportToHeader(&$headers)
+    {
+        if (array_key_exists('Report-To', $headers)) {
+            $headers['Report-To'] = $headers['Report-To'] . ',' . $this->getReportToHeader();
+        } else {
+            $headers['Report-To'] = $this->getReportToHeader();
+        }
+    }
+
+    protected function getReportToHeader()
+    {
+        $header = [
+            'group' => $this->getReportToGroup(),
+            'max_age' => 1800,
+            'endpoints' => [[
+                'url' => Director::absoluteURL($this->getReportURI()),
+            ],],
+            'include_subdomains' => $this->getIncludeSubdomains(),
+        ];
+        return json_encode($header);
     }
 
 }
