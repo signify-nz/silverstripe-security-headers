@@ -12,7 +12,7 @@ class SecurityHeaderSiteconfigExtension extends DataExtension implements Permiss
 
     private static $db = [
         'CSPReportingOnly' => 'Boolean',
-    ];//TODO WHY ISN'T THIS CREATING THE DB COLUMN??
+    ];
 
     public function updateCMSFields(FieldList $fields)
     {
