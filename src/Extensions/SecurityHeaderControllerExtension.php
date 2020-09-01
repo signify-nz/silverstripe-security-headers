@@ -4,6 +4,9 @@ namespace Signify\Extensions;
 
 use SilverStripe\Core\Extension;
 use SilverStripe\Core\Config\Configurable;
+use SilverStripe\SiteConfig\SiteConfig;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\DB;
 
 class SecurityHeaderControllerExtension extends Extension
 {
@@ -41,7 +44,12 @@ class SecurityHeaderControllerExtension extends Extension
             // SEE https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/report-to
             // SEE https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/report-uri for report-uri deprecation
             // SEE https://canhas.report/csp-report-to
+            // SEE https://w3c.github.io/reporting/
             if ($header === 'Content-Security-Policy') {
+                if ($this->isCSPReportingOnly()) {
+                    $header = 'Content-Security-Policy-Report-Only';
+                }
+
                 if (strpos($value, 'report-uri')) {
                     $value = str_replace('report-uri', "report-uri {$this->getReportURI()}", $value);
                 } else {
@@ -51,6 +59,21 @@ class SecurityHeaderControllerExtension extends Extension
 
             $response->addHeader($header, $value);
         }
+    }
+
+    /**
+     * Returns true if the Content-Security-Policy-Report-Only header should be used.
+     * @return boolean
+     */
+    public function isCSPReportingOnly()
+    {
+        // If the CSPReportingOnly field doesn't exist on SiteConfig yet, we're not in report-only mode.
+        // This is necessary to let dev/build run safely the first time SecurityHeaderSiteconfigExtension is applied.
+        $table = DataObject::getSchema()->baseDataTable(SiteConfig::class);
+        if (!in_array('CSPReportingOnly', array_keys(DB::field_list($table)))) {
+            return false;
+        }
+        return SiteConfig::current_site_config()->CSPReportingOnly;
     }
 
     protected function getReportURI()

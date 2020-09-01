@@ -1,0 +1,42 @@
+<?php
+namespace Signify\Extensions;
+
+use SilverStripe\ORM\DataExtension;
+use SilverStripe\Security\Permission;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\CheckboxField;
+use SilverStripe\Security\PermissionProvider;
+
+class SecurityHeaderSiteconfigExtension extends DataExtension implements PermissionProvider
+{
+
+    private static $db = [
+        'CSPReportingOnly' => 'Boolean',
+    ];//TODO WHY ISN'T THIS CREATING THE DB COLUMN??
+
+    public function updateCMSFields(FieldList $fields)
+    {
+        if (!Permission::check('ADMINISTER_CSP')) {
+            return;
+        }
+
+        $fields->addFieldToTab('Root.Main', CheckboxField::create(
+            'CSPReportingOnly',
+            'Set Content Security Policy to report-only mode'
+        ));
+    }
+
+    public function providePermissions()
+    {
+        $category = 'Content Security Policy';
+        $permissions = [
+            'ADMINISTER_CSP' => [
+                'name' => 'Administer CSP',
+                'category' => $category,
+                'help' => 'Can administer settings related to the Content Security Policy'
+            ],
+        ];
+        return $permissions;
+    }
+
+}
