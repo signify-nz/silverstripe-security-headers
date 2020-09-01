@@ -16,7 +16,7 @@ Install via [composer](https://getcomposer.org):
 
 ## Usage
 
-### Apply the extension
+### Apply the extensions
 
 Apply the `SecurityHeaderControllerExtension` to the controller of your choice - but we recommend applying it to `SilverStripe\Control\Controller` to ensure all responses from the website include your security headers.
 
@@ -26,6 +26,15 @@ For example, add this to your `_config/config.yml` file:
 SilverStripe\Control\Controller:
   extensions:
     - Signify\SecurityHeaderControllerExtension
+```
+
+You can also optionally apply the `SecurityHeaderSiteconfigExtension` extension to SiteConfig. This gives you the option to set the Content Security Policy to report only mode (this swaps from using the `Content-Security-Policy` header to the `Content-Security-Policy-Report-Only` header) so that you can test CSP settings without enforcing them.
+It also comes with its own permission in case you want some members to have access to the site settings, but not this CSP setting.
+
+```yml
+SilverStripe\SiteConfig\SiteConfig:
+  extensions:
+    - Signify\Extensions\SecurityHeaderSiteconfigExtension
 ```
 
 ### Configure the headers
