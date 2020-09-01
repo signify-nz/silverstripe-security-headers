@@ -71,9 +71,9 @@ class SecurityHeaderControllerExtension extends Extension
 
                 // Add or update report-uri directive.
                 if (strpos($value, 'report-uri')) {
-                    $value = str_replace('report-uri', "report-uri {$this->getReportURI()}", $value);
+                    $value = str_replace('report-uri', $this->getReportURIDirective(), $value);
                 } else {
-                    $value = rtrim($value, ';') . "; {$this->getReportURIDirective()}";
+                    $value = rtrim($value, ';') . "; {$this->getReportURIDirective()};";
                 }
 
                 // Add report-to directive.
@@ -121,7 +121,7 @@ class SecurityHeaderControllerExtension extends Extension
 
     protected function getReportURIDirective()
     {
-        return "report-uri {$this->getReportURI()};";
+        return "report-uri {$this->getReportURI()}";
     }
 
     protected function getReportToDirective()
