@@ -1,6 +1,6 @@
 ---
 Name: signify-security-headers
-After: 'framework/*, cms/*'
+After: 'coreconfig'
 ---
 SilverStripe\Control\Controller:
   extensions:
