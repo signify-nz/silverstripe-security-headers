@@ -17,7 +17,7 @@ class SecurityHeaderControllerExtension extends Extension
      * @config
      * @var array
      */
-    private static $headers;
+    private static $headers = array();
 
     /**
      * The URI to report CSP violations to.
@@ -25,7 +25,7 @@ class SecurityHeaderControllerExtension extends Extension
      * @config
      * @var string
      */
-    private static $report_uri;
+    private static $report_uri = 'cspviolations/report';
 
     public function onAfterInit()
     {
