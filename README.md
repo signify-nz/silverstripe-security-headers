@@ -12,7 +12,9 @@ Comes with a default set of headers configured, but can be used to add any heade
 
 Install via [composer](https://getcomposer.org):
 
-    composer require signify-nz/silverstripe-security-headers
+```bash
+composer require signify-nz/silverstripe-security-headers
+```
 
 ## Usage
 
