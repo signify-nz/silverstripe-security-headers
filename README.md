@@ -110,7 +110,7 @@ Signify\Extensions\SecurityHeaderControllerExtension:
   enable_reporting: false
 ```
 
-Note that this does not disable the endpoint or remove the report from the CMS - it only stops the endpoint from being _automatically_ added to the Content-Security-Policy heade
+Note that this does not disable the endpoint or remove the report from the CMS - it only stops the endpoint from being _automatically_ added to the Content-Security-Policy header
   
 If `enable_reporting` is set to false, the value of `use_report_to` (see above) no longer matters
 
