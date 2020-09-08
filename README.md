@@ -25,7 +25,7 @@ For example, add this to your `_config/config.yml` file:
 ```yml
 SilverStripe\Control\Controller:
   extensions:
-    - Signify\SecurityHeaderControllerExtension
+    - Signify\Extensions\SecurityHeaderControllerExtension
 ```
 
 You can also optionally apply the `SecurityHeaderSiteconfigExtension` extension to SiteConfig. This gives you the option to set the Content Security Policy to report only mode (this swaps from using the `Content-Security-Policy` header to the `Content-Security-Policy-Report-Only` header) so that you can test CSP settings without enforcing them.
@@ -49,7 +49,7 @@ In the below example, the `X-Frame-Options` header value is changed from the def
 ---
 After: 'signify-security-headers'
 ---
-Signify\SecurityHeaderControllerExtension:
+Signify\Extensions\SecurityHeaderControllerExtension:
   headers:
     X-Frame-Options: "allow-from https://example.com/"
 ```
@@ -63,7 +63,7 @@ Note that either `null` or an empty string will have the same effect.
 ---
 After: 'signify-security-headers'
 ---
-Signify\SecurityHeaderControllerExtension:
+Signify\Extensions\SecurityHeaderControllerExtension:
   headers:
     Strict-Transport-Security: null
 ```
@@ -92,7 +92,7 @@ To enable the report-to directive and Report-To header to be used (for browsers 
 ---
 After: 'signify-security-headers'
 ---
-Signify\SecurityHeaderControllerExtension:
+Signify\Extensions\SecurityHeaderControllerExtension:
   use_report_to: true
 ```
 
@@ -106,7 +106,7 @@ If you don't want the CMS reporting endpoint to automatically be added to the CS
 ---
 After: 'signify-security-headers'
 ---
-Signify\SecurityHeaderControllerExtension:
+Signify\Extensions\SecurityHeaderControllerExtension:
   enable_reporting: false
 ```
 
