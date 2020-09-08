@@ -2,7 +2,7 @@
 
 Inspired by [Guttmann/silverstripe-security-headers](https://github.com/guttmann/silverstripe-security-headers). The configuration format used is compatible with that module.
 
-SilverStripe module for easily adding a selection of [useful HTTP headers](https://www.owasp.org/index.php/List_of_useful_HTTP_headers).
+SilverStripe module for easily adding a selection of [useful HTTP headers](https://wiki.owasp.org/index.php/OWASP_Secure_Headers_Project#tab=Headers).
 
 Additionally provides a report of Content Security Policy violations.
 
