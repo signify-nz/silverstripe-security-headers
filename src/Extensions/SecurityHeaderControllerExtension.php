@@ -21,6 +21,13 @@ class SecurityHeaderControllerExtension extends Extension
     private static $headers = array();
 
     /**
+     * Whether to automatically add the CMS report endpoint to the CSP config.
+     * @config
+     * @var string
+     */
+    private static $enable_reporting = true;
+
+    /**
      * The URI to report CSP violations to.
      * See routes.yml
      * @config
@@ -54,7 +61,7 @@ class SecurityHeaderControllerExtension extends Extension
         $response = $this->owner->getResponse();
 
         $headersToSend = (array) $this->config()->get('headers');
-        if ($this->config()->get('use_report_to')) {
+        if ($this->config()->get('enable_reporting') && $this->config()->get('use_report_to')) {
             $this->addReportToHeader($headersToSend);
         }
 
@@ -69,18 +76,20 @@ class SecurityHeaderControllerExtension extends Extension
                     $header = 'Content-Security-Policy-Report-Only';
                 }
 
-                // Add or update report-uri directive.
-                if (strpos($value, 'report-uri')) {
-                    $value = str_replace('report-uri', $this->getReportURIDirective(), $value);
-                } else {
-                    $value = rtrim($value, ';') . "; {$this->getReportURIDirective()};";
-                }
+                if ($this->config()->get('enable_reporting')) {
+                    // Add or update report-uri directive.
+                    if (strpos($value, 'report-uri')) {
+                        $value = str_replace('report-uri', $this->getReportURIDirective(), $value);
+                    } else {
+                        $value = rtrim($value, ';') . "; {$this->getReportURIDirective()};";
+                    }
 
-                // Add report-to directive.
-                // Note that unlike report-uri, only the first endpoint is used if multiple are declared.
-                if ($this->config()->get('use_report_to')) {
-                    if (strpos($value, 'report-to') === false) {
-                        $value = rtrim($value, ';') . "; {$this->getReportToDirective()};";
+                    // Add report-to directive.
+                    // Note that unlike report-uri, only the first endpoint is used if multiple are declared.
+                    if ($this->config()->get('use_report_to')) {
+                        if (strpos($value, 'report-to') === false) {
+                            $value = rtrim($value, ';') . "; {$this->getReportToDirective()};";
+                        }
                     }
                 }
             }
