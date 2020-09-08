@@ -2,10 +2,6 @@
 Name: signify-security-headers
 After: 'coreconfig'
 ---
-SilverStripe\Control\Controller:
-  extensions:
-    - Signify\Extensions\SecurityHeaderControllerExtension
-
 Signify\Extensions\SecurityHeaderControllerExtension:
   headers:
     Strict-Transport-Security: "max-age=31536000"
