@@ -8,7 +8,7 @@ Signify\Extensions\SecurityHeaderControllerExtension:
     X-Frame-Options: "deny"
     X-XSS-Protection: "1; mode=block"
     X-Content-Type-Options: "nosniff"
-    Referrer-Policy: no-referrer
+    Referrer-Policy: same-origin
     Content-Security-Policy: >-
       default-src 'self';
       script-src 'self' 'unsafe-inline' 'unsafe-eval';
