@@ -76,7 +76,7 @@ We recommend copying the value we use in the packaged `_config/config.yml` file,
 ### Content Security Policy Violation Reports
 
 Unless disabled (see below), content security policy violations will automatically be added to a report in the CMS in the reports section (at `/admin/reports/show/Signify-Reports-CSPViolationsReport`).  
-Both the report-uri directive and the report-to directive/header combination are supported, though report-to is currently disabled by default as the implementation for that directive and header are expected to change (see the [working draft](https://www.w3.org/TR/reporting/) and the [editor's draft](https://w3c.github.io/reporting/).
+Both the report-uri directive and the report-to directive/header combination are supported, though report-to is currently disabled by default as the implementation for that directive and header are expected to change (see the [working draft](https://www.w3.org/TR/reporting/) and the [editor's draft](https://w3c.github.io/reporting/)).
 
 If you supply your own endpoint using the report-uri directive, the default will also be added to it. It is expected that browsers will send a report to each endpoint in the report-uri directive.
 
