@@ -5,7 +5,7 @@ After: 'coreconfig'
 Signify\Extensions\SecurityHeaderControllerExtension:
   headers:
     Strict-Transport-Security: "max-age=31536000"
-    X-Frame-Options: "deny"
+    X-Frame-Options: "SAMEORIGIN"
     X-XSS-Protection: "1; mode=block"
     X-Content-Type-Options: "nosniff"
     Referrer-Policy: same-origin
