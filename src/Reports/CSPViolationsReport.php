@@ -4,6 +4,7 @@ namespace Signify\Reports;
 
 use SilverStripe\Reports\Report;
 use Signify\Models\CSPViolation;
+use SilverStripe\Forms\GridField\GridFieldDeleteAction;
 
 class CSPViolationsReport extends Report
 {
@@ -25,6 +26,17 @@ class CSPViolationsReport extends Report
     public function sourceRecords($params = [], $sort = null, $limit = null)
     {
         return CSPViolation::get();
+    }
+
+    public function getReportField()
+    {
+        /* @var $gridConfig \SilverStripe\Forms\GridField\GridFieldConfig */
+        $gridField = parent::getReportField();
+        $gridConfig = $gridField->getConfig();
+
+        $gridConfig->addComponent(new GridFieldDeleteAction());
+
+        return $gridField;
     }
 
 }
