@@ -5,6 +5,7 @@ namespace Signify\Reports;
 use SilverStripe\Reports\Report;
 use Signify\Models\CSPViolation;
 use SilverStripe\Forms\GridField\GridFieldDeleteAction;
+use SilverStripe\Forms\GridField\GridFieldDeleteRelationsButton;
 
 class CSPViolationsReport extends Report
 {
@@ -34,7 +35,10 @@ class CSPViolationsReport extends Report
         $gridField = parent::getReportField();
         $gridConfig = $gridField->getConfig();
 
-        $gridConfig->addComponent(new GridFieldDeleteAction());
+        $gridConfig->addComponents([
+            new GridFieldDeleteAction(),
+            GridFieldDeleteRelationsButton::create('buttons-before-left'),
+        ]);
 
         return $gridField;
     }
