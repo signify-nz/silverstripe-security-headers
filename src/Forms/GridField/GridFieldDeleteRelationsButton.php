@@ -304,8 +304,15 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
      */
     public function setFilterFields($fields)
     {
-        throw new \LogicException('Not implemented yet.');
-        // TODO: Allow developer-defined filter fields as per {@link \SilverStripe\Forms\GridField\GridFieldDataColumns::setDisplayFields()}
+        if (is_array($fields)) {
+            $fields = FieldList::create($fields);
+        }
+        if (!$fields instanceof FieldList) {
+            throw new \BadMethodCallException('"fields" must be a FieldList or array.');
+        }
+
+        $this->filterFields = $fields;
+        return $this;
     }
 
     /**
