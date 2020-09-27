@@ -6,7 +6,6 @@ use SilverStripe\Forms\GridField\GridField_HTMLProvider;
 use SilverStripe\Forms\GridField\GridField_ActionProvider;
 use SilverStripe\Forms\GridField\GridField_URLHandler;
 use SilverStripe\Forms\GridField\GridField;
-use SilverStripe\Forms\GridField\GridFieldImportButton;
 use SilverStripe\Forms\GridField\GridField_FormAction;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Extensible;
@@ -18,12 +17,16 @@ use SilverStripe\Forms\FieldList;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Forms\Form;
+use SilverStripe\Forms\DropdownField;
+use SilverStripe\Forms\FieldGroup;
+use SilverStripe\Forms\FormField;
+use SilverStripe\Forms\CheckboxField;
+use SilverStripe\Core\Manifest\ModuleLoader;
 
 /**
  * Adds an delete button to the bottom or top of a GridField.
  * Clicking the button opens a modal in which a user can select filter options.
  * The user can then delete models from the gridfield's list based on those filter options.
- * TODO: Allow developer-defined filter fields as per {@link \SilverStripe\Forms\GridField\GridFieldDataColumns::setDisplayFields()}
  */
 class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridField_ActionProvider, GridField_URLHandler
 {
@@ -49,6 +52,35 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
      * @var string
      */
     protected $modalTitle = null;
+
+    /**
+     * @var FieldList
+     */
+    protected $filterFields;
+
+    /**
+     * @var array
+     */
+    protected $filterOptions = [
+        '__default' => [
+            'LesserThan',
+            'LesserThanOrEqual',
+            'GreaterThan',
+            'GreaterThanOrEqual',
+            'ExactMatch',
+            'PartialMatch',
+            'StartsWith',
+            'EndsWith',
+        ]
+    ];
+
+    const DEFAULT_OPTION = '__default';
+
+    const OPTION_FIELD_SUFFIX = '__FilterOption';
+
+    const FILTER_BY_SUFFIX = '__FilterBy';
+
+    const FILTER_INVERT_SUFFIX = '__FilterInvert';
 
     /**
      * @param string $targetFragment The HTML fragment to write the button into
@@ -171,7 +203,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
     }
 
     /**
-     * Generate a CSV import form for a single {@link DataObject} subclass.
+     * Generate a modal form for a single {@link DataObject} subclass.
      *
      * @param GridField $gridField
      * @return Form|false
@@ -189,10 +221,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
             return false;
         }
 
-        $fields = new FieldList(
-            // TODO: ADD FILTER FIELDS
-            // decide whether to do this dynamically just based on the model, or if these should be passed in (probably the latter)
-        );
+        $fields = $this->getPreparedFilterFields();
 
         $actions = new FieldList(
             FormAction::create('delete', "Delete {$dummyObj->plural_name()}")
@@ -201,7 +230,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
 
         $form = new Form(
             $gridField,
-            "deletionForm",
+            'deletionForm',
             $fields,
             $actions
         );
@@ -213,11 +242,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
     }
 
     /**
-     * Imports the submitted CSV file based on specifications given in
-     * {@link self::model_importers}.
-     * Redirects back with a success/failure message.
-     *
-     * @todo Figure out ajax submission of files via jQuery.form plugin
+     * Deletes models from the gridfield list based on user-supplied filters.
      *
      * @param GridField $gridField
      * @param HTTPRequest $request
@@ -226,7 +251,27 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
     public function handleDelete($gridField, HTTPRequest $request)
     {
         $data = $request->requestVars();
-        // TODO get the records which need to be deleted.
+        $filters = array();
+
+        // Prepare filters based on user input.
+        foreach ($data as $key => $value) {
+            // If this fields is a "filter by" field, and the value is truthy, add the filter.
+            if (preg_match('/' . static::FILTER_BY_SUFFIX . '$/', $key) && $value) {
+                $fieldName = str_replace(static::FILTER_BY_SUFFIX, '', $key);
+                $filterType = $data[$fieldName . static::OPTION_FIELD_SUFFIX];
+                if (empty($filterType)) {
+                    $filterType = 'ExactMatch';
+                }
+                if (!empty($data[$fieldName . static::FILTER_INVERT_SUFFIX])) {
+                    $filterType .= ':not';
+                }
+                $filters["$fieldName:$filterType"] = $data[$fieldName];
+            }
+        }
+        // Ensure data objects are filtered to only include items in this gridfield.
+        $filters['ID'] = $gridField->getManipulatedList()->column('ID');
+
+        $deletions = $gridField->getModelClass()::get()->filter($filters);
 
         $message = '';
         if ($count = $deletions->count()) {
@@ -241,7 +286,109 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
     }
 
     /**
-     *
+     * Get the fields to display in the filter modal.
+     * If {@link setFilterFields()} has not been called, this will be based on the class's getCMSFields
+     * implementation or the default scaffolded fields for the class.
+     * @return FieldList
+     */
+    public function getFilterFields()
+    {
+        if (!$this->filterFields) {
+            $obj = $this->getDummyObject();
+            $fields = array_keys(DataObject::getSchema()->databaseFields($obj->ClassName));
+            $fieldList = FieldList::create();
+            // Get fields from object's CMSFields.
+            foreach ($obj->getCMSFields()->flattenFields() as $field) {
+                if (!in_array($field->Name, $fields)) {
+                    continue;
+                }
+                $fieldList->add($field);
+            }
+            // Get scaffolded DB fields if getCMSFields has no DB Fields.
+            if (!$fieldList->count()) {
+                foreach ($obj->scaffoldFormFields() as $field) {
+                    $fieldList->add($field);
+                }
+            }
+            $this->filterFields = $fieldList;
+        }
+        return $this->filterFields;
+    }
+
+    public function setFilterFields($fields)
+    {
+        throw new \LogicException('Not implemented yet.');
+        // TODO: Allow developer-defined filter fields as per {@link \SilverStripe\Forms\GridField\GridFieldDataColumns::setDisplayFields()}
+    }
+
+    public function getFilterOptions()
+    {
+        return $this->filterOptions;
+    }
+
+    public function setFilterOptions(array $options)
+    {
+        $this->filterOptions = array_merge($this->filterOptions, $options);
+    }
+
+    protected function getPreparedFilterFields()
+    {
+        $fields = FieldList::create();
+        foreach ($this->getFilterFields() as $field) {
+            $fields->add($this->getFieldAsComposite($field));
+        }
+        return $fields;
+    }
+
+    protected function getFieldAsComposite(FormField $field)
+    {
+        $group = FieldGroup::create(
+            "'{$field->Title()}' filter group",
+            [
+                $filterBy = CheckboxField::create(
+                    $field->Name . static::FILTER_BY_SUFFIX,
+                    "Filter by {$field->Title()}?"
+                ),
+                $field,
+                $options = $this->getFilterOptionsField($field->Name),
+                $invert = CheckboxField::create(
+                    $field->Name . static::FILTER_INVERT_SUFFIX,
+                    'Invert Filter?'
+                ),
+            ]
+        );
+        if (ModuleLoader::inst()->getManifest()->moduleExists('unclecheese/display-logic')) {
+            $field->displayIf($filterBy->Name)->isChecked();
+            $options->displayIf($filterBy->Name)->isChecked();
+            $invert->displayIf($filterBy->Name)->isChecked();
+        }
+        return $group;
+    }
+
+    protected function getFilterOptionsField($fieldName)
+    {
+        $allOptions = $this->filterOptions;
+        if (array_key_exists($fieldName, $allOptions)) {
+            $options = $allOptions[$fieldName];
+        } else {
+            $options = $allOptions[static::DEFAULT_OPTION];
+        }
+        $field = DropdownField::create(
+            $fieldName . static::OPTION_FIELD_SUFFIX,
+            "$fieldName Filter Type",
+            array_combine($options, $options)
+        );
+        if (in_array('ExactMatch', $options)) {
+            $field->setValue('ExactMatch');
+        } else {
+            $field->setHasEmptyDefault(true);
+        }
+        $this->extend('updateFilterOptionsField', $field, $fieldName);
+        return $field;
+    }
+
+    /**
+     * Returns a singleton of the class held by the gridfield.
      * @return \SilverStripe\ORM\DataObject
      */
     protected function getDummyObject()
