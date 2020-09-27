@@ -91,7 +91,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
             null
         );
         $button
-        ->addExtraClass('btn btn-secondary font-icon-trash btn--icon-large')
+        ->addExtraClass('btn btn-secondary font-icon-trash btn--icon-large action_import')
         ->setForm($gridField->getForm())
         ->setAttribute('data-toggle', 'modal')
         ->setAttribute('aria-controls', $modalID)
