@@ -1,7 +1,13 @@
 <?php
 
-namespace SilverStripe\Forms\GridField;
+namespace Signify\Forms\GridField;
 
+use SilverStripe\Forms\GridField\GridField_HTMLProvider;
+use SilverStripe\Forms\GridField\GridField_ActionProvider;
+use SilverStripe\Forms\GridField\GridField_URLHandler;
+use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\Forms\GridField\GridFieldImportButton;
+use SilverStripe\Forms\GridField\GridField_FormAction;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Extensible;
 use SilverStripe\Security\Security;
@@ -14,7 +20,10 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\Forms\Form;
 
 /**
- * Adds an "Print" button to the bottom or top of a GridField.
+ * Adds an delete button to the bottom or top of a GridField.
+ * Clicking the button opens a modal in which a user can select filter options.
+ * The user can then delete models from the gridfield's list based on those filter options.
+ * TODO: Allow developer-defined filter fields as per {@link \SilverStripe\Forms\GridField\GridFieldDataColumns::setDisplayFields()}
  */
 class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridField_ActionProvider, GridField_URLHandler
 {
