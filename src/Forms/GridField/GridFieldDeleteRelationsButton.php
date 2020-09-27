@@ -289,6 +289,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
      * Get the fields to display in the filter modal.
      * If {@link setFilterFields()} has not been called, this will be based on the class's getCMSFields
      * implementation or the default scaffolded fields for the class.
+     *
      * @return FieldList
      */
     public function getFilterFields()
@@ -315,22 +316,53 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
         return $this->filterFields;
     }
 
+    /**
+     * Set the fields to display in the filter modal.
+     * Names of fields must match the names of database fields on the class which is held by the gridfield.
+     *
+     * @param array|FieldList $fields
+     * @return $this
+     */
     public function setFilterFields($fields)
     {
         throw new \LogicException('Not implemented yet.');
         // TODO: Allow developer-defined filter fields as per {@link \SilverStripe\Forms\GridField\GridFieldDataColumns::setDisplayFields()}
     }
 
+    /**
+     * Get the options by which each field can be filtered.
+     *
+     * @return array
+     */
     public function getFilterOptions()
     {
         return $this->filterOptions;
     }
 
+    /**
+     * Get the options by which each field can be filtered.
+     *
+     * The keys are names of database fields on the class which is held by the gridfield.
+     * Values must be an array of search filter options.
+     *
+     * Note that if a given field is not set, this will fall back to the default options.
+     * The key for the default options is {@link GridFieldDeleteRelationsButton::DEFAULT_OPTION}
+     *
+     * @param array $options
+     * @return $this
+     * @link https://docs.silverstripe.org/en/4/developer_guides/model/searchfilters/
+     */
     public function setFilterOptions(array $options)
     {
         $this->filterOptions = array_merge($this->filterOptions, $options);
+        return $this;
     }
 
+    /**
+     * Get all composite fields for the modal form.
+     *
+     * @return FieldList
+     */
     protected function getPreparedFilterFields()
     {
         $fields = FieldList::create();
@@ -340,6 +372,13 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
         return $fields;
     }
 
+    /**
+     * Get a CompositeField for the given field which contains all
+     * necessary filter fields to support the given field.
+     *
+     * @param FormField $field
+     * @return \SilverStripe\Forms\CompositeField
+     */
     protected function getFieldAsComposite(FormField $field)
     {
         $group = FieldGroup::create(
@@ -365,6 +404,13 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
         return $group;
     }
 
+    /**
+     * Get a DropdownField with filter options as defined in
+     * {@link GridFieldDeleteRelationsButton::setFilterOptions()}.
+     *
+     * @param string $fieldName
+     * @return DropdownField
+     */
     protected function getFilterOptionsField($fieldName)
     {
         $allOptions = $this->filterOptions;
@@ -389,6 +435,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
 
     /**
      * Returns a singleton of the class held by the gridfield.
+     *
      * @return \SilverStripe\ORM\DataObject
      */
     protected function getDummyObject()
