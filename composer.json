@@ -1,27 +1,27 @@
 {
-    "name": "signify-nz/silverstripe-security-headers",
-    "type": "silverstripe-vendormodule",
-    "license": "BSD-3-Clause",
-    "authors": [
-        {
-            "name": "Signify Ltd",
-            "homepage": "https://www.signify.co.nz/"
-        }
-    ],
-    "support": {
-        "issues": "https://github.com/signify-nz/silverstripe-security-headers/issues"
-    },
-    "require": {
-        "silverstripe/framework": "^4.0",
-        "silverstripe/cms": "^4.0"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^5.7",
-        "squizlabs/php_codesniffer": "^3.0"
-    },
-    "autoload": {
-        "psr-4": {
-            "Signify\\": "src/"
-        }
+  "name": "signify-nz/silverstripe-security-headers",
+  "type": "silverstripe-vendormodule",
+  "license": "BSD-3-Clause",
+  "authors": [
+    {
+      "name": "Signify Ltd",
+      "homepage": "https://www.signify.co.nz/"
     }
+  ],
+  "support": {
+    "issues": "https://github.com/signify-nz/silverstripe-security-headers/issues"
+  },
+  "require": {
+    "silverstripe/framework": "^4.0",
+    "silverstripe/cms": "^4.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^5.7",
+    "squizlabs/php_codesniffer": "^3.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Signify\\": "src/"
+    }
+  }
 }
