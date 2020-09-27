@@ -63,8 +63,8 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
      */
     protected $filterOptions = [
         '__default' => [
-            'LesserThan',
-            'LesserThanOrEqual',
+            'LessThan',
+            'LessThanOrEqual',
             'GreaterThan',
             'GreaterThanOrEqual',
             'ExactMatch',
