@@ -5,7 +5,7 @@ namespace Signify\Reports;
 use SilverStripe\Reports\Report;
 use Signify\Models\CSPViolation;
 use SilverStripe\Forms\GridField\GridFieldDeleteAction;
-use SilverStripe\Forms\GridField\GridFieldDeleteRelationsButton;
+use Signify\Forms\GridField\GridFieldDeleteRelationsButton;
 
 class CSPViolationsReport extends Report
 {
