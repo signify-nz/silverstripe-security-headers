@@ -19,6 +19,14 @@
     "phpunit/phpunit": "^5.7",
     "squizlabs/php_codesniffer": "^3.0"
   },
+  "suggest": {
+    "unclecheese/display-logic": "Provides functionality to hide fields that shouldn't used for filtering."
+  },
+  "extra": {
+    "expose": [
+      "dist"
+    ]
+  },
   "autoload": {
     "psr-4": {
       "Signify\\": "src/"

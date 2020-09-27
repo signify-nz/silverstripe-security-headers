@@ -6,6 +6,7 @@ use SilverStripe\Reports\Report;
 use Signify\Models\CSPViolation;
 use SilverStripe\Forms\GridField\GridFieldDeleteAction;
 use Signify\Forms\GridField\GridFieldDeleteRelationsButton;
+use SilverStripe\View\Requirements;
 
 class CSPViolationsReport extends Report
 {
@@ -31,6 +32,7 @@ class CSPViolationsReport extends Report
 
     public function getReportField()
     {
+        Requirements::css('signify-nz/silverstripe-security-headers:client/dist/main.css');
         /* @var $gridConfig \SilverStripe\Forms\GridField\GridFieldConfig */
         $gridField = parent::getReportField();
         $gridConfig = $gridField->getConfig();
