@@ -1,5 +1,5 @@
-<div id="$ModalID.ATT" class="modal fade grid-field-import" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
+<div id="$ModalID.ATT" class="modal modal--gridfield-delete-relations fade grid-field-import" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog--gridfield-delete-relations" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="modal-title">$ModalTitle</h2>
