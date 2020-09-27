@@ -73,12 +73,11 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
         $hasMessage = $form && $form->getMessage();
 
         // Render modal
-        $template = SSViewer::get_templates_by_class(GridFieldImportButton::class, '_Modal');
+        $template = SSViewer::get_templates_by_class(__CLASS__, '_Modal');
         $viewer = new ArrayData([
-            'ImportModalTitle' => $this->getModalTitle(),
-            'ImportModalID' => $modalID,
-            'ImportIframe' => false,
-            'ImportForm' => $form,
+            'ModalTitle' => $this->getModalTitle(),
+            'ModalID' => $modalID,
+            'ModalForm' => $form,
         ]);
         $modal = $viewer->renderWith($template)->forTemplate();
 
