@@ -182,27 +182,6 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
     }
 
     /**
-     * @return string
-     */
-    public function getModalTitle()
-    {
-        if (!$this->modalTitle) {
-            $this->modalTitle = "Delete {$this->getDummyObject()->plural_name()}";
-        }
-        return $this->modalTitle;
-    }
-
-    /**
-     * @param string $modalTitle
-     * @return $this
-     */
-    public function setModalTitle($modalTitle)
-    {
-        $this->modalTitle = $modalTitle;
-        return $this;
-    }
-
-    /**
      * Generate a modal form for a single {@link DataObject} subclass.
      *
      * @param GridField $gridField
@@ -355,6 +334,31 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
     public function setFilterOptions(array $options)
     {
         $this->filterOptions = array_merge($this->filterOptions, $options);
+        return $this;
+    }
+
+    /**
+     * Get the title of the filter modal.
+     *
+     * @return string
+     */
+    public function getModalTitle()
+    {
+        if (!$this->modalTitle) {
+            $this->modalTitle = "Delete {$this->getDummyObject()->plural_name()}";
+        }
+        return $this->modalTitle;
+    }
+
+    /**
+     * Set the title of the filter modal.
+     *
+     * @param string $modalTitle
+     * @return $this
+     */
+    public function setModalTitle($modalTitle)
+    {
+        $this->modalTitle = $modalTitle;
         return $this;
     }
 
