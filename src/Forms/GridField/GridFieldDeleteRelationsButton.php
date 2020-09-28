@@ -495,6 +495,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
         if (empty($data)) {
             return array();
         }
+        $data = urldecode($data);
 
         $data = preg_replace_callback('/(?:^|(?<=&))[^=[]+/', function($match) {
             return bin2hex(urldecode($match[0]));
