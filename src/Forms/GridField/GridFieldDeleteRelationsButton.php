@@ -440,7 +440,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
         );
         if (in_array('ExactMatch', $options)) {
             $field->setValue('ExactMatch');
-        } else {
+        } else if (count($options) !== 1) {
             $field->setHasEmptyDefault(true);
         }
         $this->extend('updateFilterOptionsField', $field, $fieldName);
