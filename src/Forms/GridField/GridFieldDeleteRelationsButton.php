@@ -280,7 +280,11 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
 
         $message = '';
         if ($count = $deletions->count()) {
-            //TODO delete them
+            /* @var $dataObject DataObject */
+            foreach ($deletions as $dataObject) {
+                $dataObject->delete();
+                $dataObject->destroy();
+            }
             $message .= "Deleted {$count} records.";
         } else {
             $message .= 'Nothing to delete';
