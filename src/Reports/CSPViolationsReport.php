@@ -54,7 +54,7 @@ class CSPViolationsReport extends Report
                 DropdownField::create('Disposition', 'Disposition', array_combine($dispositions, $dispositions)),
                 TextField::create('BlockedURI'),
                 ListboxField::create('EffectiveDirective', 'EffectiveDirective', array_combine($directives, $directives)),
-                NumericField::create('Violations'),
+                NumericField::create('Violations', '# Violations'),
                 TextField::create('Documents.URI', 'Document URIs'),
             ])
             ->setFilterOptions([
