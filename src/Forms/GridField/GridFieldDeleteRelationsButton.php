@@ -83,6 +83,29 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
     const FILTER_INVERT_SUFFIX = '__FilterInvert';
 
     /**
+     * Filter options which are commonly used with string values.
+     * @var array
+     */
+    const STRING_FILTER_OPTIONS = [
+        'ExactMatch',
+        'PartialMatch',
+        'StartsWith',
+        'EndsWith',
+    ];
+
+    /**
+     * Filter options which are commonly used with numbers or date values.
+     * @var array
+     */
+    const NUMBER_DATE_FILTER_OPTIONS = [
+        'ExactMatch',
+        'LessThan',
+        'LessThanOrEqual',
+        'GreaterThan',
+        'GreaterThanOrEqual',
+    ];
+
+    /**
      * @param string $targetFragment The HTML fragment to write the button into
      */
     public function __construct($targetFragment = "after")

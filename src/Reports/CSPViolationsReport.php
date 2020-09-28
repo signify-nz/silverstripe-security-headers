@@ -58,38 +58,16 @@ class CSPViolationsReport extends Report
                 TextField::create('Documents.URI', 'Document URIs'),
             ])
             ->setFilterOptions([
-                'ReportedTime' => [
-                    'ExactMatch',
-                    'LessThan',
-                    'LessThanOrEqual',
-                    'GreaterThan',
-                    'GreaterThanOrEqual',
-                ],
+                'ReportedTime' => GridFieldDeleteRelationsButton::NUMBER_DATE_FILTER_OPTIONS,
                 'Disposition' => [
                     'ExactMatch',
                 ],
-                'BlockedURI' => [
-                    'ExactMatch',
-                    'PartialMatch',
-                    'StartsWith',
-                    'EndsWith',
-                ],
+                'BlockedURI' => GridFieldDeleteRelationsButton::STRING_FILTER_OPTIONS,
                 'EffectiveDirective' => [
                     'ExactMatch',
                 ],
-                'Violations' => [
-                    'ExactMatch',
-                    'LessThan',
-                    'LessThanOrEqual',
-                    'GreaterThan',
-                    'GreaterThanOrEqual',
-                ],
-                'Documents.URI' => [
-                    'ExactMatch',
-                    'PartialMatch',
-                    'StartsWith',
-                    'EndsWith',
-                ],
+                'Violations' => GridFieldDeleteRelationsButton::NUMBER_DATE_FILTER_OPTIONS,
+                'Documents.URI' => GridFieldDeleteRelationsButton::STRING_FILTER_OPTIONS,
             ]),
         ]);
 
