@@ -7,6 +7,11 @@ use Signify\Models\CSPViolation;
 use SilverStripe\Forms\GridField\GridFieldDeleteAction;
 use Signify\Forms\GridField\GridFieldDeleteRelationsButton;
 use SilverStripe\View\Requirements;
+use SilverStripe\Forms\DropdownField;
+use SilverStripe\Forms\NumericField;
+use SilverStripe\Forms\TextField;
+use SilverStripe\Forms\DatetimeField;
+use SilverStripe\Forms\ListboxField;
 
 class CSPViolationsReport extends Report
 {
@@ -38,9 +43,54 @@ class CSPViolationsReport extends Report
         $gridField = parent::getReportField();
         $gridConfig = $gridField->getConfig();
 
+        $dispositions = CSPViolation::get()->columnUnique('Disposition');
+        $directives = CSPViolation::get()->columnUnique('EffectiveDirective');
+
         $gridConfig->addComponents([
             new GridFieldDeleteAction(),
-            GridFieldDeleteRelationsButton::create('buttons-before-left'),
+            GridFieldDeleteRelationsButton::create('buttons-before-left')
+            ->setFilterFields([
+                DatetimeField::create('ReportedTime'),
+                DropdownField::create('Disposition', 'Disposition', array_combine($dispositions, $dispositions)),
+                TextField::create('BlockedURI'),
+                ListboxField::create('EffectiveDirective', 'EffectiveDirective', array_combine($directives, $directives)),
+                NumericField::create('Violations'),
+                TextField::create('Documents.URI', 'Document URIs'),
+            ])
+            ->setFilterOptions([
+                'ReportedTime' => [
+                    'ExactMatch',
+                    'LessThan',
+                    'LessThanOrEqual',
+                    'GreaterThan',
+                    'GreaterThanOrEqual',
+                ],
+                'Disposition' => [
+                    'ExactMatch',
+                ],
+                'BlockedURI' => [
+                    'ExactMatch',
+                    'PartialMatch',
+                    'StartsWith',
+                    'EndsWith',
+                ],
+                'EffectiveDirective' => [
+                    'ExactMatch',
+                ],
+                'Violations' => [
+                    'ExactMatch',
+                    'LessThan',
+                    'LessThanOrEqual',
+                    'GreaterThan',
+                    'GreaterThanOrEqual',
+                ],
+                'Documents.URI' => [
+                    'ExactMatch',
+                    'PartialMatch',
+                    'StartsWith',
+                    'EndsWith',
+                ],
+            ]),
         ]);
 
         return $gridField;
