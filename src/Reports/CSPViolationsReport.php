@@ -17,12 +17,13 @@ class CSPViolationsReport extends Report
 
     public function description()
     {
-        return _t(
+        $desc = _t(
             __CLASS__ . '.DESCRIPTION',
             'Lists violations caught by the Content Security Policy.'
             . ' For more details see <a href="{url}" target="_blank">the MDN documentation</a>.',
             ['url' => 'https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP#Violation_report_syntax']
         );
+        return str_replace('</a>', ' <span class="font-icon-external-link"></span></a>', $desc);
     }
 
     public function sourceRecords($params = [], $sort = null, $limit = null)
