@@ -229,7 +229,10 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
      */
     public function handleDelete($gridField, HTTPRequest $request)
     {
-        $data = $request->requestVars();
+        $data = $this->parseQueryString($request->getBody());
+        if (empty($data)) {
+            $data = $request->requestVars();
+        }
         $filters = array();
 
         // Prepare filters based on user input.
@@ -455,5 +458,27 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
             $this->dummyObject = $this->gridField->getModelClass()::singleton();
         }
         return $this->dummyObject;
+    }
+
+    /**
+     * An alternative to {@link parse_str()} which keeps periods intact.
+     * This allows using dot syntax for filtering by relationships.
+     *
+     * @param string $data
+     * @return array
+     */
+    protected function parseQueryString($data)
+    {
+        if (empty($data)) {
+            return array();
+        }
+
+        $data = preg_replace_callback('/(?:^|(?<=&))[^=[]+/', function($match) {
+            return bin2hex(urldecode($match[0]));
+        }, $data);
+
+        parse_str($data, $result);
+
+        return array_combine(array_map('hex2bin', array_keys($result)), $result);
     }
 }
