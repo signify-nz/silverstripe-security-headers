@@ -6,6 +6,7 @@ use SilverStripe\ORM\FieldType\DBField;
 
 class CSPViolation extends DataObject
 {
+    private static $plural_name = 'CSP Violations';
 
     private static $table_name = 'Signify_CSPViolation';
 

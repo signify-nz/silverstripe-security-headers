@@ -10,6 +10,7 @@ use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\CMS\Controllers\RootURLController;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\ORM\FieldType\DBDatetime;
+use Signify\Extensions\SecurityHeaderControllerExtension;
 
 class CSPViolationsController extends Controller
 {
@@ -173,15 +174,20 @@ class CSPViolationsController extends Controller
     /**
      * If the origin header is set, return true if it is the same as the current absolute base URL.
      *
-     * The origin header may not be set for report-to requests, so null must be considered sameorigin.
-     *
      * @param HTTPRequest $request
      * @return boolean
      */
     protected function isSameOrigin(HTTPRequest $request)
     {
         $origin = $request->getHeader('origin');
-        return $origin == null || $origin == rtrim(Director::absoluteBaseURL(), '/');
+
+        // The origin header may not be set for report-to requests, so null must be considered sameorigin.
+        if (SecurityHeaderControllerExtension::config()->get('use_report_to') && $origin === null) {
+            return true;
+        }
+
+        // If not using report-to, or the origin header is set, only allow same origin requests.
+        return $origin == rtrim(Director::absoluteBaseURL(), '/');
     }
 
     /**

@@ -119,3 +119,14 @@ Note that this does not disable the endpoint or remove the report from the CMS -
 If `enable_reporting` is set to false, the value of `use_report_to` (see above) no longer matters
 
 Note that this also doesn't affect the ability to set the CSP to report-only mode with SecurityHeaderControllerExtension (see [Apply the extensions](#apply-the-extensions)).
+
+## Development
+Styling used in this module has not yet required anything more complex than a simple sass command to compile it.  
+To compile the sass, use the following command:
+```
+sass --style=compressed client/src/scss/main.scss client/dist/main.css
+```
+To compile the sass interactively while developing, use the following command:
+```
+sass --watch --style=compressed client/src/scss/main.scss client/dist/main.css
+```
