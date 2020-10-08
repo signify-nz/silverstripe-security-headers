@@ -8,6 +8,10 @@ use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
 use SilverStripe\Control\Director;
+use SilverStripe\Dev\DevelopmentAdmin;
+use SilverStripe\Dev\DevBuildController;
+use SilverStripe\Control\Controller;
+use SilverStripe\ORM\DatabaseAdmin;
 
 class SecurityHeaderControllerExtension extends Extension
 {
@@ -104,10 +108,13 @@ class SecurityHeaderControllerExtension extends Extension
      */
     public function isCSPReportingOnly()
     {
-        // If the CSPReportingOnly field doesn't exist on SiteConfig yet, we're not in report-only mode.
-        // This is necessary to let dev/build run safely the first time SecurityHeaderSiteconfigExtension is applied.
-        $table = DataObject::getSchema()->baseDataTable(SiteConfig::class);
-        if (!in_array('CSPReportingOnly', array_keys(DB::field_list($table)))) {
+        $devBuildControllers = [
+            DevBuildController::class,
+            DevelopmentAdmin::class,
+            DatabaseAdmin::class
+        ];
+        // If we're running one of these controllers, checking SiteConfig can cause issues.
+        if (in_array(get_class($this->owner), $devBuildControllers)) {
             return false;
         }
         return SiteConfig::current_site_config()->CSPReportingOnly;
