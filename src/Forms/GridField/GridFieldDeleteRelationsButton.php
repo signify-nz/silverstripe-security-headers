@@ -257,9 +257,9 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
         if (empty($data)) {
             $data = $request->requestVars();
         }
-        $filters = array();
 
         // Prepare filters based on user input.
+        $filters = array();
         foreach ($data as $key => $value) {
             // If this fields is a "filter by" field, and the value is truthy, add the filter.
             if (preg_match('/' . static::FILTER_BY_SUFFIX . '$/', $key) && $value) {
