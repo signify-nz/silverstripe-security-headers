@@ -74,7 +74,7 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
 
     public function testReportURIAppended()
     {
-        $testURI = 'https://example.co.nz/endpoint.aspx';
+        $testURI = 'https://example.test/endpoint.aspx';
         TestUtils::testWithConfig(
             [
                 SecurityHeaderControllerExtension::class => [

@@ -427,13 +427,13 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
             [
                 $filterBy = CheckboxField::create(
                     $field->Name . static::FILTER_BY_SUFFIX,
-                    "Filter by {$field->Title()}?"
+                    "Filter by {$field->Title()}"
                 ),
                 $field,
                 $options = $this->getFilterOptionsField($field->Name),
                 $invert = CheckboxField::create(
                     $field->Name . static::FILTER_INVERT_SUFFIX,
-                    'Invert Filter?'
+                    'Invert Filter'
                 ),
             ]
         );
