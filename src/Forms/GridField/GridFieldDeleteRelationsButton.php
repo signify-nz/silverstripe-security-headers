@@ -434,7 +434,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
                     "Filter by {$field->Title()}"
                 ),
                 $field,
-                $options = $this->getFilterOptionsField($field->Name),
+                $options = $this->getFilterTypesField($field->Name),
                 $invert = CheckboxField::create(
                     $field->Name . static::FILTER_INVERT_SUFFIX,
                     'Invert Filter'
@@ -450,13 +450,13 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
     }
 
     /**
-     * Get a DropdownField with filter options as defined in
+     * Get a DropdownField with filter types as defined in
      * {@link GridFieldDeleteRelationsButton::setFilterOptions()}.
      *
      * @param string $fieldName
      * @return DropdownField
      */
-    protected function getFilterOptionsField($fieldName)
+    protected function getFilterTypesField($fieldName)
     {
         $allOptions = $this->filterOptions;
         if (array_key_exists($fieldName, $allOptions)) {
