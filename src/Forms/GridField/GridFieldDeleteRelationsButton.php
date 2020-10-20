@@ -22,6 +22,7 @@ use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\FormField;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Core\Manifest\ModuleLoader;
+use SilverStripe\ORM\ArrayList;
 
 /**
  * Adds an delete button to the bottom or top of a GridField.
@@ -275,8 +276,11 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
         }
         // Ensure data objects are filtered to only include items in this gridfield.
         $filters['ID'] = $gridField->getManipulatedList()->column('ID');
-
-        $deletions = $gridField->getModelClass()::get()->filter($filters);
+        if (empty($filters['ID'])) {
+            $deletions = new ArrayList();
+        } else {
+            $deletions = $gridField->getModelClass()::get()->filter($filters);
+        }
 
         $message = '';
         if ($count = $deletions->count()) {
