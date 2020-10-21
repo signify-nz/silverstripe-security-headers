@@ -144,11 +144,22 @@ class CSPViolationsController extends Controller
                 case self::REPORT_TIME:
                     return $cspReport[self::REPORT_TIME];
                 case self::DISPOSITION:
-                    return $cspReport['disposition'];
+                    if (!empty($cspReport['disposition'])) {
+                        return $cspReport['disposition'];
+                    } else {
+                        // Firefox doesn't report the disposition.
+                        return 'unknown';
+                    }
+                    return ;
                 case self::BLOCKED_URI:
                     return $cspReport['blocked-uri'];
                 case self::EFFECTIVE_DIRECTIVE:
-                    return $cspReport['effective-directive'];
+                    if (!empty($cspReport['effective-directive'])) {
+                        return $cspReport['effective-directive'];
+                    } else {
+                        // Firefox doesn't report the effective directive.
+                        return $cspReport['violated-directive'];
+                    }
                 case self::DOCUMENT_URI:
                     return $cspReport['document-uri'];
             }
