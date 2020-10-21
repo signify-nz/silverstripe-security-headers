@@ -262,13 +262,13 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
         $filters = array();
         foreach ($data as $key => $value) {
             // If this fields is a "filter by" field, and the value is truthy, add the filter.
-            if (preg_match('/' . static::FILTER_BY_SUFFIX . '$/', $key) && $value) {
-                $fieldName = str_replace(static::FILTER_BY_SUFFIX, '', $key);
-                $filterType = $data[$fieldName . static::OPTION_FIELD_SUFFIX];
+            if (preg_match('/' . self::FILTER_BY_SUFFIX . '$/', $key) && $value) {
+                $fieldName = str_replace(self::FILTER_BY_SUFFIX, '', $key);
+                $filterType = $data[$fieldName . self::OPTION_FIELD_SUFFIX];
                 if (empty($filterType)) {
                     $filterType = 'ExactMatch';
                 }
-                if (!empty($data[$fieldName . static::FILTER_INVERT_SUFFIX])) {
+                if (!empty($data[$fieldName . self::FILTER_INVERT_SUFFIX])) {
                     $filterType .= ':not';
                 }
                 $filters["$fieldName:$filterType"] = $data[$fieldName];
@@ -430,13 +430,13 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
             "'{$field->Title()}' filter group",
             [
                 $filterBy = CheckboxField::create(
-                    $field->Name . static::FILTER_BY_SUFFIX,
+                    $field->Name . self::FILTER_BY_SUFFIX,
                     "Filter by {$field->Title()}"
                 ),
                 $field,
                 $options = $this->getFilterTypesField($field->Name),
                 $invert = CheckboxField::create(
-                    $field->Name . static::FILTER_INVERT_SUFFIX,
+                    $field->Name . self::FILTER_INVERT_SUFFIX,
                     'Invert Filter'
                 ),
             ]
@@ -462,10 +462,10 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
         if (array_key_exists($fieldName, $allOptions)) {
             $options = $allOptions[$fieldName];
         } else {
-            $options = $allOptions[static::DEFAULT_OPTION];
+            $options = $allOptions[self::DEFAULT_OPTION];
         }
         $field = DropdownField::create(
-            $fieldName . static::OPTION_FIELD_SUFFIX,
+            $fieldName . self::OPTION_FIELD_SUFFIX,
             "$fieldName Filter Type",
             array_combine($options, $options)
         );
