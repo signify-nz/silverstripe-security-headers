@@ -82,6 +82,8 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
 
     const FILTER_INVERT_SUFFIX = '__FilterInvert';
 
+    const DELETE_ALL = 'DeleteAll__FilterAll';
+
     /**
      * Filter options which are commonly used with string values.
      * @var array
@@ -246,6 +248,25 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
                 $filters["$fieldName:$filterType"] = $data[$fieldName];
             }
         }
+
+        if (!empty($filters) && !empty($data[self::DELETE_ALL])) {
+            $form = $this->DeletionForm($gridField);
+            $form->sessionMessage(
+                "A filter checkbox and 'Delete all {$this->getDummyObject()->plural_name()}'"
+                . " cannot be checked simultaneously."
+            );
+            return $gridField->redirectBack();
+        }
+
+        if (empty($filters) && empty($data[self::DELETE_ALL])) {
+            $form = $this->DeletionForm($gridField);
+            $form->sessionMessage(
+                "At least one filter checkbox or 'Delete all {$this->getDummyObject()->plural_name()}'"
+                . " must be checked."
+            );
+            return $gridField->redirectBack();
+        }
+
         // Ensure data objects are filtered to only include items in this gridfield.
         $filters['ID'] = $gridField->getManipulatedList()->column('ID');
         if (empty($filters['ID'])) {
@@ -383,6 +404,10 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
     protected function getPreparedFilterFields()
     {
         $fields = FieldList::create();
+        $fields->add(CheckboxField::create(
+            self::DELETE_ALL,
+            "Delete all {$this->getDummyObject()->plural_name()}"
+        ));
         foreach ($this->getFilterFields() as $field) {
             $fields->add($this->getFieldAsComposite($field));
         }
@@ -417,7 +442,9 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
             $field->displayIf($filterBy->Name)->isChecked();
             $options->displayIf($filterBy->Name)->isChecked();
             $invert->displayIf($filterBy->Name)->isChecked();
+            $group->hideIf(self::DELETE_ALL)->isChecked();
         }
+
         return $group;
     }
 
