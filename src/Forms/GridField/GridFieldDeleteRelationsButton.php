@@ -21,6 +21,8 @@ use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\FormField;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Core\Manifest\ModuleLoader;
+use SilverStripe\Forms\HiddenField;
+use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\ArrayList;
 
 /**
@@ -431,7 +433,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
                     "Filter by {$field->Title()}"
                 ),
                 $field,
-                $options = $this->getFilterTypesField($field->Name),
+                ...$options = $this->getFilterTypesField($field->Name),
                 $invert = CheckboxField::create(
                     $field->Name . self::FILTER_INVERT_SUFFIX,
                     'Invert Filter'
@@ -440,7 +442,11 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
         );
         if (ModuleLoader::inst()->getManifest()->moduleExists('unclecheese/display-logic')) {
             $field->displayIf($filterBy->Name)->isChecked();
-            $options->displayIf($filterBy->Name)->isChecked();
+            foreach ($options as $optionsField) {
+                if (!$optionsField instanceof HiddenField) {
+                    $optionsField->displayIf($filterBy->Name)->isChecked();
+                }
+            }
             $invert->displayIf($filterBy->Name)->isChecked();
             $group->hideIf(self::DELETE_ALL)->isChecked();
         }
@@ -453,7 +459,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
      * {@link GridFieldDeleteRelationsButton::setFilterOptions()}.
      *
      * @param string $fieldName
-     * @return DropdownField
+     * @return FormField[]
      */
     protected function getFilterTypesField($fieldName)
     {
@@ -463,18 +469,32 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
         } else {
             $options = $allOptions[self::DEFAULT_OPTION];
         }
-        $field = DropdownField::create(
-            $fieldName . self::OPTION_FIELD_SUFFIX,
-            "$fieldName Filter Type",
-            array_combine($options, $options)
-        );
-        if (in_array('ExactMatch', $options)) {
-            $field->setValue('ExactMatch');
-        } else if (count($options) !== 1) {
+        $fields = array();
+        if (count($options) == 1) {
+            $fields[] = ReadonlyField::create(
+                $fieldName . self::OPTION_FIELD_SUFFIX . '__READONLY',
+                "$fieldName Filter Type",
+                $options[0]
+            );
+            $fields[] = HiddenField::create(
+                $fieldName . self::OPTION_FIELD_SUFFIX,
+                "$fieldName Filter Type",
+                $options[0]
+            );
+        } else {
+            $field = DropdownField::create(
+                $fieldName . self::OPTION_FIELD_SUFFIX,
+                "$fieldName Filter Type",
+                array_combine($options, $options)
+            );
             $field->setHasEmptyDefault(true);
+            if (in_array('ExactMatch', $options)) {
+                $field->setValue('ExactMatch');
+            }
+            $fields[] = $field;
         }
-        $this->extend('updateFilterOptionsField', $field, $fieldName);
-        return $field;
+        $this->extend('updateFilterOptionsField', $fields, $fieldName);
+        return $fields;
     }
 
     /**
