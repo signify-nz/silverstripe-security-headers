@@ -3,7 +3,6 @@
 namespace Signify\Forms\GridField;
 
 use SilverStripe\Forms\GridField\GridField_HTMLProvider;
-use SilverStripe\Forms\GridField\GridField_ActionProvider;
 use SilverStripe\Forms\GridField\GridField_URLHandler;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridField_FormAction;
@@ -29,7 +28,7 @@ use SilverStripe\ORM\ArrayList;
  * Clicking the button opens a modal in which a user can select filter options.
  * The user can then delete models from the gridfield's list based on those filter options.
  */
-class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridField_ActionProvider, GridField_URLHandler
+class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridField_URLHandler
 {
     use Injectable, Extensible;
 
@@ -161,33 +160,6 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
         return [
             $this->targetFragment => $button->Field()
         ];
-    }
-
-    /**
-     * delete is an action button
-     *
-     * @param GridField $gridField
-     *
-     * @return array
-     */
-    public function getActions($gridField)
-    {
-        return [
-            'delete',
-            'deletionForm',
-        ];
-    }
-
-    public function handleAction(GridField $gridField, $actionName, $arguments, $data)
-    {
-        switch ($actionName) {
-            case 'delete':
-                return $this->handleDelete($data, $gridField);
-            case 'deletionForm':
-                return $this->DeletionForm($gridField);
-            default:
-                return null;
-        }
     }
 
     /**
