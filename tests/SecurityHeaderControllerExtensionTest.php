@@ -10,7 +10,7 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
 {
     const HEADER_TEST_ROUTE = 'security-header-test';
 
-    private $originalHeaderValues = null;
+    private static $originalHeaderValues = null;
 
     private static $testHeaders = [
         'Content-Security-Policy' => 'test-value1',
@@ -20,7 +20,7 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
         'X-Content-Type-Options' => 'test-value5'
     ];
 
-    public function setUpOnce()
+    public static function setUpBeforeClass()
     {
         // Add extension and a new test route.
         Controller::add_extension(SecurityHeaderControllerExtension::class);
@@ -29,16 +29,16 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
         ));
 
         // Set test header values.
-        $this->originalHeaderValues = SecurityHeaderControllerExtension::config()->get('headers');
+        static::$originalHeaderValues = SecurityHeaderControllerExtension::config()->get('headers');
         SecurityHeaderControllerExtension::config()->update('headers', self::$testHeaders);
     }
 
-    public function tearDownOnce()
+    public static function tearDownAfterClass()
     {
         // Remove extension and test route. Reset headers to defaults.
         Controller::remove_extension(SecurityHeaderControllerExtension::class);
         Director::config()->remove('rules', self::HEADER_TEST_ROUTE);
-        SecurityHeaderControllerExtension::config()->update('headers', $this->originalHeaderValues);
+        SecurityHeaderControllerExtension::config()->update('headers', static::$originalHeaderValues);
     }
 
     public function testResponseHeaders()

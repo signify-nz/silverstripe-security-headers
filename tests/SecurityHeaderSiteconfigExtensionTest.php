@@ -11,7 +11,7 @@ class SecurityHeaderSiteconfigExtensionTest extends FunctionalTest
 {
     const HEADER_TEST_ROUTE = 'security-header-test';
 
-    public function setUpOnce()
+    public static function setUpBeforeClass()
     {
         // Add extension and a new test route.
         SiteConfig::add_extension(SecurityHeaderSiteconfigExtension::class);
@@ -20,7 +20,7 @@ class SecurityHeaderSiteconfigExtensionTest extends FunctionalTest
         ));
     }
 
-    public function tearDownOnce()
+    public static function tearDownAfterClass()
     {
         // Remove extension and test route.
         SiteConfig::remove_extension(SecurityHeaderSiteconfigExtension::class);
