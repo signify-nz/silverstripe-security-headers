@@ -13,6 +13,7 @@ class SecurityHeaderSiteconfigExtensionTest extends FunctionalTest
 
     public static function setUpBeforeClass()
     {
+        parent::setUpBeforeClass();
         // Add extension and a new test route.
         SiteConfig::add_extension(SecurityHeaderSiteconfigExtension::class);
         Director::config()->update('rules', array(
@@ -22,6 +23,7 @@ class SecurityHeaderSiteconfigExtensionTest extends FunctionalTest
 
     public static function tearDownAfterClass()
     {
+        parent::tearDownAfterClass();
         // Remove extension and test route.
         SiteConfig::remove_extension(SecurityHeaderSiteconfigExtension::class);
         Director::config()->remove('rules', self::HEADER_TEST_ROUTE);

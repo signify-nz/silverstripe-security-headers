@@ -22,6 +22,7 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
 
     public static function setUpBeforeClass()
     {
+        parent::setUpBeforeClass();
         // Add extension and a new test route.
         Controller::add_extension(SecurityHeaderControllerExtension::class);
         Director::config()->update('rules', array(
@@ -35,6 +36,7 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
 
     public static function tearDownAfterClass()
     {
+        parent::tearDownAfterClass();
         // Remove extension and test route. Reset headers to defaults.
         Controller::remove_extension(SecurityHeaderControllerExtension::class);
         Director::config()->remove('rules', self::HEADER_TEST_ROUTE);
