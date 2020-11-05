@@ -20,7 +20,7 @@ composer require signify-nz/silverstripe-security-headers
 
 ## Usage
 
-For information on how to setup and use this module, please refer to the [documentation](docs/00_index.md).
+For information on how to setup and use this module, please refer to the [documentation](docs/en/00_index.md).
 
 ## CSS/JS Development
 ### Setup
