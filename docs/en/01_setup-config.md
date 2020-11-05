@@ -9,7 +9,7 @@ For example, add this to your `_config/config.yml` file:
 ```yml
 SilverStripe\Control\Controller:
   extensions:
-    - Signify\Extensions\SecurityHeaderControllerExtension
+    - Signify\SecurityHeaders\Extensions\SecurityHeaderControllerExtension
 ```
 
 ## Configure the headers
@@ -24,7 +24,7 @@ In the below example, the `X-Frame-Options` header value is changed from the def
 ---
 After: 'signify-security-headers'
 ---
-Signify\Extensions\SecurityHeaderControllerExtension:
+Signify\SecurityHeaders\Extensions\SecurityHeaderControllerExtension:
   headers:
     X-Frame-Options: "allow-from https://example.com/"
 ```
@@ -38,7 +38,7 @@ Note that either `null` or an empty string will have the same effect.
 ---
 After: 'signify-security-headers'
 ---
-Signify\Extensions\SecurityHeaderControllerExtension:
+Signify\SecurityHeaders\Extensions\SecurityHeaderControllerExtension:
   headers:
     Strict-Transport-Security: null
 ```

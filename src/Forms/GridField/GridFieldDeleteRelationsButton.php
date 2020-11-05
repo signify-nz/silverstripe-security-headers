@@ -1,8 +1,8 @@
 <?php
 
-namespace Signify\Forms\GridField;
+namespace Signify\SecurityHeaders\Forms\GridField;
 
-use Signify\Forms\Validators\GridFieldDeleteRelationsValidator;
+use Signify\SecurityHeaders\Forms\Validators\GridFieldDeleteRelationsValidator;
 use SilverStripe\Forms\GridField\GridField_HTMLProvider;
 use SilverStripe\Forms\GridField\GridField_URLHandler;
 use SilverStripe\Forms\GridField\GridField;

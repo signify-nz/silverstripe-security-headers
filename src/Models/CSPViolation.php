@@ -1,5 +1,5 @@
 <?php
-namespace Signify\Models;
+namespace Signify\SecurityHeaders\Models;
 
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBField;

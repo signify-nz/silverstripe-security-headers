@@ -29,7 +29,8 @@
   },
   "autoload": {
     "psr-4": {
-      "Signify\\": "src/"
+      "Signify\\SecurityHeaders\\": "src/",
+      "Signify\\SecurityHeaders\\Tests\\": "tests/"
     }
   }
 }

@@ -1,11 +1,11 @@
 <?php
-namespace Signify\Tests;
+namespace Signify\SecurityHeaders\Tests;
 
 use SilverStripe\Dev\FunctionalTest;
 use SilverStripe\SiteConfig\SiteConfig;
-use Signify\Extensions\SecurityHeaderSiteconfigExtension;
+use Signify\SecurityHeaders\Extensions\SecurityHeaderSiteconfigExtension;
 use SilverStripe\Control\Director;
-use Signify\Extensions\SecurityHeaderControllerExtension;
+use Signify\SecurityHeaders\Extensions\SecurityHeaderControllerExtension;
 
 class SecurityHeaderSiteconfigExtensionTest extends FunctionalTest
 {

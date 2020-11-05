@@ -1,16 +1,16 @@
 <?php
-namespace Signify\Controllers;
+namespace Signify\SecurityHeaders\Controllers;
 
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\Director;
-use Signify\Models\CSPViolation;
-use Signify\Models\CSPDocument;
+use Signify\SecurityHeaders\Models\CSPViolation;
+use Signify\SecurityHeaders\Models\CSPDocument;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\CMS\Controllers\RootURLController;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\ORM\FieldType\DBDatetime;
-use Signify\Extensions\SecurityHeaderControllerExtension;
+use Signify\SecurityHeaders\Extensions\SecurityHeaderControllerExtension;
 
 class CSPViolationsController extends Controller
 {

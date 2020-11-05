@@ -1,6 +1,6 @@
 <?php
 
-namespace Signify\Extensions;
+namespace Signify\SecurityHeaders\Extensions;
 
 use SilverStripe\Core\Extension;
 use SilverStripe\Core\Config\Configurable;

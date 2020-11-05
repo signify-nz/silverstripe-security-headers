@@ -1,8 +1,8 @@
 en:
-  Signify\Reports\CSPViolationsReport:
+  Signify\SecurityHeaders\Reports\CSPViolationsReport:
     DESCRIPTION: 'Lists violations caught by the Content Security Policy. For more details see <a href="{url}" target="_blank">the MDN documentation</a>.'
     TITLE: 'Content security violations'
-  Signify\Forms\GridField\GridFieldDeleteRelationsButton:
+  Signify\SecurityHeaders\Forms\GridField\GridFieldDeleteRelationsButton:
     DELETE_ALL: 'Delete all {pluralName}'
     DELETED:
       one: 'Deleted one record.'

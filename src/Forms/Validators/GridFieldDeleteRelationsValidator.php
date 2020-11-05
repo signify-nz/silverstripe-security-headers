@@ -1,8 +1,8 @@
 <?php
 
-namespace Signify\Forms\Validators;
+namespace Signify\SecurityHeaders\Forms\Validators;
 
-use Signify\Forms\GridField\GridFieldDeleteRelationsButton;
+use Signify\SecurityHeaders\Forms\GridField\GridFieldDeleteRelationsButton;
 use SilverStripe\Forms\Validator;
 
 class GridFieldDeleteRelationsValidator extends Validator
