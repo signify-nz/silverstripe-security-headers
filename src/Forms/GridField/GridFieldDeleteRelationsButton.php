@@ -437,31 +437,36 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
      */
     protected function getFieldAsComposite(FormField $field)
     {
+        $fields = [
+            $filterBy = CheckboxField::create(
+                $field->Name . self::FILTER_BY_SUFFIX,
+                _t(
+                    self::class . '.FILTER_BY',
+                    'Filter by "{fieldName}"',
+                    ['fieldName' => $field->Title()]
+                ),
+            ),
+            $field,
+        ];
+        $options = $this->getFilterTypesField($field->Name);
+        foreach ($options as $option) {
+            $fields[] = $option;
+        }
+        $fields[] = $invert = CheckboxField::create(
+            $field->Name . self::FILTER_INVERT_SUFFIX,
+            _t(
+                self::class . '.FILTER_INVERT',
+                'Invert Filter'
+            ),
+        );
+
         $group = FieldGroup::create(
             _t(
                 self::class . '.FILTER_GROUP',
                 '"{fieldName}" filter group',
                 ['fieldName' => $field->Title()]
             ),
-            [
-                $filterBy = CheckboxField::create(
-                    $field->Name . self::FILTER_BY_SUFFIX,
-                    _t(
-                        self::class . '.FILTER_BY',
-                        'Filter by "{fieldName}"',
-                        ['fieldName' => $field->Title()]
-                    ),
-                ),
-                $field,
-                ...$options = $this->getFilterTypesField($field->Name),
-                $invert = CheckboxField::create(
-                    $field->Name . self::FILTER_INVERT_SUFFIX,
-                    _t(
-                        self::class . '.FILTER_INVERT',
-                        'Invert Filter'
-                    ),
-                ),
-            ]
+            $fields
         );
         if (ModuleLoader::inst()->getManifest()->moduleExists('unclecheese/display-logic')) {
             $group = Wrapper::create($group);
