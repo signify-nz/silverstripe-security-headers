@@ -9,13 +9,14 @@ use Signify\SecurityHeaders\Extensions\SecurityHeaderControllerExtension;
 
 class SecurityHeaderSiteconfigExtensionTest extends FunctionalTest
 {
+    const HEADER_TEST_ROUTE = 'security-header-test';
 
     public function setUpOnce()
     {
         // Add extension and a new test route.
         SiteConfig::add_extension(SecurityHeaderSiteconfigExtension::class);
         Director::config()->update('rules', array(
-            'security-header-test' => 'Controller'
+            self::HEADER_TEST_ROUTE => 'Controller'
         ));
     }
 
@@ -23,12 +24,12 @@ class SecurityHeaderSiteconfigExtensionTest extends FunctionalTest
     {
         // Remove extension and test route.
         SiteConfig::remove_extension(SecurityHeaderSiteconfigExtension::class);
-        Director::config()->remove('rules', 'security-header-test');
+        Director::config()->remove('rules', self::HEADER_TEST_ROUTE);
     }
 
     public function testCSPisNotReportOnly()
     {
-        $response = Director::test('security-header-test');
+        $response = $this->get(self::HEADER_TEST_ROUTE);
         $csp = $response->getHeader('Content-Security-Policy');
         $cspReportOnly = $response->getHeader('Content-Security-Policy-Report-Only');
 
@@ -42,7 +43,7 @@ class SecurityHeaderSiteconfigExtensionTest extends FunctionalTest
         SiteConfig::current_site_config()->write();
         $originalCSP = SecurityHeaderControllerExtension::config()->get('headers')['Content-Security-Policy'];
 
-        $response = Director::test('security-header-test');
+        $response = $this->get(self::HEADER_TEST_ROUTE);
         $csp = $response->getHeader('Content-Security-Policy');
         $cspReportOnly = $response->getHeader('Content-Security-Policy-Report-Only');
 

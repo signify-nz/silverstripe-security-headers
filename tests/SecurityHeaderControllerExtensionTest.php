@@ -8,6 +8,7 @@ use SilverStripe\Control\Director;
 
 class SecurityHeaderControllerExtensionTest extends FunctionalTest
 {
+    const HEADER_TEST_ROUTE = 'security-header-test';
 
     private $originalHeaderValues = null;
 
@@ -24,7 +25,7 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
         // Add extension and a new test route.
         Controller::add_extension(SecurityHeaderControllerExtension::class);
         Director::config()->update('rules', array(
-            'security-header-test' => 'Controller'
+            self::HEADER_TEST_ROUTE => 'Controller'
         ));
 
         // Set test header values.
@@ -36,13 +37,13 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
     {
         // Remove extension and test route. Reset headers to defaults.
         Controller::remove_extension(SecurityHeaderControllerExtension::class);
-        Director::config()->remove('rules', 'security-header-test');
+        Director::config()->remove('rules', self::HEADER_TEST_ROUTE);
         SecurityHeaderControllerExtension::config()->update('headers', $this->originalHeaderValues);
     }
 
     public function testResponseHeaders()
     {
-        $response = Director::test('security-header-test');
+        $response = $this->get(self::HEADER_TEST_ROUTE);
 
         // Test all headers, not just the default ones or just the ones in self::$testHeaders.
         $headersSent = array_merge(SecurityHeaderControllerExtension::config()->get('headers'), self::$testHeaders);
@@ -65,7 +66,7 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
     public function testReportURIAdded()
     {
         $defaultUri = SecurityHeaderControllerExtension::config()->get('report_uri');
-        $response = Director::test('security-header-test');
+        $response = $this->get(self::HEADER_TEST_ROUTE);
         $csp = $response->getHeader('Content-Security-Policy');
 
         $this->assertTrue($this->directiveExists($csp, 'report-uri'), 'Test CSP includes a report-uri directive.');
@@ -85,7 +86,7 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
             ],
             function () use ($testURI) {
                 $defaultUri = SecurityHeaderControllerExtension::config()->get('report_uri');
-                $response = Director::test('security-header-test');
+                $response = $this->get(self::HEADER_TEST_ROUTE);
                 $csp = $response->getHeader('Content-Security-Policy');
 
                 $this->assertTrue($this->directiveExists($csp, 'report-uri'), 'Test CSP includes a report-uri directive.');
@@ -105,7 +106,7 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
                 ],
             ],
             function () {
-                $response = Director::test('security-header-test');
+                $response = $this->get(self::HEADER_TEST_ROUTE);
                 $csp = $response->getHeader('Content-Security-Policy');
                 $reportHeaderExists = $response->getHeader('Report-To') !== null;
 
@@ -118,7 +119,7 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
 
     public function testReportToNotAdded()
     {
-        $response = Director::test('security-header-test');
+        $response = $this->get(self::HEADER_TEST_ROUTE);
         $csp = $response->getHeader('Content-Security-Policy');
         $reportHeaderExists = $response->getHeader('Report-To') !== null;
 
@@ -137,7 +138,7 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
             function () {
                 $defaultEndpoint = SecurityHeaderControllerExtension::config()->get('report_to_group');
                 $defaultUri = SecurityHeaderControllerExtension::config()->get('report_uri');
-                $response = Director::test('security-header-test');
+                $response = $this->get(self::HEADER_TEST_ROUTE);
                 $csp = $response->getHeader('Content-Security-Policy');
                 $reportHeader = json_decode($response->getHeader('Report-To'), true);
 
