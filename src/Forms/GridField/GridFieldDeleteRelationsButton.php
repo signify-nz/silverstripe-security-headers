@@ -282,9 +282,9 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
                 $dataObject->delete();
                 $dataObject->destroy();
             }
-            $message .= "Deleted {$count} records.";
+            $message .= _t(self::class . '.DELETED', 'Deleted one record.|Deleted {count} records.', ['count' => $count]);
         } else {
-            $message .= 'Nothing to delete';
+            $message .= _t(self::class . '.NOT_DELETED', 'Nothing to delete.');
         }
 
         $gridField->getForm()->sessionMessage($message, 'good');
@@ -379,7 +379,11 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
     public function getModalTitle()
     {
         if (!$this->modalTitle) {
-            $this->modalTitle = "Delete {$this->getDummyObject()->plural_name()}";
+            $this->modalTitle = _t(
+                self::class . '.TITLE_MODAL',
+                'Delete {pluralName}',
+                ['pluralName' => $this->getDummyObject()->plural_name()]
+            );
         }
         return $this->modalTitle;
     }
@@ -406,7 +410,11 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
         $fields = FieldList::create();
         $fields->add(CheckboxField::create(
             self::DELETE_ALL,
-            "Delete all {$this->getDummyObject()->plural_name()}"
+            _t(
+                self::class . '.DELETE_ALL',
+                'Delete all {pluralName}',
+                ['pluralName' => $this->getDummyObject()->plural_name()]
+            )
         ));
         foreach ($this->getFilterFields() as $field) {
             $fields->add($this->getFieldAsComposite($field));
@@ -424,17 +432,28 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
     protected function getFieldAsComposite(FormField $field)
     {
         $group = FieldGroup::create(
-            "'{$field->Title()}' filter group",
+            _t(
+                self::class . '.FILTER_GROUP',
+                '"{fieldName}" filter group',
+                ['fieldName' => $field->Title()]
+            ),
             [
                 $filterBy = CheckboxField::create(
                     $field->Name . self::FILTER_BY_SUFFIX,
-                    "Filter by {$field->Title()}"
+                    _t(
+                        self::class . '.FILTER_BY',
+                        'Filter by "{fieldName}"',
+                        ['fieldName' => $field->Title()]
+                    ),
                 ),
                 $field,
                 ...$options = $this->getFilterTypesField($field->Name),
                 $invert = CheckboxField::create(
                     $field->Name . self::FILTER_INVERT_SUFFIX,
-                    'Invert Filter'
+                    _t(
+                        self::class . '.FILTER_INVERT',
+                        'Invert Filter'
+                    ),
                 ),
             ]
         );
@@ -469,21 +488,27 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
             $options = $allOptions[self::DEFAULT_OPTION];
         }
         $fields = array();
+        $filterFieldName = $fieldName . self::OPTION_FIELD_SUFFIX;
+        $filterFieldTitle = _t(
+            self::class . '.FILTER_TYPE',
+            '"{fieldName}" Filter Type',
+            ['fieldName' => $fieldName]
+        );
         if (count($options) == 1) {
             $fields[] = ReadonlyField::create(
-                $fieldName . self::OPTION_FIELD_SUFFIX . '__READONLY',
-                "$fieldName Filter Type",
+                $filterFieldName . '__READONLY',
+                $filterFieldTitle,
                 $options[0]
             );
             $fields[] = HiddenField::create(
-                $fieldName . self::OPTION_FIELD_SUFFIX,
-                "$fieldName Filter Type",
+                $filterFieldName,
+                $filterFieldTitle,
                 $options[0]
             );
         } else {
             $field = DropdownField::create(
-                $fieldName . self::OPTION_FIELD_SUFFIX,
-                "$fieldName Filter Type",
+                $filterFieldName,
+                $filterFieldTitle,
                 array_combine($options, $options)
             );
             $field->setHasEmptyDefault(true);

@@ -1,4 +1,18 @@
 en:
   Signify\Reports\CSPViolationsReport:
-    TITLE: 'Content security violations'
     DESCRIPTION: 'Lists violations caught by the Content Security Policy. For more details see <a href="{url}" target="_blank">the MDN documentation</a>.'
+    TITLE: 'Content security violations'
+  Signify\Forms\GridField\GridFieldDeleteRelationsButton:
+    DELETE_ALL: 'Delete all {pluralName}'
+    DELETED:
+      one: 'Deleted one record.'
+      other: 'Deleted {count} records.'
+    FILTER_BY: 'Filter by "{fieldName}"'
+    FILTER_GROUP: '"{fieldName}" filter group'
+    FILTER_INVERT: 'Invert Filter'
+    FILTER_TYPE: '"{fieldName}" Filter Type'
+    NOT_DELETED: 'Nothing to delete.'
+    TITLE_MODAL: 'Delete {pluralName}'
+    VALIDATION_RequireFilters: 'At least one filter checkbox or "Delete all" must be checked.'
+    VALIDATION_TooManyFilters: 'A filter checkbox and "Delete all" cannot be checked simultaneously.'
+    VALIDATION_FormMessage: 'Please correct the validation errors.'

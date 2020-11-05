@@ -19,7 +19,10 @@ class GridFieldDeleteRelationsValidator extends Validator
         }
 
         if (!empty($filters) && !empty($data[GridFieldDeleteRelationsButton::DELETE_ALL])) {
-            $message = "A filter checkbox and 'Delete all' cannot be checked simultaneously.";
+            $message = _t(
+                GridFieldDeleteRelationsButton::class . '.VALIDATION_TooManyFilters',
+                'A filter checkbox and "Delete all" cannot be checked simultaneously.'
+            );
             $filters[] = GridFieldDeleteRelationsButton::DELETE_ALL;
             foreach ($filters as $fieldName) {
                 $this->validationError($fieldName, $message);
@@ -28,13 +31,19 @@ class GridFieldDeleteRelationsValidator extends Validator
         }
 
         if (empty($filters) && empty($data[GridFieldDeleteRelationsButton::DELETE_ALL])) {
-            $message = "At least one filter checkbox or 'Delete all' must be checked.";
+            $message = _t(
+                GridFieldDeleteRelationsButton::class . '.VALIDATION_RequireFilters',
+                'At least one filter checkbox or "Delete all" must be checked.'
+            );
             $this->validationError(GridFieldDeleteRelationsButton::DELETE_ALL, $message);
             $valid = false;
         }
 
         if (!$valid) {
-            $this->validationError('', 'Please correct the validation errors.');
+            $this->validationError('', _t(
+                GridFieldDeleteRelationsButton::class . '.VALIDATION_FormMessage',
+                'Please correct the validation errors.'
+            ));
         }
 
         return $valid;
