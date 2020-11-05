@@ -24,6 +24,8 @@ use SilverStripe\Core\Manifest\ModuleLoader;
 use SilverStripe\Forms\HiddenField;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\ArrayList;
+use SilverStripe\View\Requirements;
+use UncleCheese\DisplayLogic\Forms\Wrapper;
 
 /**
  * Adds an delete button to the bottom or top of a GridField.
@@ -125,6 +127,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
      */
     public function getHTMLFragments($gridField)
     {
+        Requirements::javascript('signify-nz/silverstripe-security-headers:client/dist/main.js');
         $modalID = $gridField->ID() . '_DeleteRelationsModal';
 
         // Check for form message prior to rendering form (which clears session messages)
@@ -441,6 +444,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
             ]
         );
         if (ModuleLoader::inst()->getManifest()->moduleExists('unclecheese/display-logic')) {
+            $group = Wrapper::create($group);
             $field->displayIf($filterBy->Name)->isChecked();
             foreach ($options as $optionsField) {
                 if (!$optionsField instanceof HiddenField) {
