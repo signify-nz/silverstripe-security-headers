@@ -74,12 +74,12 @@ Signify\Extensions\SecurityHeaderControllerExtension:
 
 #### Changing the Content Security Policy
 
-To maintain configuration compatibility with the [Guttmann/silverstripe-security-headers](https://github.com/guttmann/silverstripe-security-headers) module, and to make it clearer what the policy for your specific application is, individual CSP attributes can't be overridden. Rather, you must declare the full value for the `Content-Security-Policy` header if you wish to override it.  
+To maintain configuration compatibility with the [Guttmann/silverstripe-security-headers](https://github.com/guttmann/silverstripe-security-headers) module, and to make it clearer what the policy for your specific application is, individual CSP attributes can't be overridden. Rather, you must declare the full value for the `Content-Security-Policy` header if you wish to override it.
 We recommend copying the value we use in the packaged `_config/config.yml` file, and building onto it from there.
 
 ### Content Security Policy Violation Reports
 
-Unless disabled (see below), content security policy violations will automatically be added to a report in the CMS in the reports section (at `/admin/reports/show/Signify-Reports-CSPViolationsReport`).  
+Unless disabled (see below), content security policy violations will automatically be added to a report in the CMS in the reports section (at `/admin/reports/show/Signify-Reports-CSPViolationsReport`).
 Both the report-uri directive and the report-to directive/header combination are supported, though report-to is currently disabled by default as the implementation for that directive and header are expected to change (see the [working draft](https://www.w3.org/TR/reporting/) and the [editor's draft](https://w3c.github.io/reporting/)).
 
 If you supply your own endpoint using the report-uri directive, the default will also be added to it. It is expected that browsers will send a report to each endpoint in the report-uri directive.
@@ -115,18 +115,33 @@ Signify\Extensions\SecurityHeaderControllerExtension:
 ```
 
 Note that this does not disable the endpoint or remove the report from the CMS - it only stops the endpoint from being _automatically_ added to the Content-Security-Policy header
-  
+
 If `enable_reporting` is set to false, the value of `use_report_to` (see above) no longer matters
 
 Note that this also doesn't affect the ability to set the CSP to report-only mode with SecurityHeaderControllerExtension (see [Apply the extensions](#apply-the-extensions)).
 
-## Development
-Styling used in this module has not yet required anything more complex than a simple sass command to compile it.  
-To compile the sass, use the following command:
+## CSS/JS Development
+### Setup
+For development you will need Node.js and yarn installed.
+
+Next, you need to install the required npm packages.
+```bash
+yarn install
 ```
-sass --style=compressed client/src/scss/main.scss client/dist/main.css
+### Compiling assets
+You can compile assets using `yarn watch`.
+
+Produce minified (production) files using `yarn package`.
+
+### Linting
+Check over your JavaScript and SASS source code individually:
+
+```bash
+yarn lint-js
+yarn lint-sass
 ```
-To compile the sass interactively while developing, use the following command:
-```
-sass --watch --style=compressed client/src/scss/main.scss client/dist/main.css
+
+You can also lint both in a single command:
+```bash
+yarn lint
 ```
