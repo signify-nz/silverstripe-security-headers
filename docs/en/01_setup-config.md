@@ -46,4 +46,4 @@ Signify\Extensions\SecurityHeaderControllerExtension:
 ## Changing the Content Security Policy
 
 To maintain configuration compatibility with the [Guttmann/silverstripe-security-headers](https://github.com/guttmann/silverstripe-security-headers) module, and to make it clearer what the policy for your specific application is, individual CSP attributes can't be overridden. Rather, you must declare the full value for the `Content-Security-Policy` header if you wish to override it.
-We recommend copying the value we use in the packaged [_config/config.yml file](../_config/config.yml), and building onto it from there.
+We recommend copying the value we use in the packaged [_config/config.yml file](../../_config/config.yml), and building onto it from there.
