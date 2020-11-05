@@ -58,7 +58,7 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
             }
         }
 
-        $missedHeaders = array_diff_keys($headersSent, $headersReceived);
+        $missedHeaders = array_diff_key($headersSent, $headersReceived);
         $this->assertEmpty($missedHeaders, 'Test all headers are sent in the response.');
     }
 
