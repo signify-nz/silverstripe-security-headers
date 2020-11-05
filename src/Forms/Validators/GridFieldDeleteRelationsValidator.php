@@ -11,13 +11,14 @@ class GridFieldDeleteRelationsValidator extends Validator
     {
         $valid = true;
         $filters = array();
+        // Check for checked filter checkboxes.
         foreach ($data as $key => $value) {
-            // If this fields is a "filter by" field, and the value is truthy, add the filter.
             if (preg_match('/' . GridFieldDeleteRelationsButton::FILTER_BY_SUFFIX . '$/', $key) && $value) {
                 $filters[] = $key;
             }
         }
 
+        // If the delete all checkbox is checked, no other filters can be checked.
         if (!empty($filters) && !empty($data[GridFieldDeleteRelationsButton::DELETE_ALL])) {
             $message = _t(
                 GridFieldDeleteRelationsButton::class . '.VALIDATION_TooManyFilters',
@@ -30,6 +31,7 @@ class GridFieldDeleteRelationsValidator extends Validator
             $valid = false;
         }
 
+        // At least one checkbox must be checked.
         if (empty($filters) && empty($data[GridFieldDeleteRelationsButton::DELETE_ALL])) {
             $message = _t(
                 GridFieldDeleteRelationsButton::class . '.VALIDATION_RequireFilters',
@@ -39,6 +41,7 @@ class GridFieldDeleteRelationsValidator extends Validator
             $valid = false;
         }
 
+        // Add a message to the form itself.
         if (!$valid) {
             $this->validationError('', _t(
                 GridFieldDeleteRelationsButton::class . '.VALIDATION_FormMessage',
