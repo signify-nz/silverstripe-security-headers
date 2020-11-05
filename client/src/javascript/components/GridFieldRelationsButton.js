@@ -26,7 +26,8 @@
   // priority than display-logic's.
   const observer = new MutationObserver(((mutations) => {
     mutations.forEach(() => {
-      const $nodes = $('div.display-logic, div.display-logic-master, form');
+      const modalSelector = '.modal--gridfield-delete-relations';
+      const $nodes = $(`${modalSelector} div.display-logic,${modalSelector} div.display-logic-master,${modalSelector} form`);
       $nodes.each(function setupNodeSelectors() {
         setupSelectors(this);
       });
