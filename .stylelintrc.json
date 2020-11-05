@@ -22,7 +22,6 @@
     "scss/at-import-no-partial-leading-underscore": true,
     "scss/dollar-variable-colon-space-after": "at-least-one-space",
     "scss/dollar-variable-no-missing-interpolation": true,
-    "scss/media-feature-value-dollar-variable": ["always", { "severity": "warning" }],
     "scss/selector-no-redundant-nesting-selector": true,
     "scss/no-duplicate-dollar-variables": true
   }
