@@ -209,7 +209,11 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
         $fields = $this->getPreparedFilterFields();
 
         $actions = new FieldList(
-            FormAction::create('delete', "Delete {$dummyObj->plural_name()}")
+            FormAction::create('delete', _t(
+                self::class . '.DELETE',
+                'Delete {pluralName}',
+                ['pluralName' => $dummyObj->plural_name()]
+            ))
             ->addExtraClass('btn btn-danger font-icon-trash')
         );
 
@@ -382,7 +386,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
     {
         if (!$this->modalTitle) {
             $this->modalTitle = _t(
-                self::class . '.TITLE_MODAL',
+                self::class . '.DELETE',
                 'Delete {pluralName}',
                 ['pluralName' => $this->getDummyObject()->plural_name()]
             );
