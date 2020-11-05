@@ -27,7 +27,7 @@
   const observer = new MutationObserver(((mutations) => {
     mutations.forEach(() => {
       const $nodes = $('div.display-logic, div.display-logic-master, form');
-      $nodes.each(() => {
+      $nodes.each(function setupNodeSelectors() {
         setupSelectors(this);
       });
     });
