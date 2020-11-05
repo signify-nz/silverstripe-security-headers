@@ -128,7 +128,9 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
      */
     public function getHTMLFragments($gridField)
     {
-        Requirements::javascript('signify-nz/silverstripe-security-headers:client/dist/main.js');
+        if (ModuleLoader::inst()->getManifest()->moduleExists('unclecheese/display-logic')) {
+            Requirements::javascript('signify-nz/silverstripe-security-headers:client/dist/main.js');
+        }
         $modalID = $gridField->ID() . '_DeleteRelationsModal';
 
         // Check for form message prior to rendering form (which clears session messages)
