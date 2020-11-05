@@ -2,6 +2,7 @@
 
 namespace Signify\Forms\GridField;
 
+use Signify\Forms\Validators\GridFieldDeleteRelationsValidator;
 use SilverStripe\Forms\GridField\GridField_HTMLProvider;
 use SilverStripe\Forms\GridField\GridField_URLHandler;
 use SilverStripe\Forms\GridField\GridField;
@@ -214,9 +215,13 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
             $gridField,
             'deletionForm',
             $fields,
-            $actions
+            $actions,
+            new GridFieldDeleteRelationsValidator()
         );
         $form->setFormAction($gridField->Link('delete'));
+        if ($form->getMessage()) {
+            $form->addExtraClass('validationerror');
+        }
 
         $this->extend('updateDeletionForm', $form);
 
@@ -236,6 +241,14 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
         if (empty($data)) {
             $data = $request->requestVars();
         }
+        $form = $this->DeletionForm($gridField);
+        $form->loadDataFrom($data);
+        $validationResult = $form->validationResult();
+        if (!$validationResult->isValid()) {
+            $form->setSessionValidationResult($validationResult);
+            $form->setSessionData($data);
+            return $gridField->redirectBack();
+        }
 
         // Prepare filters based on user input.
         $filters = array();
@@ -252,24 +265,6 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
                 }
                 $filters["$fieldName:$filterType"] = $data[$fieldName];
             }
-        }
-
-        if (!empty($filters) && !empty($data[self::DELETE_ALL])) {
-            $form = $this->DeletionForm($gridField);
-            $form->sessionMessage(
-                "A filter checkbox and 'Delete all {$this->getDummyObject()->plural_name()}'"
-                . " cannot be checked simultaneously."
-            );
-            return $gridField->redirectBack();
-        }
-
-        if (empty($filters) && empty($data[self::DELETE_ALL])) {
-            $form = $this->DeletionForm($gridField);
-            $form->sessionMessage(
-                "At least one filter checkbox or 'Delete all {$this->getDummyObject()->plural_name()}'"
-                . " must be checked."
-            );
-            return $gridField->redirectBack();
         }
 
         // Ensure data objects are filtered to only include items in this gridfield.
