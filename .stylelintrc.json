@@ -1,0 +1,29 @@
+{
+  "extends": "stylelint-config-standard",
+  "plugins": [
+      "stylelint-scss"
+  ],
+  "rules": {
+    "color-hex-case": ["upper", { "severity": "warning" }],
+    "max-nesting-depth": [4, { "severity": "warning" }],
+    "selector-max-id": [0, { "severity": "warning" }],
+    "declaration-no-important": [true, { "severity": "warning" }],
+    "declaration-property-unit-blacklist": [{
+        "line-height": ["px", "rem", "em"]
+    }],
+    "declaration-property-value-blacklist": [{
+        "border": ["none"]
+    }],
+    "function-url-scheme-blacklist": ["/^http/"],
+    "function-url-quotes": ["always"],
+    "string-quotes": ["single"],
+    "at-rule-no-unknown": null,
+    "scss/at-rule-no-unknown": true,
+    "scss/at-import-no-partial-leading-underscore": true,
+    "scss/dollar-variable-colon-space-after": "at-least-one-space",
+    "scss/dollar-variable-no-missing-interpolation": true,
+    "scss/media-feature-value-dollar-variable": ["always", { "severity": "warning" }],
+    "scss/selector-no-redundant-nesting-selector": true,
+    "scss/no-duplicate-dollar-variables": true
+  }
+}
