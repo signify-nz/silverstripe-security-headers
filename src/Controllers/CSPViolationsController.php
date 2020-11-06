@@ -116,8 +116,8 @@ class CSPViolationsController extends Controller
 
         if (!$document) {
             $document = CSPDocument::create($documentData);
-            $sitetreeLink = $documentURI;
-            if (!Director::makeRelative($sitetreeLink)) {
+            $siteTreeLink = $documentURI;
+            if (!Director::makeRelative($siteTreeLink)) {
                 // SiteTree::get_by_link returns null, see https://github.com/silverstripe/silverstripe-cms/issues/2580
                 $siteTreeLink = RootURLController::get_homepage_link();
             }
