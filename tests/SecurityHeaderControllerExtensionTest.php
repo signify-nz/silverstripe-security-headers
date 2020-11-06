@@ -45,8 +45,11 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
         $response = $this->getResponse();
 
         // Test all headers, not just the default ones or just the ones in self::$testHeaders.
-        $headersSent = array_merge(SecurityHeaderControllerExtension::config()->get('headers'), self::$testHeaders);
-        $headersReceived = $response->getHeaders();
+        $headersSent = array_change_key_case(
+            array_merge(SecurityHeaderControllerExtension::config()->get('headers'), self::$testHeaders),
+            CASE_LOWER
+        );
+        $headersReceived = array_change_key_case($response->getHeaders(), CASE_LOWER);
 
         foreach ($headersReceived as $header => $value) {
             if (in_array($header, $headersSent)) {
