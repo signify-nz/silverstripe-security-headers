@@ -1,6 +1,6 @@
 ---
 Name: signify-security-header-routes
 ---
-SilverStripe\SecurityHeaders\Control\Director:
+SilverStripe\Control\Director:
   rules:
     'cspviolations/report': 'Signify\SecurityHeaders\Controllers\CSPViolationsController'
