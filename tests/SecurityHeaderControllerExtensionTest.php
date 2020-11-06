@@ -139,7 +139,7 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
             ],
             function () {
                 $defaultEndpoint = SecurityHeaderControllerExtension::config()->get('report_to_group');
-                $defaultUri = SecurityHeaderControllerExtension::config()->get('report_uri');
+                $defaultUri = Director::absoluteURL(SecurityHeaderControllerExtension::config()->get('report_uri'));
                 $response = $this->getResponse();
                 $csp = $response->getHeader('Content-Security-Policy');
                 $reportHeader = json_decode($response->getHeader('Report-To'), true);
