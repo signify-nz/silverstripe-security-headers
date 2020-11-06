@@ -54,7 +54,7 @@ class SecurityHeaderSiteconfigExtensionTest extends FunctionalTest
     protected function getResponse()
     {
         $page = $this->objFromFixture('Page', 'page');
-        $page->copyVersionToStage(Versioned::STAGEDVERSIONED, Versioned::LIVE);
+        $page->copyVersionToStage(Versioned::DRAFT, Versioned::LIVE);
         return $this->get($page->Link());
     }
 
