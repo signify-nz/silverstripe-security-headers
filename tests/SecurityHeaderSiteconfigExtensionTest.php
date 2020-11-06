@@ -6,32 +6,29 @@ use SilverStripe\SiteConfig\SiteConfig;
 use Signify\SecurityHeaders\Extensions\SecurityHeaderSiteconfigExtension;
 use SilverStripe\Control\Director;
 use Signify\SecurityHeaders\Extensions\SecurityHeaderControllerExtension;
+use SilverStripe\Versioned\Versioned;
 
 class SecurityHeaderSiteconfigExtensionTest extends FunctionalTest
 {
-    const HEADER_TEST_ROUTE = 'security-header-test';
+    protected static $fixture_file = 'fixtures.yml';
 
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
-        // Add extension and a new test route.
+        // Add extension.
         SiteConfig::add_extension(SecurityHeaderSiteconfigExtension::class);
-        Director::config()->update('rules', array(
-            self::HEADER_TEST_ROUTE => 'Controller'
-        ));
     }
 
     public static function tearDownAfterClass()
     {
         parent::tearDownAfterClass();
-        // Remove extension and test route.
+        // Remove extension.
         SiteConfig::remove_extension(SecurityHeaderSiteconfigExtension::class);
-        Director::config()->remove('rules', self::HEADER_TEST_ROUTE);
     }
 
     public function testCSPisNotReportOnly()
     {
-        $response = $this->get(self::HEADER_TEST_ROUTE);
+        $response = $this->getResponse();
         $csp = $response->getHeader('Content-Security-Policy');
         $cspReportOnly = $response->getHeader('Content-Security-Policy-Report-Only');
 
@@ -45,13 +42,20 @@ class SecurityHeaderSiteconfigExtensionTest extends FunctionalTest
         SiteConfig::current_site_config()->write();
         $originalCSP = SecurityHeaderControllerExtension::config()->get('headers')['Content-Security-Policy'];
 
-        $response = $this->get(self::HEADER_TEST_ROUTE);
+        $response = $this->getResponse();
         $csp = $response->getHeader('Content-Security-Policy');
         $cspReportOnly = $response->getHeader('Content-Security-Policy-Report-Only');
 
         $this->assertNull($csp, 'Test Content-Security-Policy header is not present.');
         $this->assertNotNull($cspReportOnly, 'Test Content-Security-Policy-Report-Only header is present.');
         $this->assertEquals($originalCSP, $cspReportOnly, 'Test configured CSP is returned in the response.');
+    }
+
+    protected function getResponse()
+    {
+        $page = $this->objFromFixture('Page', 'page');
+        $page->copyVersionToStage(Versioned::STAGEDVERSIONED, Versioned::LIVE);
+        return $this->get($page->Link());
     }
 
 }
