@@ -170,7 +170,7 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
     protected function endpointExists($csp, $directive, $endpoint, $exactMatch = false)
     {
         $matches = array();
-        preg_match('/report-uri\s+(?<endpoints>[^;]+?);/', $csp, $matches);
+        preg_match('/' . $directive . '\s+(?<endpoints>[^;]+?);/', $csp, $matches);
         if ($exactMatch) {
             return $matches['endpoints'] === $endpoint;
         } else {
