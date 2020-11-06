@@ -6,6 +6,7 @@ use SilverStripe\SiteConfig\SiteConfig;
 use Signify\SecurityHeaders\Extensions\SecurityHeaderSiteconfigExtension;
 use SilverStripe\Control\Director;
 use Signify\SecurityHeaders\Extensions\SecurityHeaderControllerExtension;
+use SilverStripe\Control\Controller;
 use SilverStripe\Versioned\Versioned;
 
 class SecurityHeaderSiteconfigExtensionTest extends FunctionalTest
@@ -15,14 +16,16 @@ class SecurityHeaderSiteconfigExtensionTest extends FunctionalTest
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
-        // Add extension.
+        // Add extensions.
+        Controller::add_extension(SecurityHeaderControllerExtension::class);
         SiteConfig::add_extension(SecurityHeaderSiteconfigExtension::class);
     }
 
     public static function tearDownAfterClass()
     {
         parent::tearDownAfterClass();
-        // Remove extension.
+        // Remove extensions.
+        Controller::remove_extension(SecurityHeaderControllerExtension::class);
         SiteConfig::remove_extension(SecurityHeaderSiteconfigExtension::class);
     }
 
@@ -41,6 +44,7 @@ class SecurityHeaderSiteconfigExtensionTest extends FunctionalTest
         SiteConfig::current_site_config()->CSPReportingOnly = true;
         SiteConfig::current_site_config()->write();
         $originalCSP = SecurityHeaderControllerExtension::config()->get('headers')['Content-Security-Policy'];
+        $originalCSP .= '; report-uri ' . SecurityHeaderControllerExtension::config()->get('report_uri');
 
         $response = $this->getResponse();
         $csp = $response->getHeader('Content-Security-Policy');
