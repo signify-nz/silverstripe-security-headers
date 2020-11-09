@@ -4,7 +4,6 @@ namespace Signify\SecurityHeaders\Tests;
 use SilverStripe\Dev\FunctionalTest;
 use SilverStripe\SiteConfig\SiteConfig;
 use Signify\SecurityHeaders\Extensions\SecurityHeaderSiteconfigExtension;
-use SilverStripe\Control\Director;
 use Signify\SecurityHeaders\Extensions\SecurityHeaderControllerExtension;
 use SilverStripe\Control\Controller;
 use SilverStripe\Versioned\Versioned;
