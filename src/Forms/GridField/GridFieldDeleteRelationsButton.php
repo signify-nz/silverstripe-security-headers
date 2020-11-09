@@ -22,7 +22,6 @@ use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\FormField;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Core\Manifest\ModuleLoader;
-use SilverStripe\Forms\HiddenField;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\View\Requirements;
@@ -447,18 +446,15 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
                 ),
             ),
             $field,
+            $options = $this->getFilterTypesField($field->Name),
+            $invert = CheckboxField::create(
+                $field->Name . self::FILTER_INVERT_SUFFIX,
+                _t(
+                    self::class . '.FILTER_INVERT',
+                    'Invert Filter'
+                ),
+            )
         ];
-        $options = $this->getFilterTypesField($field->Name);
-        foreach ($options as $option) {
-            $fields[] = $option;
-        }
-        $fields[] = $invert = CheckboxField::create(
-            $field->Name . self::FILTER_INVERT_SUFFIX,
-            _t(
-                self::class . '.FILTER_INVERT',
-                'Invert Filter'
-            ),
-        );
 
         $group = FieldGroup::create(
             _t(
@@ -471,11 +467,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
         if (ModuleLoader::inst()->getManifest()->moduleExists('unclecheese/display-logic')) {
             $group = Wrapper::create($group);
             $field->displayIf($filterBy->Name)->isChecked();
-            foreach ($options as $optionsField) {
-                if (!$optionsField instanceof HiddenField) {
-                    $optionsField->displayIf($filterBy->Name)->isChecked();
-                }
-            }
+            $options->displayIf($filterBy->Name)->isChecked();
             $invert->displayIf($filterBy->Name)->isChecked();
             $group->hideIf(self::DELETE_ALL)->isChecked();
         }
@@ -488,7 +480,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
      * {@link GridFieldDeleteRelationsButton::setFilterOptions()}.
      *
      * @param string $fieldName
-     * @return FormField[]
+     * @return FormField
      */
     protected function getFilterTypesField($fieldName)
     {
@@ -498,7 +490,6 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
         } else {
             $options = $allOptions[self::DEFAULT_OPTION];
         }
-        $fields = array();
         $filterFieldName = $fieldName . self::OPTION_FIELD_SUFFIX;
         $filterFieldTitle = _t(
             self::class . '.FILTER_TYPE',
@@ -506,16 +497,11 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
             ['fieldName' => $fieldName]
         );
         if (count($options) == 1) {
-            $fields[] = ReadonlyField::create(
-                $filterFieldName . '__READONLY',
-                $filterFieldTitle,
-                $options[0]
-            );
-            $fields[] = HiddenField::create(
+            $field = ReadonlyField::create(
                 $filterFieldName,
                 $filterFieldTitle,
                 $options[0]
-            );
+            )->setIncludeHiddenField(true);
         } else {
             $field = DropdownField::create(
                 $filterFieldName,
@@ -526,10 +512,9 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
             if (in_array('ExactMatch', $options)) {
                 $field->setValue('ExactMatch');
             }
-            $fields[] = $field;
         }
-        $this->extend('updateFilterOptionsField', $fields, $fieldName);
-        return $fields;
+        $this->extend('updateFilterOptionsField', $field, $fieldName);
+        return $field;
     }
 
     /**
