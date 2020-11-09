@@ -1,6 +1,6 @@
 {
   "name": "signify-nz/silverstripe-security-headers",
-  "type": "silverstripe-vendormodule",
+  "type": "silverstripe-module",
   "license": "BSD-3-Clause",
   "authors": [
     {
@@ -12,11 +12,11 @@
     "issues": "https://github.com/signify-nz/silverstripe-security-headers/issues"
   },
   "require": {
-    "silverstripe/framework": "^4.0",
-    "silverstripe/cms": "^4.0"
+    "silverstripe/framework": "^3.0",
+    "silverstripe/cms": "^3.0"
   },
   "require-dev": {
-    "phpunit/phpunit": "^5.7",
+    "phpunit/phpunit": "^3.7",
     "squizlabs/php_codesniffer": "^3.0"
   },
   "suggest": {
@@ -26,11 +26,5 @@
     "expose": [
       "client/dist"
     ]
-  },
-  "autoload": {
-    "psr-4": {
-      "Signify\\SecurityHeaders\\": "src/",
-      "Signify\\SecurityHeaders\\Tests\\": "tests/"
-    }
   }
 }

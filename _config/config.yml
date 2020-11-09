@@ -2,7 +2,7 @@
 Name: signify-security-headers
 After: 'coreconfig'
 ---
-Signify\SecurityHeaders\Extensions\SecurityHeaderControllerExtension:
+SecurityHeaderControllerExtension:
   headers:
     Strict-Transport-Security: "max-age=31536000"
     X-Frame-Options: "SAMEORIGIN"
@@ -24,7 +24,7 @@ Signify\SecurityHeaders\Extensions\SecurityHeaderControllerExtension:
 Only:
   environment: dev
 ---
-Signify\SecurityHeaders\Extensions\SecurityHeaderControllerExtension:
+SecurityHeaderControllerExtension:
   headers:
     # 5 minutes in dev.
     Strict-Transport-Security: "max-age=300"
@@ -32,7 +32,7 @@ Signify\SecurityHeaders\Extensions\SecurityHeaderControllerExtension:
 Only:
   environment: test
 ---
-Signify\SecurityHeaders\Extensions\SecurityHeaderControllerExtension:
+SecurityHeaderControllerExtension:
   headers:
     # 1 hour in test.
     Strict-Transport-Security: "max-age=3600"

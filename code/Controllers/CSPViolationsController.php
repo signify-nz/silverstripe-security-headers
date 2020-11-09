@@ -1,16 +1,4 @@
 <?php
-namespace Signify\SecurityHeaders\Controllers;
-
-use SilverStripe\Control\Controller;
-use SilverStripe\Control\HTTPRequest;
-use SilverStripe\Control\Director;
-use Signify\SecurityHeaders\Models\CSPViolation;
-use Signify\SecurityHeaders\Models\CSPDocument;
-use SilverStripe\CMS\Model\SiteTree;
-use SilverStripe\CMS\Controllers\RootURLController;
-use SilverStripe\ORM\FieldType\DBField;
-use SilverStripe\ORM\FieldType\DBDatetime;
-use Signify\SecurityHeaders\Extensions\SecurityHeaderControllerExtension;
 
 class CSPViolationsController extends Controller
 {
@@ -27,8 +15,10 @@ class CSPViolationsController extends Controller
     const REPORT_DIRECTIVE = 'ReportDirective';
 
 
-    public function index(HTTPRequest $request)
+    public function index()
     {
+        /* var $request SS_HTTPRequest */
+        $request = $this->getRequest();
         if (!$request->isPOST() || !$this->isSameOrigin($request) || !$this->isReport($request)) {
             return $this->httpError(400);
         }
@@ -39,7 +29,7 @@ class CSPViolationsController extends Controller
         if (isset($json['csp-report'])) {
             // This report was sent as a result of the "report-uri" directive.
             $report = $json['csp-report'];
-            $report[self::REPORT_TIME] = DBDatetime::now()->getValue();
+            $report[self::REPORT_TIME] = SS_Datetime::now()->getValue();
             $report[self::REPORT_DIRECTIVE] = 'report-uri';
             $this->processReport($report);
         } else {
@@ -49,7 +39,7 @@ class CSPViolationsController extends Controller
                 if ($reportWrapper['type'] == 'csp-violation') {
                     $report = $reportWrapper['body'];
                     // 'age' is the number of milliseconds since the report was generated.
-                    $report[self::REPORT_TIME] = DBField::create_field('Datetime', time() - ($reportWrapper['age'] / 1000))->getValue();
+                    $report[self::REPORT_TIME] = DBField::create_field('SS_Datetime', time() - ($reportWrapper['age'] / 1000))->getValue();
                     $report[self::REPORT_DIRECTIVE] = 'report-to';
                     $this->processReport($report);
                 }
@@ -188,12 +178,13 @@ class CSPViolationsController extends Controller
      * @param HTTPRequest $request
      * @return boolean
      */
-    protected function isSameOrigin(HTTPRequest $request)
+    protected function isSameOrigin($request)
     {
-        $origin = $request->getHeader('origin');
+        $origin = $request->getHeader('Origin');
+        $config = Config::inst()->forClass(SecurityHeaderControllerExtension::class);
 
         // The origin header may not be set for report-to requests, so null must be considered sameorigin.
-        if (SecurityHeaderControllerExtension::config()->get('use_report_to') && $origin === null) {
+        if ($config->get('use_report_to') && $origin === null) {
             return true;
         }
 
@@ -206,9 +197,9 @@ class CSPViolationsController extends Controller
      * @param HTTPRequest $request
      * @return boolean
      */
-    protected function isReport(HTTPRequest $request)
+    protected function isReport($request)
     {
-        return in_array($request->getHeader('content-type'), [
+        return in_array($request->getHeader('Content-Type'), [
             'application/csp-report', // from report-uri directive
             'application/reports+json', // from report-to directive
             'application/json', // fallback

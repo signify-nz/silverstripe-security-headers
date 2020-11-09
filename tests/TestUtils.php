@@ -1,9 +1,6 @@
 <?php
-namespace Signify\SecurityHeaders\Tests;
 
-use SilverStripe\Core\Config\Config;
-
-abstract class TestUtils
+abstract class SigSecurityTestUtils
 {
 
     /**

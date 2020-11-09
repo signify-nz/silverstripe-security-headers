@@ -1,11 +1,4 @@
 <?php
-namespace Signify\SecurityHeaders\Tests;
-
-use SilverStripe\Dev\FunctionalTest;
-use SilverStripe\Control\Controller;
-use Signify\SecurityHeaders\Extensions\SecurityHeaderControllerExtension;
-use SilverStripe\Control\Director;
-use SilverStripe\Versioned\Versioned;
 
 class SecurityHeaderControllerExtensionTest extends FunctionalTest
 {
@@ -28,8 +21,9 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
         Controller::add_extension(SecurityHeaderControllerExtension::class);
 
         // Set test header values.
-        static::$originalHeaderValues = SecurityHeaderControllerExtension::config()->get('headers');
-        SecurityHeaderControllerExtension::config()->merge('headers', self::$testHeaders);
+        $config = Config::inst()->forClass(SecurityHeaderControllerExtension::class);
+        static::$originalHeaderValues = $config->get('headers');
+        Config::inst()->update(SecurityHeaderControllerExtension::class, 'headers', self::$testHeaders);
     }
 
     public static function tearDownAfterClass()
@@ -37,7 +31,7 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
         parent::tearDownAfterClass();
         // Remove extension and reset headers to defaults.
         Controller::remove_extension(SecurityHeaderControllerExtension::class);
-        SecurityHeaderControllerExtension::config()->merge('headers', static::$originalHeaderValues);
+        Config::inst()->update(SecurityHeaderControllerExtension::class, 'headers', static::$originalHeaderValues);
     }
 
     public function testResponseHeaders()
@@ -45,8 +39,9 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
         $response = $this->getResponse();
 
         // Test all headers, not just the default ones or just the ones in self::$testHeaders.
+        $config = Config::inst()->forClass(SecurityHeaderControllerExtension::class);
         $headersSent = array_change_key_case(
-            array_merge(SecurityHeaderControllerExtension::config()->get('headers'), self::$testHeaders),
+            array_merge($config->get('headers'), self::$testHeaders),
             CASE_LOWER
         );
         $headersReceived = array_change_key_case($response->getHeaders(), CASE_LOWER);
@@ -67,7 +62,8 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
 
     public function testReportURIAdded()
     {
-        $defaultUri = SecurityHeaderControllerExtension::config()->get('report_uri');
+        $config = Config::inst()->forClass(SecurityHeaderControllerExtension::class);
+        $defaultUri = $config->get('report_uri');
         $response = $this->getResponse();
         $csp = $response->getHeader('Content-Security-Policy');
 
@@ -78,7 +74,8 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
     public function testReportURIAppended()
     {
         $testURI = 'https://example.test/endpoint.aspx';
-        TestUtils::testWithConfig(
+        $config = Config::inst()->forClass(SecurityHeaderControllerExtension::class);
+        SigSecurityTestUtils::testWithConfig(
             [
                 SecurityHeaderControllerExtension::class => [
                     'headers' => [
@@ -86,8 +83,8 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
                     ],
                 ],
             ],
-            function () use ($testURI) {
-                $defaultUri = SecurityHeaderControllerExtension::config()->get('report_uri');
+            function () use ($testURI, $config) {
+                $defaultUri = $config->get('report_uri');
                 $response = $this->getResponse();
                 $csp = $response->getHeader('Content-Security-Policy');
 
@@ -100,7 +97,7 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
 
     public function testReportDisabled()
     {
-        TestUtils::testWithConfig(
+        SigSecurityTestUtils::testWithConfig(
             [
                 SecurityHeaderControllerExtension::class => [
                     'enable_reporting' => false,
@@ -131,15 +128,16 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
 
     public function testReportToAdded()
     {
-        TestUtils::testWithConfig(
+        $config = Config::inst()->forClass(SecurityHeaderControllerExtension::class);
+        SigSecurityTestUtils::testWithConfig(
             [
                 SecurityHeaderControllerExtension::class => [
                     'use_report_to' => true,
                 ],
             ],
-            function () {
-                $defaultEndpoint = SecurityHeaderControllerExtension::config()->get('report_to_group');
-                $defaultUri = Director::absoluteURL(SecurityHeaderControllerExtension::config()->get('report_uri'));
+            function () use ($config) {
+                $defaultEndpoint = $config->get('report_to_group');
+                $defaultUri = Director::absoluteURL($config->get('report_uri'));
                 $response = $this->getResponse();
                 $csp = $response->getHeader('Content-Security-Policy');
                 $reportHeader = json_decode($response->getHeader('Report-To'), true);
@@ -158,7 +156,7 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
     protected function getResponse()
     {
         $page = $this->objFromFixture('Page', 'page');
-        $page->copyVersionToStage(Versioned::DRAFT, Versioned::LIVE);
+        $page->publish(Versioned::DRAFT, Versioned::LIVE);
         return $this->get($page->Link());
     }
 

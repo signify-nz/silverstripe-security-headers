@@ -1,0 +1,3 @@
+<span $AttributesHTML>
+    $Value
+</span>

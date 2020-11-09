@@ -1,0 +1,12 @@
+.fieldgroup--no-left {
+  display: flex;
+  align-items: flex-end;
+
+  .fieldgroup-field.first {
+    padding-bottom: 8px;
+  }
+}
+
+.field.checkbox--no-right {
+  padding-left: 0;
+}

@@ -1,5 +1,290 @@
-.modal-dialog--gridfield-delete-relations {
-  @media (min-width: 900px) {
-    max-width: 900px;
+// Ported from SilverStripe 4 silverstripe-admin client/src/components/Modal/Modal.scss
+// Some also from SilverStripe 4 silverstripe-admin client/src/components/GridField/GridField.scss
+$toolbar-total-height: 53px;
+$h2-font-size: 19px;
+$text-muted: #566B8D;
+$body-bg-dark: #F4F6F8;
+$panel-padding-y: 1.5385rem;
+$panel-padding-x: 1.5385rem;
+$spacer: 5px;
+$transition-speed-fast: 0.3s;
+$transition-speed-mid: 0.6s;
+
+// Based on bootstrap modal
+.modal--gridfield-delete-relations {
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1050;
+  display: none;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  outline: 0;
+
+  .fade {
+    -webkit-transition: opacity 0.15s linear;
+    -o-transition: opacity 0.15s linear;
+    transition: opacity 0.15s linear;
+  }
+
+  .modal-dialog {
+    height: calc(100% - #{$toolbar-total-height}); // IE10 fix
+    position: relative;
+    max-height: 600px;
+    width: auto;
+    margin: 0.5rem;
+    pointer-events: none;
+
+    @media (min-width: 900px) {
+      max-width: 900px;
+    }
+
+    @media (min-width: 544px) {
+      height: calc(100% - 1rem);
+      width: calc(100% - 0.5rem);
+      margin: 1.75rem auto;
+    }
+
+    .form-group:last-of-type,
+    .form-group:last-of-type .form-group {
+      margin-bottom: 0;
+    }
+
+    .advanced {
+      display: none;
+    }
+  }
+
+  .modal__dialog--scrollable {
+    overflow: auto;
+  }
+
+  &.fade {
+    .modal-dialog {
+      transition: transform $transition-speed-fast ease-out, -webkit-transform $transition-speed-fast ease-out, -o-transform $transition-speed-fast ease-out;
+      -webkit-transform: translateY(-50px);
+      -o-transform: translateY(-50px);
+      transform: translateY(-50px);
+    }
+  }
+
+  .modal-content {
+    position: relative;
+    background-color: white;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+    border: 0;
+    pointer-events: auto;
+    background-clip: padding-box;
+    border-radius: 0.5rem;
+    outline: 0;
+  }
+
+  &.show {
+    display: block;
+
+    .modal-dialog {
+      -webkit-transform: none;
+      -o-transform: none;
+      transform: none;
+    }
+
+    .modal-content {
+      overflow-y: auto;
+      pointer-events: all;
+    }
+  }
+
+  // Modal header
+  // Top section of the modal w/ title and dismiss
+  .modal-header {
+    min-height: $toolbar-total-height;
+    color: $text-muted;
+    background-color: $body-bg-dark;
+    display: flex;
+    -webkit-box-align: start;
+    -webkit-align-items: flex-start;
+    align-items: flex-start;
+    -webkit-box-pack: justify;
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+    padding: 0.76925rem 1.5385rem;
+    border-bottom: 1px solid #E5E5E5;
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+
+    // Close icon
+    .close {
+      position: relative;
+      z-index: 2;
+      height: 32px;
+      opacity: 1;
+      margin-top: 0;
+      margin-right: -$panel-padding-x;
+      color: $text-muted;
+
+      /* stylelint-disable-next-line no-descending-specificity */
+      span {
+        display: none;
+      }
+    }
+
+    .modal-title {
+      // margin-top: $spacer-sm / 3;
+      font-size: $h2-font-size;
+      font-weight: normal;
+    }
+  }
+
+  .modal__close-button,
+  .modal-header .close {
+    opacity: 1;
+
+    // We can't insert our own classes into the header close button
+    // so manually add font icon styles
+    &::before {
+      content: '\44'; // font-icon-cancel
+      color: $text-muted;
+      position: relative;
+      top: -0.2em;
+      font-size: 22px; // btn-icon-xl
+      /* stylelint-disable-next-line font-family-no-missing-generic-family-keyword */
+      font-family: silverstripe;
+      font-style: normal;
+      font-weight: normal;
+      font-variant: normal;
+      text-transform: none;
+      speak: none;
+      line-height: 1;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      transition: color $transition-speed-fast;
+    }
+
+    // Extra specificity to override bootstrap
+    &:not(.disabled):hover {
+      opacity: 1;
+    }
+
+    // Hide default modal close icon
+    /* stylelint-disable-next-line no-descending-specificity */
+    span {
+      display: none;
+    }
+  }
+
+  .modal-body {
+    position: relative;
+    -webkit-box-flex: 1;
+    -webkit-flex: 1 1 auto;
+    flex: 1 1 auto;
+    padding: 20px;
+  }
+
+  .modal-footer {
+    background-color: white;
+    border-top: 0;
+    padding-top: 0;
+    justify-content: flex-start;
+  }
+
+  .modal__response {
+    overflow: auto;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    height: calc(100% + #{$toolbar-total-height});
+    width: 100%;
+    background: $body-bg-dark;
+    border-radius: 1rem;
+    z-index: 1;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: $panel-padding-y $panel-padding-x;
+
+    // This prevents a scroll bar appearing during
+    // the modal--slideup animation
+    animation: modal--prevent-overflow $transition-speed-mid * 2;
+
+    @keyframes modal--prevent-overflow {
+      from {
+        overflow: hidden;
+      }
+
+      to {
+        overflow: auto;
+      }
+    }
+  }
+
+  // Response messages
+  .modal__response--good,
+  .modal__response--error {
+    font-size: $h2-font-size;
+
+    /* stylelint-disable-next-line no-descending-specificity */
+    span {
+      animation: modal--slideup $transition-speed-mid;
+
+      @keyframes modal--slideup {
+        from {
+          transform: translateY(200%);
+          opacity: 0.5;
+        }
+
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+    }
+
+    /* stylelint-disable-next-line no-descending-specificity */
+    span::before {
+      /* stylelint-disable-next-line font-family-no-missing-generic-family-keyword */
+      font-family: silverstripe;
+      margin-bottom: $spacer;
+      font-size: 48px;
+      display: block;
+      padding-bottom: $spacer;
+    }
+  }
+
+  .modal__response--good span::before {
+    content: 'O';
+    color: #D4EDDA;
+  }
+
+  .modal__response--error span::before {
+    content: '#';
+    color: #F8D7DA;
+  }
+}
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1040;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000;
+
+  &.fade {
+    opacity: 0;
+  }
+
+  &.show {
+    opacity: 0.5;
   }
 }

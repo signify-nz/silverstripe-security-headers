@@ -1,8 +1,4 @@
 <?php
-namespace Signify\SecurityHeaders\Models;
-
-use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\FieldType\DBField;
 
 class CSPViolation extends DataObject
 {
@@ -11,7 +7,7 @@ class CSPViolation extends DataObject
     private static $table_name = 'Signify_CSPViolation';
 
     private static $db = [
-        'ReportedTime' => 'Datetime',
+        'ReportedTime' => 'SS_Datetime',
         'Disposition' => 'Varchar(7)',
         'BlockedURI' => 'Varchar(255)',
         'EffectiveDirective' => 'Varchar(255)',

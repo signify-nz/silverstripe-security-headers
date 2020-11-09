@@ -5,9 +5,7 @@ en:
   Signify\SecurityHeaders\Forms\GridField\GridFieldDeleteRelationsButton:
     DELETE: 'Delete {pluralName}'
     DELETE_ALL: 'Delete all {pluralName}'
-    DELETED:
-      one: 'Deleted one record.'
-      other: 'Deleted {count} records.'
+    DELETED: 'Deleted {count} records.'
     FILTER_BY: 'Filter by "{fieldName}"'
     FILTER_GROUP: '"{fieldName}" filter group'
     FILTER_INVERT: 'Invert Filter'

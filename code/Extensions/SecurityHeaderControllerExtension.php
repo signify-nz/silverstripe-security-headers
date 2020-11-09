@@ -1,21 +1,7 @@
 <?php
 
-namespace Signify\SecurityHeaders\Extensions;
-
-use SilverStripe\Core\Extension;
-use SilverStripe\Core\Config\Configurable;
-use SilverStripe\SiteConfig\SiteConfig;
-use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\DB;
-use SilverStripe\Control\Director;
-use SilverStripe\Dev\DevelopmentAdmin;
-use SilverStripe\Dev\DevBuildController;
-use SilverStripe\Control\Controller;
-use SilverStripe\ORM\DatabaseAdmin;
-
 class SecurityHeaderControllerExtension extends Extension
 {
-    use Configurable;
 
     /**
      * An array of HTTP headers.
@@ -63,9 +49,10 @@ class SecurityHeaderControllerExtension extends Extension
     public function onAfterInit()
     {
         $response = $this->owner->getResponse();
+        $config = Config::inst()->forClass(__CLASS__);
 
-        $headersToSend = (array) $this->config()->get('headers');
-        if ($this->config()->get('enable_reporting') && $this->config()->get('use_report_to')) {
+        $headersToSend = (array) $config->get('headers');
+        if ($config->get('enable_reporting') && $config->get('use_report_to')) {
             $this->addReportToHeader($headersToSend);
         }
 
@@ -80,7 +67,7 @@ class SecurityHeaderControllerExtension extends Extension
                     $header = 'Content-Security-Policy-Report-Only';
                 }
 
-                if ($this->config()->get('enable_reporting')) {
+                if ($config->get('enable_reporting')) {
                     // Add or update report-uri directive.
                     if (strpos($value, 'report-uri')) {
                         $value = str_replace('report-uri', $this->getReportURIDirective(), $value);
@@ -90,7 +77,7 @@ class SecurityHeaderControllerExtension extends Extension
 
                     // Add report-to directive.
                     // Note that unlike report-uri, only the first endpoint is used if multiple are declared.
-                    if ($this->config()->get('use_report_to')) {
+                    if ($config->get('use_report_to')) {
                         if (strpos($value, 'report-to') === false) {
                             $value = rtrim($value, ';') . "; {$this->getReportToDirective()};";
                         }
@@ -122,17 +109,17 @@ class SecurityHeaderControllerExtension extends Extension
 
     protected function getReportURI()
     {
-        return $this->config()->get('report_uri');
+        return Config::inst()->get(__CLASS__, 'report_uri');
     }
 
     protected function getIncludeSubdomains()
     {
-        return $this->config()->get('report_to_subdomains');
+        return Config::inst()->get(__CLASS__, 'report_to_subdomains');
     }
 
     protected function getReportToGroup()
     {
-        return $this->config()->get('report_to_group');
+        return Config::inst()->get(__CLASS__, 'report_to_group');
     }
 
     protected function getReportURIDirective()

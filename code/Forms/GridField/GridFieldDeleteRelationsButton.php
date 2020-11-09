@@ -1,41 +1,12 @@
 <?php
 
-namespace Signify\SecurityHeaders\Forms\GridField;
-
-use Signify\SecurityHeaders\Forms\Validators\GridFieldDeleteRelationsValidator;
-use SilverStripe\Forms\GridField\GridField_HTMLProvider;
-use SilverStripe\Forms\GridField\GridField_URLHandler;
-use SilverStripe\Forms\GridField\GridField;
-use SilverStripe\Forms\GridField\GridField_FormAction;
-use SilverStripe\Control\HTTPRequest;
-use SilverStripe\Core\Extensible;
-use SilverStripe\Security\Security;
-use SilverStripe\View\ArrayData;
-use SilverStripe\Forms\FormAction;
-use SilverStripe\View\SSViewer;
-use SilverStripe\Forms\FieldList;
-use SilverStripe\Core\Injector\Injectable;
-use SilverStripe\ORM\DataObject;
-use SilverStripe\Forms\Form;
-use SilverStripe\Forms\DropdownField;
-use SilverStripe\Forms\FieldGroup;
-use SilverStripe\Forms\FormField;
-use SilverStripe\Forms\CheckboxField;
-use SilverStripe\Core\Manifest\ModuleLoader;
-use SilverStripe\Forms\ReadonlyField;
-use SilverStripe\ORM\ArrayList;
-use SilverStripe\View\Requirements;
-use UncleCheese\DisplayLogic\Forms\Wrapper;
-
 /**
  * Adds an delete button to the bottom or top of a GridField.
  * Clicking the button opens a modal in which a user can select filter options.
  * The user can then delete models from the gridfield's list based on those filter options.
  */
-class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridField_URLHandler
+class GridFieldDeleteRelationsButton extends SS_Object implements GridField_HTMLProvider, GridField_ActionProvider, GridField_URLHandler
 {
-    use Injectable, Extensible;
-
     /**
      * Fragment to write the button to
      */
@@ -61,6 +32,11 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
      * @var FieldList
      */
     protected $filterFields;
+
+    /**
+     * @var bool
+     */
+    protected $hasDisplayLogic;
 
     /**
      * @var array
@@ -127,14 +103,13 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
      */
     public function getHTMLFragments($gridField)
     {
-        if (ModuleLoader::inst()->getManifest()->moduleExists('unclecheese/display-logic')) {
-            Requirements::javascript('signify-nz/silverstripe-security-headers:client/dist/main.js');
-        }
+        Requirements::css('silverstripe-security-headers/client/dist/main.css');
+        Requirements::javascript('silverstripe-security-headers/client/dist/main.js');
         $modalID = $gridField->ID() . '_DeleteRelationsModal';
 
         // Check for form message prior to rendering form (which clears session messages)
         $form = $this->DeletionForm($gridField);
-        $hasMessage = $form && $form->getMessage();
+        $hasMessage = $form && $form->Message();
 
         // Render modal
         $template = SSViewer::get_templates_by_class(__CLASS__, '_Modal');
@@ -154,7 +129,8 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
             null
         );
         $button
-        ->addExtraClass('btn btn-outline-danger font-icon-trash btn--icon-large action_import')
+        ->setAttribute('data-icon', 'delete')
+        ->addExtraClass('ss-ui-action-destructive js-delete-relations-btn')
         ->setForm($gridField->getForm())
         ->setAttribute('data-toggle', 'modal')
         ->setAttribute('aria-controls', $modalID)
@@ -169,6 +145,28 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
         return [
             $this->targetFragment => $button->Field()
         ];
+    }
+
+	/**
+	 * export is an action button
+	 */
+	public function getActions($gridField) {
+		return [
+            'DeletionForm',
+            'handleDelete',
+        ];
+	}
+
+    public function handleAction(GridField $gridField, $actionName, $arguments, $data)
+    {
+        switch ($actionName) {
+            case 'delete':
+                return $this->handleDelete($gridField, $gridField->getRequest());
+            case 'deletionForm':
+                return $this->DeletionForm($gridField);
+            default:
+                return null;
+        }
     }
 
     /**
@@ -201,7 +199,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
 
         $dummyObj = $this->getDummyObject();
 
-        if (!$dummyObj->canCreate(Security::getCurrentUser())) {
+        if (!$dummyObj->canCreate(Member::currentUser())) {
             return false;
         }
 
@@ -213,7 +211,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
                 'Delete {pluralName}',
                 ['pluralName' => $dummyObj->plural_name()]
             ))
-            ->addExtraClass('btn btn-danger font-icon-trash')
+            ->addExtraClass('ss-ui-action-destructive')
         );
 
         $form = new Form(
@@ -224,7 +222,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
             new GridFieldDeleteRelationsValidator()
         );
         $form->setFormAction($gridField->Link('delete'));
-        if ($form->getMessage()) {
+        if ($form->Message()) {
             $form->addExtraClass('validationerror');
         }
 
@@ -237,10 +235,10 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
      * Deletes models from the gridfield list based on user-supplied filters.
      *
      * @param GridField $gridField
-     * @param HTTPRequest $request
+     * @param SS_HTTPRequest $request
      * @return bool|HTTPResponse
      */
-    public function handleDelete($gridField, HTTPRequest $request)
+    public function handleDelete($gridField, $request)
     {
         $data = $this->parseQueryString($request->getBody());
         if (empty($data)) {
@@ -248,11 +246,8 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
         }
         $form = $this->DeletionForm($gridField);
         $form->loadDataFrom($data);
-        $validationResult = $form->validationResult();
-        if (!$validationResult->isValid()) {
-            $form->setSessionValidationResult($validationResult);
-            $form->setSessionData($data);
-            return $gridField->redirectBack();
+        if (!$form->validate()) {
+            return Controller::curr()->redirectBack();
         }
 
         // Prepare filters based on user input.
@@ -287,13 +282,13 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
                 $dataObject->delete();
                 $dataObject->destroy();
             }
-            $message .= _t(self::class . '.DELETED', 'Deleted one record.|Deleted {count} records.', ['count' => $count]);
+            $message .= _t(self::class . '.DELETED', 'Deleted {count} records.', ['count' => $count]);
         } else {
             $message .= _t(self::class . '.NOT_DELETED', 'Nothing to delete.');
         }
 
         $gridField->getForm()->sessionMessage($message, 'good');
-        return $gridField->redirectBack();
+        return Controller::curr()->redirectBack();
     }
 
     /**
@@ -420,7 +415,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
                 'Delete all {pluralName}',
                 ['pluralName' => $this->getDummyObject()->plural_name()]
             )
-        ));
+        )->setFieldHolderTemplate(CheckboxField::class . '_holder_noRight'));
         foreach ($this->getFilterFields() as $field) {
             $fields->add($this->getFieldAsComposite($field));
         }
@@ -432,10 +427,11 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
      * necessary filter fields to support the given field.
      *
      * @param FormField $field
-     * @return \SilverStripe\Forms\CompositeField
+     * @return CompositeField
      */
     protected function getFieldAsComposite(FormField $field)
     {
+        // $origField = $this->hasDisplayLogic() ? DisplayLogicWrapper::create($field) : $field;
         $fields = [
             $filterBy = CheckboxField::create(
                 $field->Name . self::FILTER_BY_SUFFIX,
@@ -446,15 +442,18 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
                 ),
             ),
             $field,
-            $options = $this->getFilterTypesField($field->Name),
-            $invert = CheckboxField::create(
-                $field->Name . self::FILTER_INVERT_SUFFIX,
-                _t(
-                    self::class . '.FILTER_INVERT',
-                    'Invert Filter'
-                ),
-            )
         ];
+        $options = $this->getFilterTypesField($field->Name);
+        foreach ($options as $option) {
+            $fields[] = $option;
+        }
+        $fields[] = $invert = CheckboxField::create(
+            $field->Name . self::FILTER_INVERT_SUFFIX,
+            _t(
+                self::class . '.FILTER_INVERT',
+                'Invert Filter'
+            ),
+        );
 
         $group = FieldGroup::create(
             _t(
@@ -463,11 +462,15 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
                 ['fieldName' => $field->Title()]
             ),
             $fields
-        );
-        if (ModuleLoader::inst()->getManifest()->moduleExists('unclecheese/display-logic')) {
-            $group = Wrapper::create($group);
+        )->setFieldHolderTemplate(FieldGroup::class . '_holder_noLeft');
+        if ($this->hasDisplayLogic()) {
+            $group = DisplayLogicWrapper::create($group);
             $field->displayIf($filterBy->Name)->isChecked();
-            $options->displayIf($filterBy->Name)->isChecked();
+            foreach ($options as $optionsField) {
+                if (!$optionsField instanceof HiddenField) {
+                    $optionsField->displayIf($filterBy->Name)->isChecked();
+                }
+            }
             $invert->displayIf($filterBy->Name)->isChecked();
             $group->hideIf(self::DELETE_ALL)->isChecked();
         }
@@ -480,7 +483,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
      * {@link GridFieldDeleteRelationsButton::setFilterOptions()}.
      *
      * @param string $fieldName
-     * @return FormField
+     * @return FormField[]
      */
     protected function getFilterTypesField($fieldName)
     {
@@ -490,6 +493,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
         } else {
             $options = $allOptions[self::DEFAULT_OPTION];
         }
+        $fields = array();
         $filterFieldName = $fieldName . self::OPTION_FIELD_SUFFIX;
         $filterFieldTitle = _t(
             self::class . '.FILTER_TYPE',
@@ -497,12 +501,16 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
             ['fieldName' => $fieldName]
         );
         if (count($options) == 1) {
-            $field = ReadonlyField::create(
+            $fields[] = ReadonlyField::create(
+                $filterFieldName . '__READONLY',
+                $filterFieldTitle,
+                $options[0]
+            )->setTemplate('ReadonlyField_displaylogic');
+            $fields[] = HiddenField::create(
                 $filterFieldName,
                 $filterFieldTitle,
                 $options[0]
-            )->setIncludeHiddenField(true)
-            ->setTemplate('Signify\SecurityHeaders\Forms\ReadonlyField');
+            );
         } else {
             $field = DropdownField::create(
                 $filterFieldName,
@@ -513,9 +521,10 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
             if (in_array('ExactMatch', $options)) {
                 $field->setValue('ExactMatch');
             }
+            $fields[] = $field;
         }
-        $this->extend('updateFilterOptionsField', $field, $fieldName);
-        return $field;
+        $this->extend('updateFilterOptionsField', $fields, $fieldName);
+        return $fields;
     }
 
     /**
@@ -552,5 +561,14 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
         parse_str($data, $result);
 
         return array_combine(array_map('hex2bin', array_keys($result)), $result);
+    }
+
+    protected function hasDisplayLogic()
+    {
+        if ($this->hasDisplayLogic == null) {
+            $modules = SS_ClassLoader::instance()->getManifest()->getModules();
+            $this->hasDisplayLogic = array_key_exists('display_logic', $modules);
+        }
+        return $this->hasDisplayLogic;
     }
 }

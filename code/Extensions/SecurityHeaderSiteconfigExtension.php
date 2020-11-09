@@ -1,11 +1,4 @@
 <?php
-namespace Signify\SecurityHeaders\Extensions;
-
-use SilverStripe\ORM\DataExtension;
-use SilverStripe\Security\Permission;
-use SilverStripe\Forms\FieldList;
-use SilverStripe\Forms\CheckboxField;
-use SilverStripe\Security\PermissionProvider;
 
 class SecurityHeaderSiteconfigExtension extends DataExtension implements PermissionProvider
 {

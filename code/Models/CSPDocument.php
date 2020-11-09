@@ -1,8 +1,4 @@
 <?php
-namespace Signify\SecurityHeaders\Models;
-
-use SilverStripe\ORM\DataObject;
-use SilverStripe\CMS\Model\SiteTree;
 
 class CSPDocument extends DataObject {
 

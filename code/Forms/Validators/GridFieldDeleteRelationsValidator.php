@@ -1,10 +1,5 @@
 <?php
 
-namespace Signify\SecurityHeaders\Forms\Validators;
-
-use Signify\SecurityHeaders\Forms\GridField\GridFieldDeleteRelationsButton;
-use SilverStripe\Forms\Validator;
-
 class GridFieldDeleteRelationsValidator extends Validator
 {
     public function php($data)
@@ -26,7 +21,7 @@ class GridFieldDeleteRelationsValidator extends Validator
             );
             $filters[] = GridFieldDeleteRelationsButton::DELETE_ALL;
             foreach ($filters as $fieldName) {
-                $this->validationError($fieldName, $message);
+                $this->validationError($fieldName, $message, 'required');
             }
             $valid = false;
         }
@@ -37,16 +32,16 @@ class GridFieldDeleteRelationsValidator extends Validator
                 GridFieldDeleteRelationsButton::class . '.VALIDATION_RequireFilters',
                 'At least one filter checkbox or "Delete all" must be checked.'
             );
-            $this->validationError(GridFieldDeleteRelationsButton::DELETE_ALL, $message);
+            $this->validationError(GridFieldDeleteRelationsButton::DELETE_ALL, $message, 'required');
             $valid = false;
         }
 
         // Add a message to the form itself.
         if (!$valid) {
-            $this->validationError('', _t(
+            $this->form->sessionMessage(_t(
                 GridFieldDeleteRelationsButton::class . '.VALIDATION_FormMessage',
                 'Please correct the validation errors.'
-            ));
+            ), 'bad');
         }
 
         return $valid;
