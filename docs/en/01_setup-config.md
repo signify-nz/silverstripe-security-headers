@@ -2,14 +2,14 @@
 
 ## Apply the extension
 
-Apply the `SecurityHeaderControllerExtension` to the controller of your choice - but we recommend applying it to `SilverStripe\Control\Controller` to ensure all responses from the website include your security headers.
+Apply the `SecurityHeaderControllerExtension` to the controller of your choice - but we recommend applying it to `Controller` to ensure all responses from the website include your security headers.
 
 For example, add this to your `_config/config.yml` file:
 
 ```yml
-SilverStripe\Control\Controller:
+Controller:
   extensions:
-    - Signify\SecurityHeaders\Extensions\SecurityHeaderControllerExtension
+    - SecurityHeaderControllerExtension
 ```
 
 ## Configure the headers
@@ -24,7 +24,7 @@ In the below example, the `X-Frame-Options` header value is changed from the def
 ---
 After: 'signify-security-headers'
 ---
-Signify\SecurityHeaders\Extensions\SecurityHeaderControllerExtension:
+SecurityHeaderControllerExtension:
   headers:
     X-Frame-Options: "allow-from https://example.com/"
 ```
@@ -38,7 +38,7 @@ Note that either `null` or an empty string will have the same effect.
 ---
 After: 'signify-security-headers'
 ---
-Signify\SecurityHeaders\Extensions\SecurityHeaderControllerExtension:
+SecurityHeaderControllerExtension:
   headers:
     Strict-Transport-Security: null
 ```

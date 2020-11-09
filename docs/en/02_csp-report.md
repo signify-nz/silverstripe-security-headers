@@ -1,6 +1,6 @@
 # Content Security Policy Violations Report
 
-Unless disabled ([see below](#disabling-reporting), content security policy violations will automatically be added to a report in the CMS in the reports section (at `/admin/reports/show/Signify-SecurityHeaders-Reports-CSPViolationsReport`).
+Unless disabled ([see below](#disabling-reporting), content security policy violations will automatically be added to a report in the CMS in the reports section (at `/admin/reports/CSPViolationsReport`).
 Both the report-uri directive and the report-to directive/header combination are supported, though report-to is currently disabled by default as the implementation for that directive and header are expected to change (see the [working draft](https://www.w3.org/TR/reporting/) and the [editor's draft](https://w3c.github.io/reporting/)).
 
 If you supply your own endpoint using the report-uri directive, the default will also be added to it. It is expected that browsers will send a report to each endpoint in the report-uri directive.
@@ -11,9 +11,9 @@ You can optionally apply the `SecurityHeaderSiteconfigExtension` extension to Si
 It also comes with its own permission in case you want some members to have access to the site settings, but not this CSP setting.
 
 ```yml
-SilverStripe\SiteConfig\SiteConfig:
+SiteConfig:
   extensions:
-    - Signify\SecurityHeaders\Extensions\SecurityHeaderSiteconfigExtension
+    - SecurityHeaderSiteconfigExtension
 ```
 
 ## Enabling report-to
@@ -28,7 +28,7 @@ To enable the report-to directive and Report-To header to be used (for browsers 
 ---
 After: 'signify-security-headers'
 ---
-Signify\SecurityHeaders\Extensions\SecurityHeaderControllerExtension:
+SecurityHeaderControllerExtension:
   use_report_to: true
 ```
 
@@ -42,7 +42,7 @@ If you don't want the CMS reporting endpoint to automatically be added to the CS
 ---
 After: 'signify-security-headers'
 ---
-Signify\SecurityHeaders\Extensions\SecurityHeaderControllerExtension:
+SecurityHeaderControllerExtension:
   enable_reporting: false
 ```
 
