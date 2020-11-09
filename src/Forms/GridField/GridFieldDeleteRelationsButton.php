@@ -501,7 +501,8 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
                 $filterFieldName,
                 $filterFieldTitle,
                 $options[0]
-            )->setIncludeHiddenField(true);
+            )->setIncludeHiddenField(true)
+            ->setTemplate('Signify\SecurityHeaders\Forms\ReadonlyField');
         } else {
             $field = DropdownField::create(
                 $filterFieldName,
