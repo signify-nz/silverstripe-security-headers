@@ -269,7 +269,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
                 if (!empty($data[$fieldName . self::FILTER_INVERT_SUFFIX])) {
                     $filterType .= ':not';
                 }
-                $filters["$fieldName:$filterType"] = $data[$fieldName];
+                $filters["$fieldName:$filterType"] = empty($data[$fieldName]) ? null : $data[$fieldName];
             }
         }
 
