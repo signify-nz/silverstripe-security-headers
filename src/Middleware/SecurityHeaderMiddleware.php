@@ -96,6 +96,7 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
             $response->addHeader($header, $value);
         }
 
+        return $response;
     }
 
     /**
