@@ -1,10 +1,10 @@
 <?php
-namespace Signify\SecurityHeaders\Tests;
+namespace Signify\Tests;
 
 use SilverStripe\Dev\FunctionalTest;
 use SilverStripe\SiteConfig\SiteConfig;
-use Signify\SecurityHeaders\Extensions\SecurityHeaderSiteconfigExtension;
-use Signify\SecurityHeaders\Extensions\SecurityHeaderControllerExtension;
+use Signify\Extensions\SecurityHeaderSiteconfigExtension;
+use Signify\Extensions\SecurityHeaderControllerExtension;
 use SilverStripe\Control\Controller;
 use SilverStripe\Versioned\Versioned;
 

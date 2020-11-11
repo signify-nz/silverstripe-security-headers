@@ -1,16 +1,13 @@
 <?php
 
-namespace Signify\SecurityHeaders\Extensions;
+namespace Signify\Extensions;
 
 use SilverStripe\Core\Extension;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\SiteConfig\SiteConfig;
-use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\DB;
 use SilverStripe\Control\Director;
 use SilverStripe\Dev\DevelopmentAdmin;
 use SilverStripe\Dev\DevBuildController;
-use SilverStripe\Control\Controller;
 use SilverStripe\ORM\DatabaseAdmin;
 
 class SecurityHeaderControllerExtension extends Extension

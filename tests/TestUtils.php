@@ -1,5 +1,5 @@
 <?php
-namespace Signify\SecurityHeaders\Tests;
+namespace Signify\Tests;
 
 use SilverStripe\Core\Config\Config;
 

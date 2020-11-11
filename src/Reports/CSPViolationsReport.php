@@ -1,11 +1,11 @@
 <?php
 
-namespace Signify\SecurityHeaders\Reports;
+namespace Signify\Reports;
 
 use SilverStripe\Reports\Report;
-use Signify\SecurityHeaders\Models\CSPViolation;
+use Signify\Models\CSPViolation;
 use SilverStripe\Forms\GridField\GridFieldDeleteAction;
-use Signify\SecurityHeaders\Forms\GridField\GridFieldDeleteRelationsButton;
+use Signify\Forms\GridField\GridFieldDeleteRelationsButton;
 use SilverStripe\View\Requirements;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\NumericField;

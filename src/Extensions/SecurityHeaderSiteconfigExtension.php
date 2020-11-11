@@ -1,5 +1,5 @@
 <?php
-namespace Signify\SecurityHeaders\Extensions;
+namespace Signify\Extensions;
 
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\Security\Permission;

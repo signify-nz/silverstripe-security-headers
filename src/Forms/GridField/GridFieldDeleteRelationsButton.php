@@ -1,8 +1,8 @@
 <?php
 
-namespace Signify\SecurityHeaders\Forms\GridField;
+namespace Signify\Forms\GridField;
 
-use Signify\SecurityHeaders\Forms\Validators\GridFieldDeleteRelationsValidator;
+use Signify\Forms\Validators\GridFieldDeleteRelationsValidator;
 use SilverStripe\Forms\GridField\GridField_HTMLProvider;
 use SilverStripe\Forms\GridField\GridField_URLHandler;
 use SilverStripe\Forms\GridField\GridField;
@@ -502,7 +502,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
                 $filterFieldTitle,
                 $options[0]
             )->setIncludeHiddenField(true)
-            ->setTemplate('Signify\SecurityHeaders\Forms\ReadonlyField');
+            ->setTemplate('Signify\Forms\ReadonlyField');
         } else {
             $field = DropdownField::create(
                 $filterFieldName,

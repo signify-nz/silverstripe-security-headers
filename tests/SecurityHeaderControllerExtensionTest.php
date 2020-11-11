@@ -1,9 +1,9 @@
 <?php
-namespace Signify\SecurityHeaders\Tests;
+namespace Signify\Tests;
 
 use SilverStripe\Dev\FunctionalTest;
 use SilverStripe\Control\Controller;
-use Signify\SecurityHeaders\Extensions\SecurityHeaderControllerExtension;
+use Signify\Extensions\SecurityHeaderControllerExtension;
 use SilverStripe\Control\Director;
 use SilverStripe\Versioned\Versioned;
 
