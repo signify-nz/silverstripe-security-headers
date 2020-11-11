@@ -71,7 +71,7 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
             $value = preg_replace('/\v/', '', $value);
 
             if ($header === 'Content-Security-Policy') {
-                if ($this->isCSPReportingOnly()) {
+                if ($this->isCSPReportingOnly($request)) {
                     $header = 'Content-Security-Policy-Report-Only';
                 }
 
@@ -92,7 +92,6 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
                     }
                 }
             }
-
             $response->addHeader($header, $value);
         }
 
@@ -103,18 +102,12 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
      * Returns true if the Content-Security-Policy-Report-Only header should be used.
      * @return boolean
      */
-    public function isCSPReportingOnly()
+    public function isCSPReportingOnly($request)
     {
-        // $devBuildControllers = [
-        //     DevBuildController::class,
-        //     DevelopmentAdmin::class,
-        //     DatabaseAdmin::class
-        // ];
-        // // If we're running one of these controllers, checking SiteConfig can cause issues.
-        // if (in_array(get_class($this->owner), $devBuildControllers)) {
-        //     return false;
-        // }
-        // return SiteConfig::current_site_config()->CSPReportingOnly;
+        if ($request->getURL() == 'dev/build') {
+            return false;
+        }
+        return SiteConfig::current_site_config()->CSPReportingOnly;
     }
 
     protected function getReportURI()
