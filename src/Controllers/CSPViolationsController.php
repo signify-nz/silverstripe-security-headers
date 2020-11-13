@@ -10,7 +10,7 @@ use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\CMS\Controllers\RootURLController;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\ORM\FieldType\DBDatetime;
-use Signify\Extensions\SecurityHeaderControllerExtension;
+use Signify\Middleware\SecurityHeaderMiddleware;
 
 class CSPViolationsController extends Controller
 {
@@ -193,7 +193,7 @@ class CSPViolationsController extends Controller
         $origin = $request->getHeader('origin');
 
         // The origin header may not be set for report-to requests, so null must be considered sameorigin.
-        if (SecurityHeaderControllerExtension::config()->get('use_report_to') && $origin === null) {
+        if (SecurityHeaderMiddleware::config()->get('use_report_to') && $origin === null) {
             return true;
         }
 

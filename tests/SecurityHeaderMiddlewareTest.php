@@ -2,12 +2,11 @@
 namespace Signify\Tests;
 
 use SilverStripe\Dev\FunctionalTest;
-use SilverStripe\Control\Controller;
-use Signify\Extensions\SecurityHeaderControllerExtension;
+use Signify\Middleware\SecurityHeaderMiddleware;
 use SilverStripe\Control\Director;
 use SilverStripe\Versioned\Versioned;
 
-class SecurityHeaderControllerExtensionTest extends FunctionalTest
+class SecurityHeaderMiddlewareExtensionTest extends FunctionalTest
 {
     protected static $fixture_file = 'fixtures.yml';
 
@@ -24,20 +23,17 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
-        // Add extension.
-        Controller::add_extension(SecurityHeaderControllerExtension::class);
 
         // Set test header values.
-        static::$originalHeaderValues = SecurityHeaderControllerExtension::config()->get('headers');
-        SecurityHeaderControllerExtension::config()->merge('headers', self::$testHeaders);
+        static::$originalHeaderValues = SecurityHeaderMiddleware::config()->get('headers');
+        SecurityHeaderMiddleware::config()->merge('headers', self::$testHeaders);
     }
 
     public static function tearDownAfterClass()
     {
         parent::tearDownAfterClass();
-        // Remove extension and reset headers to defaults.
-        Controller::remove_extension(SecurityHeaderControllerExtension::class);
-        SecurityHeaderControllerExtension::config()->merge('headers', static::$originalHeaderValues);
+        // Reset headers to defaults.
+        SecurityHeaderMiddleware::config()->merge('headers', static::$originalHeaderValues);
     }
 
     public function testResponseHeaders()
@@ -46,7 +42,7 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
 
         // Test all headers, not just the default ones or just the ones in self::$testHeaders.
         $headersSent = array_change_key_case(
-            array_merge(SecurityHeaderControllerExtension::config()->get('headers'), self::$testHeaders),
+            array_merge(SecurityHeaderMiddleware::config()->get('headers'), self::$testHeaders),
             CASE_LOWER
         );
         $headersReceived = array_change_key_case($response->getHeaders(), CASE_LOWER);
@@ -67,7 +63,7 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
 
     public function testReportURIAdded()
     {
-        $defaultUri = SecurityHeaderControllerExtension::config()->get('report_uri');
+        $defaultUri = SecurityHeaderMiddleware::config()->get('report_uri');
         $response = $this->getResponse();
         $csp = $response->getHeader('Content-Security-Policy');
 
@@ -80,14 +76,14 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
         $testURI = 'https://example.test/endpoint.aspx';
         TestUtils::testWithConfig(
             [
-                SecurityHeaderControllerExtension::class => [
+                SecurityHeaderMiddleware::class => [
                     'headers' => [
                         'Content-Security-Policy' => "default-src 'self'; report-uri $testURI;",
                     ],
                 ],
             ],
             function () use ($testURI) {
-                $defaultUri = SecurityHeaderControllerExtension::config()->get('report_uri');
+                $defaultUri = SecurityHeaderMiddleware::config()->get('report_uri');
                 $response = $this->getResponse();
                 $csp = $response->getHeader('Content-Security-Policy');
 
@@ -102,7 +98,7 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
     {
         TestUtils::testWithConfig(
             [
-                SecurityHeaderControllerExtension::class => [
+                SecurityHeaderMiddleware::class => [
                     'enable_reporting' => false,
                     'use_report_to' => true,
                 ],
@@ -133,13 +129,13 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
     {
         TestUtils::testWithConfig(
             [
-                SecurityHeaderControllerExtension::class => [
+                SecurityHeaderMiddleware::class => [
                     'use_report_to' => true,
                 ],
             ],
             function () {
-                $defaultEndpoint = SecurityHeaderControllerExtension::config()->get('report_to_group');
-                $defaultUri = Director::absoluteURL(SecurityHeaderControllerExtension::config()->get('report_uri'));
+                $defaultEndpoint = SecurityHeaderMiddleware::config()->get('report_to_group');
+                $defaultUri = Director::absoluteURL(SecurityHeaderMiddleware::config()->get('report_uri'));
                 $response = $this->getResponse();
                 $csp = $response->getHeader('Content-Security-Policy');
                 $reportHeader = json_decode($response->getHeader('Report-To'), true);
