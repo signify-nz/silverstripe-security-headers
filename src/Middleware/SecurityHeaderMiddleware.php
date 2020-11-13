@@ -108,9 +108,6 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
      */
     public function isCSPReportingOnly($request)
     {
-        if ($request->getURL() == 'dev/build') {
-            return false;
-        }
         return SiteConfig::current_site_config()->CSPReportingOnly;
     }
 
