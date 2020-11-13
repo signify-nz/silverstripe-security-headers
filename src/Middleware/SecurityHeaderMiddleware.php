@@ -6,11 +6,12 @@ use SilverStripe\Control\Director;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\Middleware\HTTPMiddleware;
 use SilverStripe\Core\Config\Configurable;
+use SilverStripe\Core\Extensible;
 use SilverStripe\SiteConfig\SiteConfig;
 
 class SecurityHeaderMiddleware implements HTTPMiddleware
 {
-    use Configurable;
+    use Configurable, Extensible;
 
     /**
      * An array of HTTP headers.
@@ -92,7 +93,10 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
                     }
                 }
             }
-            $response->addHeader($header, $value);
+            $this->extend('updateHeader', $header, $value);
+            if ($value) {
+                $response->addHeader($header, $value);
+            }
         }
 
         return $response;
