@@ -1,6 +1,6 @@
 <?php
 
-class SecurityHeaderControllerExtensionTest extends FunctionalTest
+class SecurityHeaderRequestFilterTest extends FunctionalTest
 {
     protected static $fixture_file = 'fixtures.yml';
 
@@ -18,20 +18,20 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
     {
         parent::setUpBeforeClass();
         // Add extension.
-        Controller::add_extension(SecurityHeaderControllerExtension::class);
+        Controller::add_extension(SecurityHeaderRequestFilter::class);
 
         // Set test header values.
-        $config = Config::inst()->forClass(SecurityHeaderControllerExtension::class);
+        $config = Config::inst()->forClass(SecurityHeaderRequestFilter::class);
         static::$originalHeaderValues = $config->get('headers');
-        Config::inst()->update(SecurityHeaderControllerExtension::class, 'headers', self::$testHeaders);
+        Config::inst()->update(SecurityHeaderRequestFilter::class, 'headers', self::$testHeaders);
     }
 
     public static function tearDownAfterClass()
     {
         parent::tearDownAfterClass();
         // Remove extension and reset headers to defaults.
-        Controller::remove_extension(SecurityHeaderControllerExtension::class);
-        Config::inst()->update(SecurityHeaderControllerExtension::class, 'headers', static::$originalHeaderValues);
+        Controller::remove_extension(SecurityHeaderRequestFilter::class);
+        Config::inst()->update(SecurityHeaderRequestFilter::class, 'headers', static::$originalHeaderValues);
     }
 
     public function testResponseHeaders()
@@ -39,7 +39,7 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
         $response = $this->getResponse();
 
         // Test all headers, not just the default ones or just the ones in self::$testHeaders.
-        $config = Config::inst()->forClass(SecurityHeaderControllerExtension::class);
+        $config = Config::inst()->forClass(SecurityHeaderRequestFilter::class);
         $headersSent = array_change_key_case(
             array_merge($config->get('headers'), self::$testHeaders),
             CASE_LOWER
@@ -62,7 +62,7 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
 
     public function testReportURIAdded()
     {
-        $config = Config::inst()->forClass(SecurityHeaderControllerExtension::class);
+        $config = Config::inst()->forClass(SecurityHeaderRequestFilter::class);
         $defaultUri = $config->get('report_uri');
         $response = $this->getResponse();
         $csp = $response->getHeader('Content-Security-Policy');
@@ -74,10 +74,10 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
     public function testReportURIAppended()
     {
         $testURI = 'https://example.test/endpoint.aspx';
-        $config = Config::inst()->forClass(SecurityHeaderControllerExtension::class);
+        $config = Config::inst()->forClass(SecurityHeaderRequestFilter::class);
         SigSecurityTestUtils::testWithConfig(
             [
-                SecurityHeaderControllerExtension::class => [
+                SecurityHeaderRequestFilter::class => [
                     'headers' => [
                         'Content-Security-Policy' => "default-src 'self'; report-uri $testURI;",
                     ],
@@ -99,7 +99,7 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
     {
         SigSecurityTestUtils::testWithConfig(
             [
-                SecurityHeaderControllerExtension::class => [
+                SecurityHeaderRequestFilter::class => [
                     'enable_reporting' => false,
                     'use_report_to' => true,
                 ],
@@ -128,10 +128,10 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
 
     public function testReportToAdded()
     {
-        $config = Config::inst()->forClass(SecurityHeaderControllerExtension::class);
+        $config = Config::inst()->forClass(SecurityHeaderRequestFilter::class);
         SigSecurityTestUtils::testWithConfig(
             [
-                SecurityHeaderControllerExtension::class => [
+                SecurityHeaderRequestFilter::class => [
                     'use_report_to' => true,
                 ],
             ],

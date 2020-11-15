@@ -28,7 +28,7 @@ To enable the report-to directive and Report-To header to be used (for browsers 
 ---
 After: 'signify-security-headers'
 ---
-SecurityHeaderControllerExtension:
+SecurityHeaderRequestFilter:
   use_report_to: true
 ```
 
@@ -42,7 +42,7 @@ If you don't want the CMS reporting endpoint to automatically be added to the CS
 ---
 After: 'signify-security-headers'
 ---
-SecurityHeaderControllerExtension:
+SecurityHeaderRequestFilter:
   enable_reporting: false
 ```
 
@@ -50,4 +50,4 @@ Note that this does not disable the endpoint or remove the report from the CMS -
 
 If `enable_reporting` is set to false, the value of `use_report_to` (see above) no longer matters
 
-Note that this also doesn't affect the ability to set the CSP to report-only mode with SecurityHeaderControllerExtension (see [Apply the extensions](#apply-the-extensions)).
+Note that this also doesn't affect the ability to set the CSP to report-only mode (see [Report-Only mode](#report-only-mode)).

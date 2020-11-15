@@ -1,6 +1,6 @@
 <?php
 
-class SecurityHeaderControllerExtension extends Extension
+class SecurityHeaderRequestFilter extends SS_Object implements RequestFilter
 {
 
     /**
@@ -46,9 +46,14 @@ class SecurityHeaderControllerExtension extends Extension
      */
     private static $report_to_group = 'signify-csp-violation';
 
-    public function onAfterInit()
+    public function preRequest(SS_HTTPRequest $request, Session $session, DataModel $model)
     {
-        $response = $this->owner->getResponse();
+        // Return true to continue processing.
+        return true;
+    }
+
+    public function postRequest(SS_HTTPRequest $request, SS_HTTPResponse $response, DataModel $model)
+    {
         $config = Config::inst()->forClass(__CLASS__);
 
         $headersToSend = (array) $config->get('headers');
@@ -84,9 +89,12 @@ class SecurityHeaderControllerExtension extends Extension
                     }
                 }
             }
-
+            $this->extend('updateHeader', $header, $value, $request);
             $response->addHeader($header, $value);
         }
+
+        // return true to send the response.
+        return true;
     }
 
     /**
@@ -95,15 +103,6 @@ class SecurityHeaderControllerExtension extends Extension
      */
     public function isCSPReportingOnly()
     {
-        $devBuildControllers = [
-            DevBuildController::class,
-            DevelopmentAdmin::class,
-            DatabaseAdmin::class
-        ];
-        // If we're running one of these controllers, checking SiteConfig can cause issues.
-        if (in_array(get_class($this->owner), $devBuildControllers)) {
-            return false;
-        }
         return SiteConfig::current_site_config()->CSPReportingOnly;
     }
 
@@ -153,5 +152,4 @@ class SecurityHeaderControllerExtension extends Extension
         ];
         return json_encode($header);
     }
-
 }

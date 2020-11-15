@@ -1,20 +1,10 @@
 # Setup and Basic Configuration
 
-## Apply the extension
-
-Apply the `SecurityHeaderControllerExtension` to the controller of your choice - but we recommend applying it to `Controller` to ensure all responses from the website include your security headers.
-
-For example, add this to your `_config/config.yml` file:
-
-```yml
-Controller:
-  extensions:
-    - SecurityHeaderControllerExtension
-```
+The middleware is already added when you install the module.
 
 ## Configure the headers
 
-While some default headers are already set for your convenience, you may wish to add new headers, alter the values for the default headers, or even remove the default headers. This is all done with the `headers` configurable array on the `SecurityHeaderControllerExtension` extension.
+While some default headers are already set for your convenience, you may wish to add new headers, alter the values for the default headers, or even remove the default headers. This is all done with the `headers` configurable array on the `SecurityHeaderRequestFilter`.
 
 ### Add or amend a header value
 
@@ -24,7 +14,7 @@ In the below example, the `X-Frame-Options` header value is changed from the def
 ---
 After: 'signify-security-headers'
 ---
-SecurityHeaderControllerExtension:
+SecurityHeaderRequestFilter:
   headers:
     X-Frame-Options: "allow-from https://example.com/"
 ```
@@ -38,7 +28,7 @@ Note that either `null` or an empty string will have the same effect.
 ---
 After: 'signify-security-headers'
 ---
-SecurityHeaderControllerExtension:
+SecurityHeaderRequestFilter:
   headers:
     Strict-Transport-Security: null
 ```

@@ -7,16 +7,14 @@ class SecurityHeaderSiteconfigExtensionTest extends FunctionalTest
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
-        // Add extensions.
-        Controller::add_extension(SecurityHeaderControllerExtension::class);
+        // Add extension.
         SiteConfig::add_extension(SecurityHeaderSiteconfigExtension::class);
     }
 
     public static function tearDownAfterClass()
     {
         parent::tearDownAfterClass();
-        // Remove extensions.
-        Controller::remove_extension(SecurityHeaderControllerExtension::class);
+        // Remove extension.
         SiteConfig::remove_extension(SecurityHeaderSiteconfigExtension::class);
     }
 
@@ -32,7 +30,7 @@ class SecurityHeaderSiteconfigExtensionTest extends FunctionalTest
 
     public function testCSPisReportOnly()
     {
-        $config = Config::inst()->forClass(SecurityHeaderControllerExtension::class);
+        $config = Config::inst()->forClass(SecurityHeaderRequestFilter::class);
         $siteConfig = SiteConfig::current_site_config();
         $siteConfig->CSPReportingOnly = true;
         $siteConfig->write();

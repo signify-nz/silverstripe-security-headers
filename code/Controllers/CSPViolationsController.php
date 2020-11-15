@@ -181,7 +181,7 @@ class CSPViolationsController extends Controller
     protected function isSameOrigin($request)
     {
         $origin = $request->getHeader('Origin');
-        $config = Config::inst()->forClass(SecurityHeaderControllerExtension::class);
+        $config = Config::inst()->forClass(SecurityHeaderRequestFilter::class);
 
         // The origin header may not be set for report-to requests, so null must be considered sameorigin.
         if ($config->get('use_report_to') && $origin === null) {
