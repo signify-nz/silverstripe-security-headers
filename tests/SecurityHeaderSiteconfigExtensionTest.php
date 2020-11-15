@@ -4,8 +4,7 @@ namespace Signify\Tests;
 use SilverStripe\Dev\FunctionalTest;
 use SilverStripe\SiteConfig\SiteConfig;
 use Signify\Extensions\SecurityHeaderSiteconfigExtension;
-use Signify\Extensions\SecurityHeaderControllerExtension;
-use SilverStripe\Control\Controller;
+use Signify\Middleware\SecurityHeaderMiddleware;
 use SilverStripe\Versioned\Versioned;
 
 class SecurityHeaderSiteconfigExtensionTest extends FunctionalTest
@@ -15,16 +14,14 @@ class SecurityHeaderSiteconfigExtensionTest extends FunctionalTest
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
-        // Add extensions.
-        Controller::add_extension(SecurityHeaderControllerExtension::class);
+        // Add extension.
         SiteConfig::add_extension(SecurityHeaderSiteconfigExtension::class);
     }
 
     public static function tearDownAfterClass()
     {
         parent::tearDownAfterClass();
-        // Remove extensions.
-        Controller::remove_extension(SecurityHeaderControllerExtension::class);
+        // Remove extension.
         SiteConfig::remove_extension(SecurityHeaderSiteconfigExtension::class);
     }
 
@@ -42,8 +39,8 @@ class SecurityHeaderSiteconfigExtensionTest extends FunctionalTest
     {
         SiteConfig::current_site_config()->CSPReportingOnly = true;
         SiteConfig::current_site_config()->write();
-        $originalCSP = SecurityHeaderControllerExtension::config()->get('headers')['Content-Security-Policy'];
-        $originalCSP .= ' report-uri ' . SecurityHeaderControllerExtension::config()->get('report_uri') . ';';
+        $originalCSP = SecurityHeaderMiddleware::config()->get('headers')['global']['Content-Security-Policy'];
+        $originalCSP .= ' report-uri ' . SecurityHeaderMiddleware::config()->get('report_uri') . ';';
 
         $response = $this->getResponse();
         $csp = $response->getHeader('Content-Security-Policy');

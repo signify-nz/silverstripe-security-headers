@@ -1,25 +1,26 @@
 <?php
 
-namespace Signify\Extensions;
+namespace Signify\Middleware;
 
-use SilverStripe\Core\Extension;
-use SilverStripe\Core\Config\Configurable;
-use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\Control\Director;
-use SilverStripe\Dev\DevelopmentAdmin;
-use SilverStripe\Dev\DevBuildController;
-use SilverStripe\ORM\DatabaseAdmin;
+use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Control\Middleware\HTTPMiddleware;
+use SilverStripe\Core\Config\Configurable;
+use SilverStripe\Core\Extensible;
+use SilverStripe\SiteConfig\SiteConfig;
 
-class SecurityHeaderControllerExtension extends Extension
+class SecurityHeaderMiddleware implements HTTPMiddleware
 {
-    use Configurable;
+    use Configurable, Extensible;
 
     /**
      * An array of HTTP headers.
      * @config
      * @var array
      */
-    private static $headers = array();
+    private static $headers = [
+        'global' => array(),
+    ];
 
     /**
      * Whether to automatically add the CMS report endpoint to the CSP config.
@@ -57,11 +58,16 @@ class SecurityHeaderControllerExtension extends Extension
      */
     private static $report_to_group = 'signify-csp-violation';
 
-    public function onAfterInit()
+    public function process(HTTPRequest $request, callable $delegate)
     {
-        $response = $this->owner->getResponse();
+        $response = $delegate($request);
 
-        $headersToSend = (array) $this->config()->get('headers');
+        $headersConfig = (array) $this->config()->get('headers');
+        if (empty($headersConfig['global'])) {
+            return $response;
+        }
+
+        $headersToSend = $headersConfig['global'];
         if ($this->config()->get('enable_reporting') && $this->config()->get('use_report_to')) {
             $this->addReportToHeader($headersToSend);
         }
@@ -73,7 +79,7 @@ class SecurityHeaderControllerExtension extends Extension
             $value = preg_replace('/\v/', '', $value);
 
             if ($header === 'Content-Security-Policy') {
-                if ($this->isCSPReportingOnly()) {
+                if ($this->isCSPReportingOnly($request)) {
                     $header = 'Content-Security-Policy-Report-Only';
                 }
 
@@ -94,26 +100,21 @@ class SecurityHeaderControllerExtension extends Extension
                     }
                 }
             }
-
-            $response->addHeader($header, $value);
+            $this->extend('updateHeader', $header, $value, $request);
+            if ($value) {
+                $response->addHeader($header, $value);
+            }
         }
+
+        return $response;
     }
 
     /**
      * Returns true if the Content-Security-Policy-Report-Only header should be used.
      * @return boolean
      */
-    public function isCSPReportingOnly()
+    public function isCSPReportingOnly($request)
     {
-        $devBuildControllers = [
-            DevBuildController::class,
-            DevelopmentAdmin::class,
-            DatabaseAdmin::class
-        ];
-        // If we're running one of these controllers, checking SiteConfig can cause issues.
-        if (in_array(get_class($this->owner), $devBuildControllers)) {
-            return false;
-        }
         return SiteConfig::current_site_config()->CSPReportingOnly;
     }
 
