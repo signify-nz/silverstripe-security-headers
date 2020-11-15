@@ -7,11 +7,13 @@ class SecurityHeaderRequestFilterTest extends FunctionalTest
     private static $originalHeaderValues = null;
 
     private static $testHeaders = [
-        'Content-Security-Policy' => 'test-value1',
-        'Strict-Transport-Security' => 'test-value2',
-        'X-Frame-Options' => 'test-value3',
-        'X-XSS-Protection' => 'test-value4',
-        'X-Content-Type-Options' => 'test-value5'
+        'global' => [
+            'Content-Security-Policy' => 'test-value1',
+            'Strict-Transport-Security' => 'test-value2',
+            'X-Frame-Options' => 'test-value3',
+            'X-XSS-Protection' => 'test-value4',
+            'X-Content-Type-Options' => 'test-value5'
+        ],
     ];
 
     public static function setUpBeforeClass()
@@ -41,7 +43,7 @@ class SecurityHeaderRequestFilterTest extends FunctionalTest
         // Test all headers, not just the default ones or just the ones in self::$testHeaders.
         $config = Config::inst()->forClass(SecurityHeaderRequestFilter::class);
         $headersSent = array_change_key_case(
-            array_merge($config->get('headers'), self::$testHeaders),
+            ArrayLib::array_merge_recursive($config->get('headers'), self::$testHeaders),
             CASE_LOWER
         );
         $headersReceived = array_change_key_case($response->getHeaders(), CASE_LOWER);
@@ -50,13 +52,13 @@ class SecurityHeaderRequestFilterTest extends FunctionalTest
             if (in_array($header, $headersSent)) {
                 $this->assertEquals(
                     $value,
-                    $headersSent[$header],
+                    $headersSent['global'][$header],
                     "Test response value for header '$header' is equal to configured value."
                 );
             }
         }
 
-        $missedHeaders = array_diff_key($headersSent, $headersReceived);
+        $missedHeaders = array_diff_key($headersSent['global'], $headersReceived);
         $this->assertEmpty($missedHeaders, 'Test all headers are sent in the response.');
     }
 
@@ -79,7 +81,9 @@ class SecurityHeaderRequestFilterTest extends FunctionalTest
             [
                 SecurityHeaderRequestFilter::class => [
                     'headers' => [
-                        'Content-Security-Policy' => "default-src 'self'; report-uri $testURI;",
+                        'global' => [
+                            'Content-Security-Policy' => "default-src 'self'; report-uri $testURI;",
+                        ],
                     ],
                 ],
             ],

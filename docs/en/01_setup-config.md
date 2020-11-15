@@ -16,7 +16,8 @@ After: 'signify-security-headers'
 ---
 SecurityHeaderRequestFilter:
   headers:
-    X-Frame-Options: "allow-from https://example.com/"
+    global:
+      X-Frame-Options: "allow-from https://example.com/"
 ```
 
 ### Remove a default header value
@@ -30,7 +31,8 @@ After: 'signify-security-headers'
 ---
 SecurityHeaderRequestFilter:
   headers:
-    Strict-Transport-Security: null
+    global:
+      Strict-Transport-Security: null
 ```
 
 ## Changing the Content Security Policy

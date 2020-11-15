@@ -8,7 +8,9 @@ class SecurityHeaderRequestFilter extends SS_Object implements RequestFilter
      * @config
      * @var array
      */
-    private static $headers = array();
+    private static $headers = [
+        'global' => array(),
+    ];
 
     /**
      * Whether to automatically add the CMS report endpoint to the CSP config.
@@ -56,7 +58,13 @@ class SecurityHeaderRequestFilter extends SS_Object implements RequestFilter
     {
         $config = Config::inst()->forClass(__CLASS__);
 
-        $headersToSend = (array) $config->get('headers');
+        $headersConfig = (array) $config->get('headers');
+        if (empty($headersConfig['global'])) {
+            // Return true to send the response.
+            return true;
+        }
+
+        $headersToSend = $headersConfig['global'];
         if ($config->get('enable_reporting') && $config->get('use_report_to')) {
             $this->addReportToHeader($headersToSend);
         }
@@ -93,7 +101,7 @@ class SecurityHeaderRequestFilter extends SS_Object implements RequestFilter
             $response->addHeader($header, $value);
         }
 
-        // return true to send the response.
+        // Return true to send the response.
         return true;
     }
 

@@ -10,21 +10,22 @@ Injector:
 
 SecurityHeaderRequestFilter:
   headers:
-    Strict-Transport-Security: "max-age=31536000"
-    X-Frame-Options: "SAMEORIGIN"
-    X-XSS-Protection: "1; mode=block"
-    X-Content-Type-Options: "nosniff"
-    Referrer-Policy: same-origin
-    Content-Security-Policy: >-
-      default-src 'self';
-      script-src 'self' 'unsafe-inline' 'unsafe-eval';
-      style-src 'self' 'unsafe-inline';
-      img-src 'self' data:;
-      object-src 'none';
-      base-uri 'self';
-      form-action 'self';
-      frame-ancestors 'self';
-      block-all-mixed-content;
+    global:
+      Strict-Transport-Security: "max-age=31536000"
+      X-Frame-Options: "SAMEORIGIN"
+      X-XSS-Protection: "1; mode=block"
+      X-Content-Type-Options: "nosniff"
+      Referrer-Policy: same-origin
+      Content-Security-Policy: >-
+        default-src 'self';
+        script-src 'self' 'unsafe-inline' 'unsafe-eval';
+        style-src 'self' 'unsafe-inline';
+        img-src 'self' data:;
+        object-src 'none';
+        base-uri 'self';
+        form-action 'self';
+        frame-ancestors 'self';
+        block-all-mixed-content;
 
 ---
 Only:
@@ -32,13 +33,15 @@ Only:
 ---
 SecurityHeaderRequestFilter:
   headers:
-    # 5 minutes in dev.
-    Strict-Transport-Security: "max-age=300"
+    global:
+      # 5 minutes in dev.
+      Strict-Transport-Security: "max-age=300"
 ---
 Only:
   environment: test
 ---
 SecurityHeaderRequestFilter:
   headers:
-    # 1 hour in test.
-    Strict-Transport-Security: "max-age=3600"
+    global:
+      # 1 hour in test.
+      Strict-Transport-Security: "max-age=3600"

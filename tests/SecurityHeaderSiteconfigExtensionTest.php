@@ -34,7 +34,7 @@ class SecurityHeaderSiteconfigExtensionTest extends FunctionalTest
         $siteConfig = SiteConfig::current_site_config();
         $siteConfig->CSPReportingOnly = true;
         $siteConfig->write();
-        $originalCSP = $config->get('headers')['Content-Security-Policy'];
+        $originalCSP = $config->get('headers')['global']['Content-Security-Policy'];
         $originalCSP .= ' report-uri ' . $config->get('report_uri') . ';';
 
         $response = $this->getResponse();
