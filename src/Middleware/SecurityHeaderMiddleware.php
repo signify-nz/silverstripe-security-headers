@@ -100,7 +100,7 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
                     }
                 }
             }
-            $this->extend('updateHeader', $header, $value);
+            $this->extend('updateHeader', $header, $value, $request);
             if ($value) {
                 $response->addHeader($header, $value);
             }
