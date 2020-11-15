@@ -3,6 +3,7 @@ namespace Signify\Tests;
 
 use SilverStripe\Dev\FunctionalTest;
 use Signify\Middleware\SecurityHeaderMiddleware;
+use SilverStripe\Config\MergeStrategy\Priority;
 use SilverStripe\Control\Director;
 use SilverStripe\Versioned\Versioned;
 
@@ -13,11 +14,13 @@ class SecurityHeaderMiddlewareExtensionTest extends FunctionalTest
     private static $originalHeaderValues = null;
 
     private static $testHeaders = [
-        'Content-Security-Policy' => 'test-value1',
-        'Strict-Transport-Security' => 'test-value2',
-        'X-Frame-Options' => 'test-value3',
-        'X-XSS-Protection' => 'test-value4',
-        'X-Content-Type-Options' => 'test-value5'
+        'global' => [
+            'Content-Security-Policy' => 'test-value1',
+            'Strict-Transport-Security' => 'test-value2',
+            'X-Frame-Options' => 'test-value3',
+            'X-XSS-Protection' => 'test-value4',
+            'X-Content-Type-Options' => 'test-value5'
+        ]
     ];
 
     public static function setUpBeforeClass()
@@ -42,7 +45,7 @@ class SecurityHeaderMiddlewareExtensionTest extends FunctionalTest
 
         // Test all headers, not just the default ones or just the ones in self::$testHeaders.
         $headersSent = array_change_key_case(
-            array_merge(SecurityHeaderMiddleware::config()->get('headers'), self::$testHeaders),
+            Priority::mergeArray(self::$testHeaders, SecurityHeaderMiddleware::config()->get('headers')),
             CASE_LOWER
         );
         $headersReceived = array_change_key_case($response->getHeaders(), CASE_LOWER);
@@ -51,7 +54,7 @@ class SecurityHeaderMiddlewareExtensionTest extends FunctionalTest
             if (in_array($header, $headersSent)) {
                 $this->assertEquals(
                     $value,
-                    $headersSent[$header],
+                    $headersSent['global'][$header],
                     "Test response value for header '$header' is equal to configured value."
                 );
             }
@@ -78,7 +81,9 @@ class SecurityHeaderMiddlewareExtensionTest extends FunctionalTest
             [
                 SecurityHeaderMiddleware::class => [
                     'headers' => [
-                        'Content-Security-Policy' => "default-src 'self'; report-uri $testURI;",
+                        'global' => [
+                            'Content-Security-Policy' => "default-src 'self'; report-uri $testURI;",
+                        ],
                     ],
                 ],
             ],

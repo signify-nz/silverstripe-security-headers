@@ -18,7 +18,9 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
      * @config
      * @var array
      */
-    private static $headers = array();
+    private static $headers = [
+        'global' => array(),
+    ];
 
     /**
      * Whether to automatically add the CMS report endpoint to the CSP config.
@@ -60,7 +62,12 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
     {
         $response = $delegate($request);
 
-        $headersToSend = (array) $this->config()->get('headers');
+        $headersConfig = (array) $this->config()->get('headers');
+        if (empty($headersConfig['global'])) {
+            return $response;
+        }
+
+        $headersToSend = $headersConfig['global'];
         if ($this->config()->get('enable_reporting') && $this->config()->get('use_report_to')) {
             $this->addReportToHeader($headersToSend);
         }
