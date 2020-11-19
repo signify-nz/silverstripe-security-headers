@@ -30,6 +30,9 @@ class SecurityHeaderMiddlewareExtensionTest extends FunctionalTest
         // Set test header values.
         static::$originalHeaderValues = SecurityHeaderMiddleware::config()->get('headers');
         SecurityHeaderMiddleware::config()->merge('headers', self::$testHeaders);
+        // Add extension. Note this is needed to ensure the test database is constructed correctly when running both
+        // test classes together. It's not strictly needed for this test class alone.
+        SiteConfig::add_extension(SecurityHeaderSiteconfigExtension::class);
     }
 
     public static function tearDownAfterClass()
@@ -37,6 +40,8 @@ class SecurityHeaderMiddlewareExtensionTest extends FunctionalTest
         parent::tearDownAfterClass();
         // Reset headers to defaults.
         SecurityHeaderMiddleware::config()->merge('headers', static::$originalHeaderValues);
+        // Remove extension.
+        SiteConfig::remove_extension(SecurityHeaderSiteconfigExtension::class);
     }
 
     public function testResponseHeaders()
