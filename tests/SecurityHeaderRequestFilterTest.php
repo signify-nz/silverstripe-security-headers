@@ -46,7 +46,7 @@ class SecurityHeaderRequestFilterTest extends FunctionalTest
         $headersReceived = array_change_key_case($response->getHeaders(), CASE_LOWER);
 
         foreach ($headersReceived as $header => $value) {
-            if (in_array($header, $headersSent)) {
+            if (in_array($header, $headersSent['global'])) {
                 $this->assertEquals(
                     $value,
                     $headersSent['global'][$header],
