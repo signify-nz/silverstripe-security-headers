@@ -1,5 +1,6 @@
 {
   "name": "signify-nz/silverstripe-security-headers",
+  "description": "Adds configurable security headers to HTTP responses via middleware.",
   "type": "silverstripe-vendormodule",
   "license": "BSD-3-Clause",
   "authors": [
@@ -29,7 +30,8 @@
   },
   "autoload": {
     "psr-4": {
-      "Signify\\": "src/"
+      "Signify\\SecurityHeaders\\": "src/",
+      "Signify\\SecurityHeaders\\Tests\\": "tests/"
     }
   }
 }

@@ -2,8 +2,8 @@
 
 namespace Signify\Forms\GridField;
 
+use Signify\Forms\Validators\GridFieldDeleteRelationsValidator;
 use SilverStripe\Forms\GridField\GridField_HTMLProvider;
-use SilverStripe\Forms\GridField\GridField_ActionProvider;
 use SilverStripe\Forms\GridField\GridField_URLHandler;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridField_FormAction;
@@ -22,13 +22,17 @@ use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\FormField;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Core\Manifest\ModuleLoader;
+use SilverStripe\Forms\ReadonlyField;
+use SilverStripe\ORM\ArrayList;
+use SilverStripe\View\Requirements;
+use UncleCheese\DisplayLogic\Forms\Wrapper;
 
 /**
  * Adds an delete button to the bottom or top of a GridField.
  * Clicking the button opens a modal in which a user can select filter options.
  * The user can then delete models from the gridfield's list based on those filter options.
  */
-class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridField_ActionProvider, GridField_URLHandler
+class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridField_URLHandler
 {
     use Injectable, Extensible;
 
@@ -82,6 +86,8 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
 
     const FILTER_INVERT_SUFFIX = '__FilterInvert';
 
+    const DELETE_ALL = 'DeleteAll__FilterAll';
+
     /**
      * Filter options which are commonly used with string values.
      * @var array
@@ -121,6 +127,9 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
      */
     public function getHTMLFragments($gridField)
     {
+        if (ModuleLoader::inst()->getManifest()->moduleExists('unclecheese/display-logic')) {
+            Requirements::javascript('signify-nz/silverstripe-security-headers:client/dist/main.js');
+        }
         $modalID = $gridField->ID() . '_DeleteRelationsModal';
 
         // Check for form message prior to rendering form (which clears session messages)
@@ -163,33 +172,6 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
     }
 
     /**
-     * delete is an action button
-     *
-     * @param GridField $gridField
-     *
-     * @return array
-     */
-    public function getActions($gridField)
-    {
-        return [
-            'delete',
-            'deletionForm',
-        ];
-    }
-
-    public function handleAction(GridField $gridField, $actionName, $arguments, $data)
-    {
-        switch ($actionName) {
-            case 'delete':
-                return $this->handleDelete($data, $gridField);
-            case 'deletionForm':
-                return $this->DeletionForm($gridField);
-            default:
-                return null;
-        }
-    }
-
-    /**
      * it is also a URL
      *
      * @param GridField $gridField
@@ -226,7 +208,11 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
         $fields = $this->getPreparedFilterFields();
 
         $actions = new FieldList(
-            FormAction::create('delete', "Delete {$dummyObj->plural_name()}")
+            FormAction::create('delete', _t(
+                self::class . '.DELETE',
+                'Delete {pluralName}',
+                ['pluralName' => $dummyObj->plural_name()]
+            ))
             ->addExtraClass('btn btn-danger font-icon-trash')
         );
 
@@ -234,9 +220,13 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
             $gridField,
             'deletionForm',
             $fields,
-            $actions
+            $actions,
+            new GridFieldDeleteRelationsValidator()
         );
         $form->setFormAction($gridField->Link('delete'));
+        if ($form->getMessage()) {
+            $form->addExtraClass('validationerror');
+        }
 
         $this->extend('updateDeletionForm', $form);
 
@@ -256,27 +246,39 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
         if (empty($data)) {
             $data = $request->requestVars();
         }
-        $filters = array();
+        $form = $this->DeletionForm($gridField);
+        $form->loadDataFrom($data);
+        $validationResult = $form->validationResult();
+        if (!$validationResult->isValid()) {
+            $form->setSessionValidationResult($validationResult);
+            $form->setSessionData($data);
+            return $gridField->redirectBack();
+        }
 
         // Prepare filters based on user input.
+        $filters = array();
         foreach ($data as $key => $value) {
             // If this fields is a "filter by" field, and the value is truthy, add the filter.
-            if (preg_match('/' . static::FILTER_BY_SUFFIX . '$/', $key) && $value) {
-                $fieldName = str_replace(static::FILTER_BY_SUFFIX, '', $key);
-                $filterType = $data[$fieldName . static::OPTION_FIELD_SUFFIX];
+            if (preg_match('/' . self::FILTER_BY_SUFFIX . '$/', $key) && $value) {
+                $fieldName = str_replace(self::FILTER_BY_SUFFIX, '', $key);
+                $filterType = $data[$fieldName . self::OPTION_FIELD_SUFFIX];
                 if (empty($filterType)) {
                     $filterType = 'ExactMatch';
                 }
-                if (!empty($data[$fieldName . static::FILTER_INVERT_SUFFIX])) {
+                if (!empty($data[$fieldName . self::FILTER_INVERT_SUFFIX])) {
                     $filterType .= ':not';
                 }
-                $filters["$fieldName:$filterType"] = $data[$fieldName];
+                $filters["$fieldName:$filterType"] = empty($data[$fieldName]) ? null : $data[$fieldName];
             }
         }
+
         // Ensure data objects are filtered to only include items in this gridfield.
         $filters['ID'] = $gridField->getManipulatedList()->column('ID');
-
-        $deletions = $gridField->getModelClass()::get()->filter($filters);
+        if (empty($filters['ID'])) {
+            $deletions = new ArrayList();
+        } else {
+            $deletions = $gridField->getModelClass()::get()->filter($filters);
+        }
 
         $message = '';
         if ($count = $deletions->count()) {
@@ -285,9 +287,9 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
                 $dataObject->delete();
                 $dataObject->destroy();
             }
-            $message .= "Deleted {$count} records.";
+            $message .= _t(self::class . '.DELETED', 'Deleted one record.|Deleted {count} records.', ['count' => $count]);
         } else {
-            $message .= 'Nothing to delete';
+            $message .= _t(self::class . '.NOT_DELETED', 'Nothing to delete.');
         }
 
         $gridField->getForm()->sessionMessage($message, 'good');
@@ -382,7 +384,11 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
     public function getModalTitle()
     {
         if (!$this->modalTitle) {
-            $this->modalTitle = "Delete {$this->getDummyObject()->plural_name()}";
+            $this->modalTitle = _t(
+                self::class . '.DELETE',
+                'Delete {pluralName}',
+                ['pluralName' => $this->getDummyObject()->plural_name()]
+            );
         }
         return $this->modalTitle;
     }
@@ -407,6 +413,14 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
     protected function getPreparedFilterFields()
     {
         $fields = FieldList::create();
+        $fields->add(CheckboxField::create(
+            self::DELETE_ALL,
+            _t(
+                self::class . '.DELETE_ALL',
+                'Delete all {pluralName}',
+                ['pluralName' => $this->getDummyObject()->plural_name()]
+            )
+        ));
         foreach ($this->getFilterFields() as $field) {
             $fields->add($this->getFieldAsComposite($field));
         }
@@ -422,53 +436,83 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
      */
     protected function getFieldAsComposite(FormField $field)
     {
-        $group = FieldGroup::create(
-            "'{$field->Title()}' filter group",
-            [
-                $filterBy = CheckboxField::create(
-                    $field->Name . static::FILTER_BY_SUFFIX,
-                    "Filter by {$field->Title()}"
-                ),
-                $field,
-                $options = $this->getFilterOptionsField($field->Name),
-                $invert = CheckboxField::create(
-                    $field->Name . static::FILTER_INVERT_SUFFIX,
+        $fields = [
+            $filterBy = CheckboxField::create(
+                $field->Name . self::FILTER_BY_SUFFIX,
+                _t(
+                    self::class . '.FILTER_BY',
+                    'Filter by "{fieldName}"',
+                    ['fieldName' => $field->Title()]
+                )
+            ),
+            $field,
+            $options = $this->getFilterTypesField($field->Name),
+            $invert = CheckboxField::create(
+                $field->Name . self::FILTER_INVERT_SUFFIX,
+                _t(
+                    self::class . '.FILTER_INVERT',
                     'Invert Filter'
-                ),
-            ]
+                )
+            )
+        ];
+
+        $group = FieldGroup::create(
+            _t(
+                self::class . '.FILTER_GROUP',
+                '"{fieldName}" filter group',
+                ['fieldName' => $field->Title()]
+            ),
+            $fields
         );
         if (ModuleLoader::inst()->getManifest()->moduleExists('unclecheese/display-logic')) {
+            $group = Wrapper::create($group);
             $field->displayIf($filterBy->Name)->isChecked();
             $options->displayIf($filterBy->Name)->isChecked();
             $invert->displayIf($filterBy->Name)->isChecked();
+            $group->hideIf(self::DELETE_ALL)->isChecked();
         }
+
         return $group;
     }
 
     /**
-     * Get a DropdownField with filter options as defined in
+     * Get a DropdownField with filter types as defined in
      * {@link GridFieldDeleteRelationsButton::setFilterOptions()}.
      *
      * @param string $fieldName
-     * @return DropdownField
+     * @return FormField
      */
-    protected function getFilterOptionsField($fieldName)
+    protected function getFilterTypesField($fieldName)
     {
         $allOptions = $this->filterOptions;
         if (array_key_exists($fieldName, $allOptions)) {
             $options = $allOptions[$fieldName];
         } else {
-            $options = $allOptions[static::DEFAULT_OPTION];
+            $options = $allOptions[self::DEFAULT_OPTION];
         }
-        $field = DropdownField::create(
-            $fieldName . static::OPTION_FIELD_SUFFIX,
-            "$fieldName Filter Type",
-            array_combine($options, $options)
+        $filterFieldName = $fieldName . self::OPTION_FIELD_SUFFIX;
+        $filterFieldTitle = _t(
+            self::class . '.FILTER_TYPE',
+            '"{fieldName}" Filter Type',
+            ['fieldName' => $fieldName]
         );
-        if (in_array('ExactMatch', $options)) {
-            $field->setValue('ExactMatch');
-        } else if (count($options) !== 1) {
+        if (count($options) == 1) {
+            $field = ReadonlyField::create(
+                $filterFieldName,
+                $filterFieldTitle,
+                $options[0]
+            )->setIncludeHiddenField(true)
+            ->setTemplate('Signify\Forms\ReadonlyField');
+        } else {
+            $field = DropdownField::create(
+                $filterFieldName,
+                $filterFieldTitle,
+                array_combine($options, $options)
+            );
             $field->setHasEmptyDefault(true);
+            if (in_array('ExactMatch', $options)) {
+                $field->setValue('ExactMatch');
+            }
         }
         $this->extend('updateFilterOptionsField', $field, $fieldName);
         return $field;

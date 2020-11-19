@@ -1,71 +1,80 @@
 <?php
 namespace Signify\Tests;
 
+use Signify\Extensions\SecurityHeaderSiteconfigExtension;
 use SilverStripe\Dev\FunctionalTest;
-use SilverStripe\Control\Controller;
-use Signify\Extensions\SecurityHeaderControllerExtension;
+use Signify\Middleware\SecurityHeaderMiddleware;
+use SilverStripe\Config\MergeStrategy\Priority;
 use SilverStripe\Control\Director;
+use SilverStripe\SiteConfig\SiteConfig;
+use SilverStripe\Versioned\Versioned;
 
-class SecurityHeaderControllerExtensionTest extends FunctionalTest
+class SecurityHeaderMiddlewareExtensionTest extends FunctionalTest
 {
+    protected static $fixture_file = 'fixtures.yml';
 
-    private $originalHeaderValues = null;
+    private static $originalHeaderValues = null;
 
     private static $testHeaders = [
-        'Content-Security-Policy' => 'test-value1',
-        'Strict-Transport-Security' => 'test-value2',
-        'X-Frame-Options' => 'test-value3',
-        'X-XSS-Protection' => 'test-value4',
-        'X-Content-Type-Options' => 'test-value5'
+        'global' => [
+            'Content-Security-Policy' => 'test-value1',
+            'Strict-Transport-Security' => 'test-value2',
+            'X-Frame-Options' => 'test-value3',
+            'X-XSS-Protection' => 'test-value4',
+            'X-Content-Type-Options' => 'test-value5'
+        ]
     ];
 
-    public function setUpOnce()
+    public static function setUpBeforeClass()
     {
-        // Add extension and a new test route.
-        Controller::add_extension(SecurityHeaderControllerExtension::class);
-        Director::config()->update('rules', array(
-            'security-header-test' => 'Controller'
-        ));
+        parent::setUpBeforeClass();
 
         // Set test header values.
-        $this->originalHeaderValues = SecurityHeaderControllerExtension::config()->get('headers');
-        SecurityHeaderControllerExtension::config()->update('headers', self::$testHeaders);
+        static::$originalHeaderValues = SecurityHeaderMiddleware::config()->get('headers');
+        SecurityHeaderMiddleware::config()->merge('headers', self::$testHeaders);
+        // Add extension. Note this is needed to ensure the test database is constructed correctly when running both
+        // test classes together. It's not strictly needed for this test class alone.
+        SiteConfig::add_extension(SecurityHeaderSiteconfigExtension::class);
     }
 
-    public function tearDownOnce()
+    public static function tearDownAfterClass()
     {
-        // Remove extension and test route. Reset headers to defaults.
-        Controller::remove_extension(SecurityHeaderControllerExtension::class);
-        Director::config()->remove('rules', 'security-header-test');
-        SecurityHeaderControllerExtension::config()->update('headers', $this->originalHeaderValues);
+        parent::tearDownAfterClass();
+        // Reset headers to defaults.
+        SecurityHeaderMiddleware::config()->merge('headers', static::$originalHeaderValues);
+        // Remove extension.
+        SiteConfig::remove_extension(SecurityHeaderSiteconfigExtension::class);
     }
 
     public function testResponseHeaders()
     {
-        $response = Director::test('security-header-test');
+        $response = $this->getResponse();
 
         // Test all headers, not just the default ones or just the ones in self::$testHeaders.
-        $headersSent = array_merge(SecurityHeaderControllerExtension::config()->get('headers'), self::$testHeaders);
-        $headersReceived = $response->getHeaders();
+        $headersSent = TestUtils::array_change_key_case_deep(
+            Priority::mergeArray(self::$testHeaders, SecurityHeaderMiddleware::config()->get('headers')),
+            CASE_LOWER
+        );
+        $headersReceived = array_change_key_case($response->getHeaders(), CASE_LOWER);
 
         foreach ($headersReceived as $header => $value) {
-            if (in_array($header, $headersSent)) {
+            if (in_array($header, $headersSent['global'])) {
                 $this->assertEquals(
                     $value,
-                    $headersSent[$header],
+                    $headersSent['global'][$header],
                     "Test response value for header '$header' is equal to configured value."
                 );
             }
         }
 
-        $missedHeaders = array_diff_keys($headersSent, $headersReceived);
+        $missedHeaders = array_diff_key($headersSent['global'], $headersReceived);
         $this->assertEmpty($missedHeaders, 'Test all headers are sent in the response.');
     }
 
     public function testReportURIAdded()
     {
-        $defaultUri = SecurityHeaderControllerExtension::config()->get('report_uri');
-        $response = Director::test('security-header-test');
+        $defaultUri = SecurityHeaderMiddleware::config()->get('report_uri');
+        $response = $this->getResponse();
         $csp = $response->getHeader('Content-Security-Policy');
 
         $this->assertTrue($this->directiveExists($csp, 'report-uri'), 'Test CSP includes a report-uri directive.');
@@ -77,15 +86,17 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
         $testURI = 'https://example.test/endpoint.aspx';
         TestUtils::testWithConfig(
             [
-                SecurityHeaderControllerExtension::class => [
+                SecurityHeaderMiddleware::class => [
                     'headers' => [
-                        'Content-Security-Policy' => "default-src 'self'; report-uri $testURI;",
+                        'global' => [
+                            'Content-Security-Policy' => "default-src 'self'; report-uri $testURI;",
+                        ],
                     ],
                 ],
             ],
             function () use ($testURI) {
-                $defaultUri = SecurityHeaderControllerExtension::config()->get('report_uri');
-                $response = Director::test('security-header-test');
+                $defaultUri = SecurityHeaderMiddleware::config()->get('report_uri');
+                $response = $this->getResponse();
                 $csp = $response->getHeader('Content-Security-Policy');
 
                 $this->assertTrue($this->directiveExists($csp, 'report-uri'), 'Test CSP includes a report-uri directive.');
@@ -99,13 +110,13 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
     {
         TestUtils::testWithConfig(
             [
-                SecurityHeaderControllerExtension::class => [
+                SecurityHeaderMiddleware::class => [
                     'enable_reporting' => false,
                     'use_report_to' => true,
                 ],
             ],
             function () {
-                $response = Director::test('security-header-test');
+                $response = $this->getResponse();
                 $csp = $response->getHeader('Content-Security-Policy');
                 $reportHeaderExists = $response->getHeader('Report-To') !== null;
 
@@ -118,7 +129,7 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
 
     public function testReportToNotAdded()
     {
-        $response = Director::test('security-header-test');
+        $response = $this->getResponse();
         $csp = $response->getHeader('Content-Security-Policy');
         $reportHeaderExists = $response->getHeader('Report-To') !== null;
 
@@ -130,14 +141,14 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
     {
         TestUtils::testWithConfig(
             [
-                SecurityHeaderControllerExtension::class => [
+                SecurityHeaderMiddleware::class => [
                     'use_report_to' => true,
                 ],
             ],
             function () {
-                $defaultEndpoint = SecurityHeaderControllerExtension::config()->get('report_to_group');
-                $defaultUri = SecurityHeaderControllerExtension::config()->get('report_uri');
-                $response = Director::test('security-header-test');
+                $defaultEndpoint = SecurityHeaderMiddleware::config()->get('report_to_group');
+                $defaultUri = Director::absoluteURL(SecurityHeaderMiddleware::config()->get('report_uri'));
+                $response = $this->getResponse();
                 $csp = $response->getHeader('Content-Security-Policy');
                 $reportHeader = json_decode($response->getHeader('Report-To'), true);
 
@@ -152,6 +163,13 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
         );
     }
 
+    protected function getResponse()
+    {
+        $page = $this->objFromFixture('Page', 'page');
+        $page->copyVersionToStage(Versioned::DRAFT, Versioned::LIVE);
+        return $this->get($page->Link());
+    }
+
     protected function directiveExists($csp, $directive)
     {
         return strpos($csp, $directive) !== false;
@@ -160,7 +178,7 @@ class SecurityHeaderControllerExtensionTest extends FunctionalTest
     protected function endpointExists($csp, $directive, $endpoint, $exactMatch = false)
     {
         $matches = array();
-        preg_match('/report-uri\s+(?<endpoints>[^;]+?);/', $csp, $matches);
+        preg_match('/' . $directive . '\s+(?<endpoints>[^;]+?);/', $csp, $matches);
         if ($exactMatch) {
             return $matches['endpoints'] === $endpoint;
         } else {

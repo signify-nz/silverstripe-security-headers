@@ -1,0 +1,30 @@
+{
+  "private": true,
+  "license": "BSD-3-Clause",
+  "scripts": {
+    "watch": "NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "build": "yarn lint && webpack --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "package": "NODE_ENV=production node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "lint": "yarn lint-js && yarn lint-scss",
+    "lint-js": "eslint client/src/javascript",
+    "lint-scss": "stylelint client/src/scss"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.1.0",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "eslint-loader": "^4.0.0",
+    "eslint-plugin-import": "^2.20.0",
+    "laravel-mix": "^5.0.0",
+    "resolve-url-loader": "^3.1.0",
+    "sass": "^1.26.0",
+    "sass-loader": "^8.0.0",
+    "source-map": "^0.7.3",
+    "stylelint": "^13.5.0",
+    "stylelint-config-standard": "^20.0.0",
+    "stylelint-scss": "^3.17.3",
+    "stylelint-webpack-plugin": "^2.0.0",
+    "vue-template-compiler": "^2.6.12",
+    "webpack": "^4.43.0"
+  }
+}

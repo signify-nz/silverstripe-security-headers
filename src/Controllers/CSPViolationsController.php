@@ -10,7 +10,7 @@ use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\CMS\Controllers\RootURLController;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\ORM\FieldType\DBDatetime;
-use Signify\Extensions\SecurityHeaderControllerExtension;
+use Signify\Middleware\SecurityHeaderMiddleware;
 
 class CSPViolationsController extends Controller
 {
@@ -39,8 +39,8 @@ class CSPViolationsController extends Controller
         if (isset($json['csp-report'])) {
             // This report was sent as a result of the "report-uri" directive.
             $report = $json['csp-report'];
-            $report[static::REPORT_TIME] = DBDatetime::now()->getValue();
-            $report[static::REPORT_DIRECTIVE] = 'report-uri';
+            $report[self::REPORT_TIME] = DBDatetime::now()->getValue();
+            $report[self::REPORT_DIRECTIVE] = 'report-uri';
             $this->processReport($report);
         } else {
             // This report was sent as a result of the "report-to" directive.
@@ -49,8 +49,8 @@ class CSPViolationsController extends Controller
                 if ($reportWrapper['type'] == 'csp-violation') {
                     $report = $reportWrapper['body'];
                     // 'age' is the number of milliseconds since the report was generated.
-                    $report[static::REPORT_TIME] = DBField::create_field('Datetime', time() - ($reportWrapper['age'] / 1000))->getValue();
-                    $report[static::REPORT_DIRECTIVE] = 'report-to';
+                    $report[self::REPORT_TIME] = DBField::create_field('Datetime', time() - ($reportWrapper['age'] / 1000))->getValue();
+                    $report[self::REPORT_DIRECTIVE] = 'report-to';
                     $this->processReport($report);
                 }
             }
@@ -67,9 +67,9 @@ class CSPViolationsController extends Controller
         $violation = $this->getOrCreateViolation($cspReport);
         $this->setDocument($cspReport, $violation);
         $violation->Violations++;
-        $reportTime = $this->getDataForAttribute($cspReport, static::REPORT_TIME);
-        if ($violation->{static::REPORT_TIME} === null || $violation->{static::REPORT_TIME} < $reportTime) {
-            $violation->{static::REPORT_TIME} = $reportTime;
+        $reportTime = $this->getDataForAttribute($cspReport, self::REPORT_TIME);
+        if ($violation->{self::REPORT_TIME} === null || $violation->{self::REPORT_TIME} < $reportTime) {
+            $violation->{self::REPORT_TIME} = $reportTime;
         }
         $violation->write();
     }
@@ -82,9 +82,9 @@ class CSPViolationsController extends Controller
     protected function getOrCreateViolation($cspReport)
     {
         $violationData = [
-            static::DISPOSITION => $this->getDataForAttribute($cspReport, static::DISPOSITION),
-            static::BLOCKED_URI => $this->getDataForAttribute($cspReport, static::BLOCKED_URI),
-            static::EFFECTIVE_DIRECTIVE => $this->getDataForAttribute($cspReport, static::EFFECTIVE_DIRECTIVE),
+            self::DISPOSITION => $this->getDataForAttribute($cspReport, self::DISPOSITION),
+            self::BLOCKED_URI => $this->getDataForAttribute($cspReport, self::BLOCKED_URI),
+            self::EFFECTIVE_DIRECTIVE => $this->getDataForAttribute($cspReport, self::EFFECTIVE_DIRECTIVE),
         ];
 
         $violation = CSPViolation::get()->filter($violationData)->first();
@@ -103,21 +103,21 @@ class CSPViolationsController extends Controller
      */
     protected function setDocument($cspReport, $violation)
     {
-        $documentURI = $this->getDataForAttribute($cspReport, static::DOCUMENT_URI);
+        $documentURI = $this->getDataForAttribute($cspReport, self::DOCUMENT_URI);
         // If the document is already added to this violation, no need to re-add it.
         if ($violation->Documents()->find('URI', $documentURI)) {
             return;
         }
 
         $documentData = [
-            static::DOCUMENT_URI => $documentURI,
+            self::DOCUMENT_URI => $documentURI,
         ];
         $document = CSPDocument::get()->filter($documentData)->first();
 
         if (!$document) {
             $document = CSPDocument::create($documentData);
-            $sitetreeLink = $documentURI;
-            if (!Director::makeRelative($sitetreeLink)) {
+            $siteTreeLink = $documentURI;
+            if (!Director::makeRelative($siteTreeLink)) {
                 // SiteTree::get_by_link returns null, see https://github.com/silverstripe/silverstripe-cms/issues/2580
                 $siteTreeLink = RootURLController::get_homepage_link();
             }
@@ -139,30 +139,41 @@ class CSPViolationsController extends Controller
      */
     protected function getDataForAttribute($cspReport, $attribute)
     {
-        if ($cspReport[static::REPORT_DIRECTIVE] == 'report-uri') {
+        if ($cspReport[self::REPORT_DIRECTIVE] == 'report-uri') {
             switch ($attribute) {
-                case static::REPORT_TIME:
-                    return $cspReport[static::REPORT_TIME];
-                case static::DISPOSITION:
-                    return $cspReport['disposition'];
-                case static::BLOCKED_URI:
+                case self::REPORT_TIME:
+                    return $cspReport[self::REPORT_TIME];
+                case self::DISPOSITION:
+                    if (!empty($cspReport['disposition'])) {
+                        return $cspReport['disposition'];
+                    } else {
+                        // Firefox doesn't report the disposition.
+                        return 'unknown';
+                    }
+                    return ;
+                case self::BLOCKED_URI:
                     return $cspReport['blocked-uri'];
-                case static::EFFECTIVE_DIRECTIVE:
-                    return $cspReport['effective-directive'];
-                case static::DOCUMENT_URI:
+                case self::EFFECTIVE_DIRECTIVE:
+                    if (!empty($cspReport['effective-directive'])) {
+                        return $cspReport['effective-directive'];
+                    } else {
+                        // Firefox doesn't report the effective directive.
+                        return $cspReport['violated-directive'];
+                    }
+                case self::DOCUMENT_URI:
                     return $cspReport['document-uri'];
             }
-        } elseif ($cspReport[static::REPORT_DIRECTIVE] == 'report-to') {
+        } elseif ($cspReport[self::REPORT_DIRECTIVE] == 'report-to') {
             switch ($attribute) {
-                case static::REPORT_TIME:
-                    return $cspReport[static::REPORT_TIME];
-                case static::DISPOSITION:
+                case self::REPORT_TIME:
+                    return $cspReport[self::REPORT_TIME];
+                case self::DISPOSITION:
                     return $cspReport['disposition'];
-                case static::BLOCKED_URI:
+                case self::BLOCKED_URI:
                     return $cspReport['blockedURL'];
-                case static::EFFECTIVE_DIRECTIVE:
+                case self::EFFECTIVE_DIRECTIVE:
                     return $cspReport['effectiveDirective'];
-                case static::DOCUMENT_URI:
+                case self::DOCUMENT_URI:
                     return $cspReport['documentURL'];
             }
         }
@@ -182,7 +193,7 @@ class CSPViolationsController extends Controller
         $origin = $request->getHeader('origin');
 
         // The origin header may not be set for report-to requests, so null must be considered sameorigin.
-        if (SecurityHeaderControllerExtension::config()->get('use_report_to') && $origin === null) {
+        if (SecurityHeaderMiddleware::config()->get('use_report_to') && $origin === null) {
             return true;
         }
 
