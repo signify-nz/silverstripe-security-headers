@@ -439,7 +439,7 @@ class GridFieldDeleteRelationsButton extends SS_Object implements GridField_HTML
                     self::class . '.FILTER_BY',
                     'Filter by "{fieldName}"',
                     ['fieldName' => $field->Title()]
-                ),
+                )
             ),
             $field,
         ];
@@ -452,7 +452,7 @@ class GridFieldDeleteRelationsButton extends SS_Object implements GridField_HTML
             _t(
                 self::class . '.FILTER_INVERT',
                 'Invert Filter'
-            ),
+            )
         );
 
         $group = FieldGroup::create(
