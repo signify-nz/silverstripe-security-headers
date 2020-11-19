@@ -39,7 +39,7 @@ class SecurityHeaderRequestFilterTest extends FunctionalTest
 
         // Test all headers, not just the default ones or just the ones in self::$testHeaders.
         $config = Config::inst()->forClass(SecurityHeaderRequestFilter::class);
-        $headersSent = array_change_key_case(
+        $headersSent = SigSecurityTestUtils::array_change_key_case_deep(
             ArrayLib::array_merge_recursive($config->get('headers'), self::$testHeaders),
             CASE_LOWER
         );

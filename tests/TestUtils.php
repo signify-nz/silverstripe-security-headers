@@ -31,4 +31,14 @@ abstract class SigSecurityTestUtils
         }
     }
 
+    public static function array_change_key_case_deep(array $input, $case = null)
+    {
+        foreach ($input as $header => &$value) {
+            if (is_array($value)) {
+                $value = self::array_change_key_case_deep($value, $case);
+            }
+        }
+        return array_change_key_case($input, $case);
+    }
+
 }
