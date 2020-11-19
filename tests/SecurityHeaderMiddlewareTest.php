@@ -1,10 +1,12 @@
 <?php
 namespace Signify\Tests;
 
+use Signify\Extensions\SecurityHeaderSiteconfigExtension;
 use SilverStripe\Dev\FunctionalTest;
 use Signify\Middleware\SecurityHeaderMiddleware;
 use SilverStripe\Config\MergeStrategy\Priority;
 use SilverStripe\Control\Director;
+use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\Versioned\Versioned;
 
 class SecurityHeaderMiddlewareExtensionTest extends FunctionalTest
