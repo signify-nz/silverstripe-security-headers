@@ -443,7 +443,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
                     self::class . '.FILTER_BY',
                     'Filter by "{fieldName}"',
                     ['fieldName' => $field->Title()]
-                ),
+                )
             ),
             $field,
             $options = $this->getFilterTypesField($field->Name),
@@ -452,7 +452,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
                 _t(
                     self::class . '.FILTER_INVERT',
                     'Invert Filter'
-                ),
+                )
             )
         ];
 
