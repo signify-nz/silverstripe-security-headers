@@ -58,16 +58,16 @@ class SecurityHeaderMiddlewareExtensionTest extends FunctionalTest
         $headersReceived = array_change_key_case($response->getHeaders(), CASE_LOWER);
 
         foreach ($headersReceived as $header => $value) {
-            if (in_array($header, $headersSent)) {
+            if (in_array($header, $headersSent['global'])) {
                 $this->assertEquals(
                     $value,
-                    $headersSent[$header],
+                    $headersSent['global'][$header],
                     "Test response value for header '$header' is equal to configured value."
                 );
             }
         }
 
-        $missedHeaders = array_diff_key($headersSent, $headersReceived);
+        $missedHeaders = array_diff_key($headersSent['global'], $headersReceived);
         $this->assertEmpty($missedHeaders, 'Test all headers are sent in the response.');
     }
 
