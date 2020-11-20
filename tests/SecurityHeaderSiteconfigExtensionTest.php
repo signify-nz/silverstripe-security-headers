@@ -58,5 +58,4 @@ class SecurityHeaderSiteconfigExtensionTest extends FunctionalTest
         $page->copyVersionToStage(Versioned::DRAFT, Versioned::LIVE);
         return $this->get($page->Link());
     }
-
 }

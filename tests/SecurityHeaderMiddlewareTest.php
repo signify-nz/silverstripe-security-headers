@@ -78,7 +78,10 @@ class SecurityHeaderMiddlewareExtensionTest extends FunctionalTest
         $csp = $response->getHeader('Content-Security-Policy');
 
         $this->assertTrue($this->directiveExists($csp, 'report-uri'), 'Test CSP includes a report-uri directive.');
-        $this->assertTrue($this->endpointExists($csp, 'report-uri', $defaultUri, true), 'Test report-uri is the default endpoint.');
+        $this->assertTrue(
+            $this->endpointExists($csp, 'report-uri', $defaultUri, true),
+            'Test report-uri is the default endpoint.'
+        );
     }
 
     public function testReportURIAppended()
@@ -99,9 +102,18 @@ class SecurityHeaderMiddlewareExtensionTest extends FunctionalTest
                 $response = $this->getResponse();
                 $csp = $response->getHeader('Content-Security-Policy');
 
-                $this->assertTrue($this->directiveExists($csp, 'report-uri'), 'Test CSP includes a report-uri directive.');
-                $this->assertTrue($this->endpointExists($csp, 'report-uri', $testURI), 'Test report-uri includes the configured endpoint.');
-                $this->assertTrue($this->endpointExists($csp, 'report-uri', $defaultUri), 'Test report-uri includes the default endpoint.');
+                $this->assertTrue(
+                    $this->directiveExists($csp, 'report-uri'),
+                    'Test CSP includes a report-uri directive.'
+                );
+                $this->assertTrue(
+                    $this->endpointExists($csp, 'report-uri', $testURI),
+                    'Test report-uri includes the configured endpoint.'
+                );
+                $this->assertTrue(
+                    $this->endpointExists($csp, 'report-uri', $defaultUri),
+                    'Test report-uri includes the default endpoint.'
+                );
             }
         );
     }
@@ -120,9 +132,18 @@ class SecurityHeaderMiddlewareExtensionTest extends FunctionalTest
                 $csp = $response->getHeader('Content-Security-Policy');
                 $reportHeaderExists = $response->getHeader('Report-To') !== null;
 
-                $this->assertFalse($this->directiveExists($csp, 'report-uri'), 'Test CSP does not include a report-uri directive.');
-                $this->assertFalse($this->directiveExists($csp, 'report-to'), 'Test CSP does not include a report-to directive.');
-                $this->assertFalse($reportHeaderExists, 'Test CSP does not include a Report-To header.');
+                $this->assertFalse(
+                    $this->directiveExists($csp, 'report-uri'),
+                    'Test CSP does not include a report-uri directive.'
+                );
+                $this->assertFalse(
+                    $this->directiveExists($csp, 'report-to'),
+                    'Test CSP does not include a report-to directive.'
+                );
+                $this->assertFalse(
+                    $reportHeaderExists,
+                    'Test CSP does not include a Report-To header.'
+                );
             }
         );
     }
@@ -133,8 +154,14 @@ class SecurityHeaderMiddlewareExtensionTest extends FunctionalTest
         $csp = $response->getHeader('Content-Security-Policy');
         $reportHeaderExists = $response->getHeader('Report-To') !== null;
 
-        $this->assertFalse($this->directiveExists($csp, 'report-to'), 'Test CSP does not include a report-to directive.');
-        $this->assertFalse($reportHeaderExists, 'Test CSP does not include a Report-To header.');
+        $this->assertFalse(
+            $this->directiveExists($csp, 'report-to'),
+            'Test CSP does not include a report-to directive.'
+        );
+        $this->assertFalse(
+            $reportHeaderExists,
+            'Test CSP does not include a Report-To header.'
+        );
     }
 
     public function testReportToAdded()
@@ -152,12 +179,29 @@ class SecurityHeaderMiddlewareExtensionTest extends FunctionalTest
                 $csp = $response->getHeader('Content-Security-Policy');
                 $reportHeader = json_decode($response->getHeader('Report-To'), true);
 
-                $this->assertTrue($this->directiveExists($csp, 'report-to'), 'Test CSP includes a report-to directive.');
-                $this->assertTrue($this->endpointExists($csp, 'report-to', $defaultEndpoint, true), 'Test report-to directive is the default endpoint group.');
-                $this->assertTrue($reportHeader !== null, 'Test CSP includes a Report-To header.');
+                $this->assertTrue(
+                    $this->directiveExists($csp, 'report-to'),
+                    'Test CSP includes a report-to directive.'
+                );
+                $this->assertTrue(
+                    $this->endpointExists($csp, 'report-to', $defaultEndpoint, true),
+                    'Test report-to directive is the default endpoint group.'
+                );
+                $this->assertTrue(
+                    $reportHeader !== null,
+                    'Test CSP includes a Report-To header.'
+                );
                 if ($reportHeader !== null) {
-                    $this->assertEquals($defaultEndpoint, $reportHeader['group'], 'Test Report-To header has correct group name.');
-                    $this->assertEquals($defaultUri, $reportHeader['endpoints'][0]['url'], 'Test Report-To header has correct endpoint URI');
+                    $this->assertEquals(
+                        $defaultEndpoint,
+                        $reportHeader['group'],
+                        'Test Report-To header has correct group name.'
+                    );
+                    $this->assertEquals(
+                        $defaultUri,
+                        $reportHeader['endpoints'][0]['url'],
+                        'Test Report-To header has correct endpoint URI'
+                    );
                 }
             }
         );

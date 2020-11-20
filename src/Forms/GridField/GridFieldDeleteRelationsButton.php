@@ -287,7 +287,11 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
                 $dataObject->delete();
                 $dataObject->destroy();
             }
-            $message .= _t(self::class . '.DELETED', 'Deleted one record.|Deleted {count} records.', ['count' => $count]);
+            $message .= _t(
+                self::class . '.DELETED',
+                'Deleted one record.|Deleted {count} records.',
+                ['count' => $count]
+            );
         } else {
             $message .= _t(self::class . '.NOT_DELETED', 'Nothing to delete.');
         }
@@ -545,7 +549,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
         }
         $data = urldecode($data);
 
-        $data = preg_replace_callback('/(?:^|(?<=&))[^=[]+/', function($match) {
+        $data = preg_replace_callback('/(?:^|(?<=&))[^=[]+/', function ($match) {
             return bin2hex(urldecode($match[0]));
         }, $data);
 

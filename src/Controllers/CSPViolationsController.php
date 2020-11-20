@@ -49,7 +49,10 @@ class CSPViolationsController extends Controller
                 if ($reportWrapper['type'] == 'csp-violation') {
                     $report = $reportWrapper['body'];
                     // 'age' is the number of milliseconds since the report was generated.
-                    $report[self::REPORT_TIME] = DBField::create_field('Datetime', time() - ($reportWrapper['age'] / 1000))->getValue();
+                    $report[self::REPORT_TIME] = DBField::create_field(
+                        'Datetime',
+                        time() - ($reportWrapper['age'] / 1000)
+                    )->getValue();
                     $report[self::REPORT_DIRECTIVE] = 'report-to';
                     $this->processReport($report);
                 }
@@ -214,5 +217,4 @@ class CSPViolationsController extends Controller
             'application/json', // fallback
         ]);
     }
-
 }

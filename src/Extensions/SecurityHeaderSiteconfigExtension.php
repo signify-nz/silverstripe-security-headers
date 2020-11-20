@@ -38,5 +38,4 @@ class SecurityHeaderSiteconfigExtension extends DataExtension implements Permiss
         ];
         return $permissions;
     }
-
 }

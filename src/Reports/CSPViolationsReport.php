@@ -44,16 +44,18 @@ class CSPViolationsReport extends Report
         $gridConfig = $gridField->getConfig();
 
         $dispositions = CSPViolation::get()->columnUnique('Disposition');
+        $dispositions = array_combine($dispositions, $dispositions);
         $directives = CSPViolation::get()->columnUnique('EffectiveDirective');
+        $directives = array_combine($directives, $directives);
 
         $gridConfig->addComponents([
             new GridFieldDeleteAction(),
             GridFieldDeleteRelationsButton::create('buttons-before-left')
             ->setFilterFields([
                 DatetimeField::create('ReportedTime'),
-                DropdownField::create('Disposition', 'Disposition', array_combine($dispositions, $dispositions)),
+                DropdownField::create('Disposition', 'Disposition', $dispositions),
                 TextField::create('BlockedURI'),
-                ListboxField::create('EffectiveDirective', 'EffectiveDirective', array_combine($directives, $directives)),
+                ListboxField::create('EffectiveDirective', 'EffectiveDirective', $directives),
                 NumericField::create('Violations', '# Violations'),
                 TextField::create('Documents.URI', 'Document URIs'),
             ])
@@ -73,6 +75,4 @@ class CSPViolationsReport extends Report
 
         return $gridField;
     }
-
 }
-

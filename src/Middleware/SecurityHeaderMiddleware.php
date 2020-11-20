@@ -164,5 +164,4 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
         ];
         return json_encode($header);
     }
-
 }

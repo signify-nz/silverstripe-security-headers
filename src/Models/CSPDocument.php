@@ -4,7 +4,8 @@ namespace Signify\Models;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\CMS\Model\SiteTree;
 
-class CSPDocument extends DataObject {
+class CSPDocument extends DataObject
+{
 
     private static $table_name = 'Signify_Document';
 
@@ -19,7 +20,4 @@ class CSPDocument extends DataObject {
     private static $belongs_many_many = [
         'CSPViolations' => CSPViolation::class,
     ];
-
-
 }
-

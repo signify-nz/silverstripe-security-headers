@@ -38,4 +38,3 @@ class CSPViolation extends DataObject
         return DBField::create_field('Text', implode(', ', $this->Documents()->Column('URI')));
     }
 }
-
