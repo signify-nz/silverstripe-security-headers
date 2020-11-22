@@ -45,8 +45,11 @@ class CSPViolationsReport extends SS_Report
             $dateTime = DatetimeField::create('ReportedTime'),
             DropdownField::create('Disposition', 'Disposition', $this->getDropdownArray($dispositions, $dispositions)),
             TextField::create('BlockedURI'),
-            ListboxField::create('EffectiveDirective', 'EffectiveDirective', $this->getDropdownArray($directives, $directives))
-                ->setMultiple(true),
+            ListboxField::create(
+                'EffectiveDirective',
+                'EffectiveDirective',
+                $this->getDropdownArray($directives, $directives)
+            )->setMultiple(true),
             NumericField::create('Violations', '# Violations'),
             TextField::create('Documents.URI', 'Document URIs'),
         ])
@@ -80,6 +83,4 @@ class CSPViolationsReport extends SS_Report
         }
         return $array;
     }
-
 }
-

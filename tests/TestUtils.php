@@ -40,5 +40,4 @@ abstract class SigSecurityTestUtils
         }
         return array_change_key_case($input, $case);
     }
-
 }

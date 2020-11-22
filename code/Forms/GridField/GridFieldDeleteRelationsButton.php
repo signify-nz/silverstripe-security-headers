@@ -5,7 +5,10 @@
  * Clicking the button opens a modal in which a user can select filter options.
  * The user can then delete models from the gridfield's list based on those filter options.
  */
-class GridFieldDeleteRelationsButton extends SS_Object implements GridField_HTMLProvider, GridField_ActionProvider, GridField_URLHandler
+class GridFieldDeleteRelationsButton extends SS_Object implements
+    GridField_HTMLProvider,
+    GridField_ActionProvider,
+    GridField_URLHandler
 {
     /**
      * Fragment to write the button to
@@ -147,15 +150,16 @@ class GridFieldDeleteRelationsButton extends SS_Object implements GridField_HTML
         ];
     }
 
-	/**
-	 * export is an action button
-	 */
-	public function getActions($gridField) {
-		return [
+    /**
+     * export is an action button
+     */
+    public function getActions($gridField)
+    {
+        return [
             'DeletionForm',
             'handleDelete',
         ];
-	}
+    }
 
     public function handleAction(GridField $gridField, $actionName, $arguments, $data)
     {
@@ -554,7 +558,7 @@ class GridFieldDeleteRelationsButton extends SS_Object implements GridField_HTML
         }
         $data = urldecode($data);
 
-        $data = preg_replace_callback('/(?:^|(?<=&))[^=[]+/', function($match) {
+        $data = preg_replace_callback('/(?:^|(?<=&))[^=[]+/', function ($match) {
             return bin2hex(urldecode($match[0]));
         }, $data);
 
