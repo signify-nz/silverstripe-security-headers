@@ -23,6 +23,7 @@
     "unclecheese/display-logic": "Provides functionality to hide fields that shouldn't used for filtering."
   },
   "extra": {
+    "installer-name": "security-headers",
     "expose": [
       "client/dist"
     ]
