@@ -172,7 +172,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
     }
 
     /**
-     * it is also a URL
+     * Map URL paths to action methods.
      *
      * @param GridField $gridField
      *
