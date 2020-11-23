@@ -1,0 +1,39 @@
+language: php
+
+dist: precise
+
+services:
+  - mysql
+  - postgresql
+
+env:
+  global:
+    - CORE_RELEASE=3
+
+matrix:
+  include:
+    - php: 7.1
+      env: DB=PGSQL PHPCS_TEST=1 PHPUNIT_TEST=1
+    - php: 7.1
+      env: DB=MYSQL PHPUNIT_TEST=1
+    - php: 7.2
+      env: DB=MYSQL PHPUNIT_TEST=1
+    - php: 7.3
+      env: DB=MYSQL PHPUNIT_TEST=1
+    - php: 7.4
+      env: DB=MYSQL PHPUNIT_TEST=1 PHPUNIT_COVERAGE_TEST=1
+
+before_script:
+  - phpenv rehash
+  - git clone git://github.com/silverstripe-labs/silverstripe-travis-support.git ~/travis-support
+  - php ~/travis-support/travis_setup.php --source `pwd` --target ~/builds/ss
+  - cd ~/builds/ss
+  - composer install
+
+script:
+  - if [[ $PHPCS_TEST ]]; then vendor/bin/phpcs --standard=./security-headers security-headers/code/ security-headers/tests/ ; fi
+  - if [[ $PHPUNIT_TEST ]]; then vendor/bin/phpunit security-headers/tests/; fi
+  - if [[ $PHPUNIT_COVERAGE_TEST ]]; then phpdbg -qrr vendor/bin/phpunit --coverage-clover=coverage.xml security-headers/ ; fi
+
+after_success:
+  - if [[ $PHPUNIT_COVERAGE_TEST ]]; then bash <(curl -s https://codecov.io/bash) -f coverage.xml; coverage.xml -F php; fi
