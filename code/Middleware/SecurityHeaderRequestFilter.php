@@ -116,7 +116,7 @@ class SecurityHeaderRequestFilter extends SS_Object implements RequestFilter
 
     protected function getReportURI()
     {
-        return Config::inst()->get(__CLASS__, 'report_uri');
+        return Director::absoluteURL(Config::inst()->get(__CLASS__, 'report_uri'));
     }
 
     protected function getIncludeSubdomains()
@@ -154,7 +154,7 @@ class SecurityHeaderRequestFilter extends SS_Object implements RequestFilter
             'group' => $this->getReportToGroup(),
             'max_age' => 1800,
             'endpoints' => [[
-                'url' => Director::absoluteURL($this->getReportURI()),
+                'url' => $this->getReportURI(),
             ],],
             'include_subdomains' => $this->getIncludeSubdomains(),
         ];
