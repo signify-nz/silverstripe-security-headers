@@ -120,7 +120,7 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
 
     protected function getReportURI()
     {
-        return $this->config()->get('report_uri');
+        return Director::absoluteURL($this->config()->get('report_uri'));
     }
 
     protected function getIncludeSubdomains()
@@ -158,7 +158,7 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
             'group' => $this->getReportToGroup(),
             'max_age' => 1800,
             'endpoints' => [[
-                'url' => Director::absoluteURL($this->getReportURI()),
+                'url' => $this->getReportURI(),
             ],],
             'include_subdomains' => $this->getIncludeSubdomains(),
         ];
