@@ -62,7 +62,7 @@ class SecurityHeaderRequestFilterTest extends FunctionalTest
     public function testReportURIAdded()
     {
         $config = Config::inst()->forClass(SecurityHeaderRequestFilter::class);
-        $defaultUri = $config->get('report_uri');
+        $defaultUri = Director::absoluteURL($config->get('report_uri'));
         $response = $this->getResponse();
         $csp = $response->getHeader('Content-Security-Policy');
 
@@ -91,7 +91,7 @@ class SecurityHeaderRequestFilterTest extends FunctionalTest
                 ],
             ],
             function () use ($testURI, $config) {
-                $defaultUri = $config->get('report_uri');
+                $defaultUri = Director::absoluteURL($config->get('report_uri'));
                 $response = $this->getResponse();
                 $csp = $response->getHeader('Content-Security-Policy');
 
