@@ -106,8 +106,8 @@ class GridFieldDeleteRelationsButton extends SS_Object implements
      */
     public function getHTMLFragments($gridField)
     {
-        Requirements::css('silverstripe-security-headers/client/dist/main.css');
-        Requirements::javascript('silverstripe-security-headers/client/dist/main.js');
+        Requirements::css('security-headers/client/dist/main.css');
+        Requirements::javascript('security-headers/client/dist/main.js');
         $modalID = $gridField->ID() . '_DeleteRelationsModal';
 
         // Check for form message prior to rendering form (which clears session messages)
