@@ -73,7 +73,7 @@ class SecurityHeaderMiddlewareExtensionTest extends FunctionalTest
 
     public function testReportURIAdded()
     {
-        $defaultUri = SecurityHeaderMiddleware::config()->get('report_uri');
+        $defaultUri = Director::absoluteURL(SecurityHeaderMiddleware::config()->get('report_uri'));;
         $response = $this->getResponse();
         $csp = $response->getHeader('Content-Security-Policy');
 
@@ -98,7 +98,7 @@ class SecurityHeaderMiddlewareExtensionTest extends FunctionalTest
                 ],
             ],
             function () use ($testURI) {
-                $defaultUri = SecurityHeaderMiddleware::config()->get('report_uri');
+                $defaultUri = Director::absoluteURL(SecurityHeaderMiddleware::config()->get('report_uri'));
                 $response = $this->getResponse();
                 $csp = $response->getHeader('Content-Security-Policy');
 

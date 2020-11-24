@@ -5,6 +5,7 @@ use SilverStripe\Dev\FunctionalTest;
 use SilverStripe\SiteConfig\SiteConfig;
 use Signify\Extensions\SecurityHeaderSiteconfigExtension;
 use Signify\Middleware\SecurityHeaderMiddleware;
+use SilverStripe\Control\Director;
 use SilverStripe\Versioned\Versioned;
 
 class SecurityHeaderSiteconfigExtensionTest extends FunctionalTest
@@ -41,7 +42,7 @@ class SecurityHeaderSiteconfigExtensionTest extends FunctionalTest
         $siteConfig->CSPReportingOnly = true;
         $siteConfig->write();
         $originalCSP = SecurityHeaderMiddleware::config()->get('headers')['global']['Content-Security-Policy'];
-        $originalCSP .= ' report-uri ' . SecurityHeaderMiddleware::config()->get('report_uri') . ';';
+        $originalCSP .= ' report-uri ' . Director::absoluteURL(SecurityHeaderMiddleware::config()->get('report_uri')) . ';';
 
         $response = $this->getResponse();
         $csp = $response->getHeader('Content-Security-Policy');
