@@ -151,7 +151,7 @@ class GridFieldDeleteRelationsButton extends SS_Object implements
     }
 
     /**
-     * export is an action button
+     * Get actions available on this component.
      */
     public function getActions($gridField)
     {
@@ -174,7 +174,7 @@ class GridFieldDeleteRelationsButton extends SS_Object implements
     }
 
     /**
-     * it is also a URL
+     * Map URL paths to action methods.
      *
      * @param GridField $gridField
      *
