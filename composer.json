@@ -1,5 +1,14 @@
 {
   "name": "signify-nz/silverstripe-security-headers",
+  "description": "Adds configurable security headers to HTTP responses via middleware.",
+  "homepage": "https://github.com/signify-nz/silverstripe-security-headers",
+  "keywords": [
+    "silverstripe",
+    "security",
+    "headers",
+    "report",
+    "CSP"
+  ],
   "type": "silverstripe-module",
   "license": "BSD-3-Clause",
   "authors": [
