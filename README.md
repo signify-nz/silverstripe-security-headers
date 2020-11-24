@@ -24,6 +24,10 @@ composer require signify-nz/silverstripe-security-headers
 
 For information on how to setup and use this module, please refer to the [documentation](docs/en/00_index.md).
 
+## Contributing
+
+If you would like to contribute either via code fixes, enhancements, or localisations, please see [the contributing guidelines](CONTRIBUTING.md).
+
 ## CSS/JS Development
 ### Setup
 For development you will need Node.js and yarn installed.
