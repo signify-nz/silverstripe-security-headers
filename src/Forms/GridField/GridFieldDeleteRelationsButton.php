@@ -90,7 +90,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
 
     /**
      * Filter options which are commonly used with string values.
-     * @var array
+     * @var string[]
      */
     const STRING_FILTER_OPTIONS = [
         'ExactMatch',
@@ -101,7 +101,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
 
     /**
      * Filter options which are commonly used with numbers or date values.
-     * @var array
+     * @var string[]
      */
     const NUMBER_DATE_FILTER_OPTIONS = [
         'ExactMatch',
