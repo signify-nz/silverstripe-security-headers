@@ -51,7 +51,7 @@ class SecurityHeaderMiddlewareExtensionTest extends FunctionalTest
         $response = $this->getResponse();
 
         // Test all headers, not just the default ones or just the ones in self::$testHeaders.
-        $headersSent = TestUtils::array_change_key_case_deep(
+        $headersSent = TestUtils::arrayChangeKeyCaseDeep(
             Priority::mergeArray(self::$testHeaders, SecurityHeaderMiddleware::config()->get('headers')),
             CASE_LOWER
         );
