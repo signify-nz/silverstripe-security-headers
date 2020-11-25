@@ -1,6 +1,6 @@
 # Setup and Basic Configuration
 
-The middleware is already added when you install the module.
+The request filter (middleware) is automatically enabled when you install the module.
 
 ## Configure the headers
 
