@@ -17,7 +17,7 @@ class CSPViolationsReport extends Report
 {
     public function title()
     {
-        return _t(__CLASS__ . '.TITLE', 'Content security violations');
+        return _t(__CLASS__ . '.TITLE', 'CSP violations');
     }
 
     public function description()
