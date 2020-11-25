@@ -69,7 +69,7 @@ class GridFieldDeleteRelationsButton extends SS_Object implements
 
     /**
      * Filter options which are commonly used with string values.
-     * @var array
+     * @var string[]
      */
     const STRING_FILTER_OPTIONS = [
         'ExactMatch',
@@ -80,7 +80,7 @@ class GridFieldDeleteRelationsButton extends SS_Object implements
 
     /**
      * Filter options which are commonly used with numbers or date values.
-     * @var array
+     * @var string[]
      */
     const NUMBER_DATE_FILTER_OPTIONS = [
         'ExactMatch',
