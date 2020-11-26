@@ -135,7 +135,7 @@ class CSPViolationsController extends Controller
         if ($cspReport[self::REPORT_DIRECTIVE] == 'report-uri') {
             switch ($attribute) {
                 case self::REPORT_TIME:
-                    return $cspReport[self::REPORT_TIME];
+                    return $this->normaliseDateTime($cspReport[self::REPORT_TIME]);
                 case self::DISPOSITION:
                     if (!empty($cspReport['disposition'])) {
                         return $cspReport['disposition'];
@@ -159,7 +159,7 @@ class CSPViolationsController extends Controller
         } elseif ($cspReport[self::REPORT_DIRECTIVE] == 'report-to') {
             switch ($attribute) {
                 case self::REPORT_TIME:
-                    return $cspReport[self::REPORT_TIME];
+                    return $this->normaliseDateTime($cspReport[self::REPORT_TIME]);
                 case self::DISPOSITION:
                     return $cspReport['disposition'];
                 case self::BLOCKED_URI:
@@ -173,6 +173,19 @@ class CSPViolationsController extends Controller
 
         // This should never be hit...
         return null;
+    }
+
+    /**
+     * Removes the seconds from a datetime string for easier comparisons.
+     *
+     * The datetime-local Chrome implementation doesn't include seconds, so it's easiest to just not include
+     * seconds at all so that exact matches work as expected.
+     *
+     * @var string $datetime
+     */
+    protected function normaliseDateTime($datetime)
+    {
+        return preg_replace('/(\d{4}-\d{2}-\d{2} \d{2}:\d{2}):\d{2}/', '$1', $datetime);
     }
 
     /**
