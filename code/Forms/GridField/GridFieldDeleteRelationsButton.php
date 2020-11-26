@@ -447,7 +447,7 @@ class GridFieldDeleteRelationsButton extends SS_Object implements
             ),
             $field,
         ];
-        $options = $this->getFilterTypesField($field->Name);
+        $options = $this->getFilterTypesField($field->Name, $field->Title());
         foreach ($options as $option) {
             $fields[] = $option;
         }
@@ -487,9 +487,10 @@ class GridFieldDeleteRelationsButton extends SS_Object implements
      * {@link GridFieldDeleteRelationsButton::setFilterOptions()}.
      *
      * @param string $fieldName
+     * @param string $fieldTitle
      * @return FormField[]
      */
-    protected function getFilterTypesField($fieldName)
+    protected function getFilterTypesField($fieldName, $fieldTitle)
     {
         $allOptions = $this->filterOptions;
         if (array_key_exists($fieldName, $allOptions)) {
@@ -502,7 +503,7 @@ class GridFieldDeleteRelationsButton extends SS_Object implements
         $filterFieldTitle = _t(
             self::class . '.FILTER_TYPE',
             '"{fieldName}" Filter Type',
-            ['fieldName' => $fieldName]
+            ['fieldName' => $fieldTitle]
         );
         if (count($options) == 1) {
             $fields[] = ReadonlyField::create(
