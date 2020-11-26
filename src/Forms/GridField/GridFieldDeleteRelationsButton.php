@@ -467,7 +467,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
                 ['fieldName' => $field->Title()]
             ),
             $fields
-        );
+        )->setDescription('<span class="js-placeholder-txt"></span>');
         if (ModuleLoader::inst()->getManifest()->moduleExists('unclecheese/display-logic')) {
             $group = Wrapper::create($group);
             $field->displayIf($filterBy->Name)->isChecked();

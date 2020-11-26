@@ -45,4 +45,28 @@
   };
 
   observer.observe(document, config);
+
+  // eslint-disable-next-line no-shadow
+  $.entwine(($) => {
+    $('div.datetime.display-logic').entwine({
+      // Provide the necessary data for display-logic.
+      // See https://github.com/unclecheese/silverstripe-display-logic/issues/119
+      onmatch() {
+        const hiddenField = this.find('input[type="hidden"]');
+        const field = this.find('input.datetime');
+        if (hiddenField.length && field.data('display-logic-eval') && field.data('display-logic-masters')) {
+          this.data('display-logic-eval', field.data('display-logic-eval'))
+            .data('display-logic-masters', field.data('display-logic-masters'))
+            .data('display-logic-animation', field.data('display-logic-animation'));
+          hiddenField.data('display-logic-eval', field.data('display-logic-eval'))
+            .data('display-logic-masters', field.data('display-logic-masters'))
+            .data('display-logic-animation', field.data('display-logic-animation'));
+          // Also add a clear example of input format, since no datepicker will be provided.
+          this.parent().find('.js-placeholder-txt').text(field.attr('placeholder'));
+        }
+        // eslint-disable-next-line no-underscore-dangle
+        this._super();
+      },
+    });
+  });
 }(jQuery));
