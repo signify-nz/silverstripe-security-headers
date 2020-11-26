@@ -450,7 +450,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
                 )
             ),
             $field,
-            $options = $this->getFilterTypesField($field->Name),
+            $options = $this->getFilterTypesField($field->Name, $field->Title()),
             $invert = CheckboxField::create(
                 $field->Name . self::FILTER_INVERT_SUFFIX,
                 _t(
@@ -484,9 +484,10 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
      * {@link GridFieldDeleteRelationsButton::setFilterOptions()}.
      *
      * @param string $fieldName
+     * @param string $fieldTitle
      * @return FormField
      */
-    protected function getFilterTypesField($fieldName)
+    protected function getFilterTypesField($fieldName, $fieldTitle)
     {
         $allOptions = $this->filterOptions;
         if (array_key_exists($fieldName, $allOptions)) {
@@ -498,7 +499,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
         $filterFieldTitle = _t(
             self::class . '.FILTER_TYPE',
             '"{fieldName}" Filter Type',
-            ['fieldName' => $fieldName]
+            ['fieldName' => $fieldTitle]
         );
         if (count($options) == 1) {
             $field = ReadonlyField::create(
