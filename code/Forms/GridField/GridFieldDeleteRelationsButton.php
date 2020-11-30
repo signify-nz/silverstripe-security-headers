@@ -57,21 +57,21 @@ class GridFieldDeleteRelationsButton extends SS_Object implements
         ]
     ];
 
-    const DEFAULT_OPTION = '__default';
+    public const DEFAULT_OPTION = '__default';
 
-    const OPTION_FIELD_SUFFIX = '__FilterOption';
+    public const OPTION_FIELD_SUFFIX = '__FilterOption';
 
-    const FILTER_BY_SUFFIX = '__FilterBy';
+    public const FILTER_BY_SUFFIX = '__FilterBy';
 
-    const FILTER_INVERT_SUFFIX = '__FilterInvert';
+    public const FILTER_INVERT_SUFFIX = '__FilterInvert';
 
-    const DELETE_ALL = 'DeleteAll__FilterAll';
+    public const DELETE_ALL = 'DeleteAll__FilterAll';
 
     /**
      * Filter options which are commonly used with string values.
      * @var string[]
      */
-    const STRING_FILTER_OPTIONS = [
+    public const STRING_FILTER_OPTIONS = [
         'ExactMatch',
         'PartialMatch',
         'StartsWith',
@@ -82,7 +82,7 @@ class GridFieldDeleteRelationsButton extends SS_Object implements
      * Filter options which are commonly used with numbers or date values.
      * @var string[]
      */
-    const NUMBER_DATE_FILTER_OPTIONS = [
+    public const NUMBER_DATE_FILTER_OPTIONS = [
         'ExactMatch',
         'LessThan',
         'LessThanOrEqual',
