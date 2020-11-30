@@ -25,7 +25,7 @@ before_script:
   - composer install
 
 script:
-  - if [[ $PHPCS_TEST ]]; then vendor/bin/phpcs --standard=./security-headers security-headers/code/ security-headers/tests/ ; fi
+  - if [[ $PHPCS_TEST ]]; then vendor/bin/phpcs --standard=security-headers/phpcs.xml.dist security-headers/code/ security-headers/tests/ ; fi
   - if [[ $PHPUNIT_TEST ]]; then vendor/bin/phpunit security-headers/tests/; fi
   - if [[ $PHPUNIT_COVERAGE_TEST ]]; then phpdbg -qrr vendor/bin/phpunit --coverage-clover=coverage.xml security-headers/ ; fi
 
