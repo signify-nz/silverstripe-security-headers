@@ -19,6 +19,9 @@ class SecurityHeaderRequestFilterTest extends FunctionalTest
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
+        // Add extension. Note this is needed to ensure the test database is constructed correctly when running both
+        // test classes together. It's not strictly needed for this test class alone.
+        SiteConfig::add_extension(SecurityHeaderSiteconfigExtension::class);
 
         // Set test header values.
         $config = Config::inst()->forClass(SecurityHeaderRequestFilter::class);
@@ -31,6 +34,8 @@ class SecurityHeaderRequestFilterTest extends FunctionalTest
         parent::tearDownAfterClass();
         // Reset headers to defaults.
         Config::inst()->update(SecurityHeaderRequestFilter::class, 'headers', static::$originalHeaderValues);
+        // Remove extension.
+        SiteConfig::remove_extension(SecurityHeaderSiteconfigExtension::class);
     }
 
     public function testResponseHeaders()
