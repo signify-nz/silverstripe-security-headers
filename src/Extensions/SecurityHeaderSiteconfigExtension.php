@@ -1,4 +1,5 @@
 <?php
+
 namespace Signify\Extensions;
 
 use SilverStripe\ORM\DataExtension;

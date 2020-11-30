@@ -1,4 +1,5 @@
 <?php
+
 namespace Signify\Models;
 
 use SilverStripe\ORM\DataObject;

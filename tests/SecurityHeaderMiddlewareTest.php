@@ -1,4 +1,5 @@
 <?php
+
 namespace Signify\Tests;
 
 use Signify\Extensions\SecurityHeaderSiteconfigExtension;
@@ -73,7 +74,8 @@ class SecurityHeaderMiddlewareExtensionTest extends FunctionalTest
 
     public function testReportURIAdded()
     {
-        $defaultUri = Director::absoluteURL(SecurityHeaderMiddleware::config()->get('report_uri'));;
+        $defaultUri = Director::absoluteURL(SecurityHeaderMiddleware::config()->get('report_uri'));
+        ;
         $response = $this->getResponse();
         $csp = $response->getHeader('Content-Security-Policy');
 

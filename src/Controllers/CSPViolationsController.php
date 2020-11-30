@@ -1,4 +1,5 @@
 <?php
+
 namespace Signify\Controllers;
 
 use SilverStripe\Control\Controller;
@@ -14,17 +15,17 @@ use Signify\Middleware\SecurityHeaderMiddleware;
 
 class CSPViolationsController extends Controller
 {
-    const REPORT_TIME = 'ReportedTime';
+    public const REPORT_TIME = 'ReportedTime';
 
-    const DISPOSITION = 'Disposition';
+    public const DISPOSITION = 'Disposition';
 
-    const BLOCKED_URI = 'BlockedURI';
+    public const BLOCKED_URI = 'BlockedURI';
 
-    const EFFECTIVE_DIRECTIVE = 'EffectiveDirective';
+    public const EFFECTIVE_DIRECTIVE = 'EffectiveDirective';
 
-    const DOCUMENT_URI = 'URI';
+    public const DOCUMENT_URI = 'URI';
 
-    const REPORT_DIRECTIVE = 'ReportDirective';
+    public const REPORT_DIRECTIVE = 'ReportDirective';
 
 
     public function index(HTTPRequest $request)

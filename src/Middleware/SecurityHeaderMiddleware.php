@@ -11,7 +11,8 @@ use SilverStripe\SiteConfig\SiteConfig;
 
 class SecurityHeaderMiddleware implements HTTPMiddleware
 {
-    use Configurable, Extensible;
+    use Configurable;
+    use Extensible;
 
     /**
      * An array of HTTP headers.

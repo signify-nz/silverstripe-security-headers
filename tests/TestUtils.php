@@ -1,4 +1,5 @@
 <?php
+
 namespace Signify\Tests;
 
 use SilverStripe\Core\Config\Config;
