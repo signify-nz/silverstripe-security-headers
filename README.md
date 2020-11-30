@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.com/signify-nz/silverstripe-security-headers.svg?branch=master)](https://travis-ci.com/signify-nz/silverstripe-security-headers)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/signify-nz/silverstripe-security-headers/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/signify-nz/silverstripe-silverstripe-security-headers/?branch=master)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/signify-nz/silverstripe-security-headers/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/signify-nz/silverstripe-security-headers/?branch=master)
 
 # SilverStripe security headers
 
