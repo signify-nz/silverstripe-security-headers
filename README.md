@@ -14,7 +14,7 @@ Comes with a default set of headers configured, but can be used to add any heade
 
 ## Install
 
-For SilverStripe 3, see the [appropriate branch](https://gitea.signify.nz/gsartorelli/silverstripe-security-headers/src/branch/1)
+For SilverStripe 3, see the [appropriate branch](https://github.com/signify-nz/silverstripe-security-headers/tree/1)
 
 Install via [composer](https://getcomposer.org):
 
