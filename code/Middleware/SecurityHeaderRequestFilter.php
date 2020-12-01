@@ -68,37 +68,30 @@ class SecurityHeaderRequestFilter extends SS_Object implements RequestFilter
         if ($config->get('enable_reporting') && $config->get('use_report_to')) {
             $this->addReportToHeader($headersToSend);
         }
+        // Update CSP header.
+        if (array_key_exists('Content-Security-Policy', $headersToSend)) {
+            $header = 'Content-Security-Policy';
+            $headerValue = $headersToSend['Content-Security-Policy'];
+            // Set report only mode if appropriate.
+            if ($this->isCSPReportingOnly()) {
+                unset($headersToSend['Content-Security-Policy']);
+                $header = 'Content-Security-Policy-Report-Only';
+            }
+            // Update CSP header value.
+            $headersToSend[$header] = $this->updateCspHeader($headerValue);
+        }
+        $this->extend('updateHeaders', $headersToSend, $request);
 
+        // Add headers to response.
         foreach ($headersToSend as $header => $value) {
             if (empty($value)) {
                 continue;
             }
             $value = preg_replace('/\v/', '', $value);
-
-            if ($header === 'Content-Security-Policy') {
-                if ($this->isCSPReportingOnly()) {
-                    $header = 'Content-Security-Policy-Report-Only';
-                }
-
-                if ($config->get('enable_reporting')) {
-                    // Add or update report-uri directive.
-                    if (strpos($value, 'report-uri')) {
-                        $value = str_replace('report-uri', $this->getReportURIDirective(), $value);
-                    } else {
-                        $value = rtrim($value, ';') . "; {$this->getReportURIDirective()};";
-                    }
-
-                    // Add report-to directive.
-                    // Note that unlike report-uri, only the first endpoint is used if multiple are declared.
-                    if ($config->get('use_report_to')) {
-                        if (strpos($value, 'report-to') === false) {
-                            $value = rtrim($value, ';') . "; {$this->getReportToDirective()};";
-                        }
-                    }
-                }
-            }
             $this->extend('updateHeader', $header, $value, $request);
-            $response->addHeader($header, $value);
+            if ($value) {
+                $response->addHeader($header, $value);
+            }
         }
 
         // Return true to send the response.
@@ -159,5 +152,27 @@ class SecurityHeaderRequestFilter extends SS_Object implements RequestFilter
             'include_subdomains' => $this->getIncludeSubdomains(),
         ];
         return json_encode($header);
+    }
+
+    public function updateCspHeader($cspHeader)
+    {
+        $config = Config::inst()->forClass(__CLASS__);
+        if ($config->get('enable_reporting')) {
+            // Add or update report-uri directive.
+            if (strpos($cspHeader, 'report-uri')) {
+                $cspHeader = str_replace('report-uri', $this->getReportURIDirective(), $cspHeader);
+            } else {
+                $cspHeader = rtrim($cspHeader, ';') . "; {$this->getReportURIDirective()};";
+            }
+
+            // Add report-to directive.
+            // Note that unlike report-uri, only the first endpoint is used if multiple are declared.
+            if ($config->get('use_report_to')) {
+                if (strpos($cspHeader, 'report-to') === false) {
+                    $cspHeader = rtrim($cspHeader, ';') . "; {$this->getReportToDirective()};";
+                }
+            }
+        }
+        return $cspHeader;
     }
 }

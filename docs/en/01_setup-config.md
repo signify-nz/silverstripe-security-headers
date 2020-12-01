@@ -42,7 +42,16 @@ We recommend copying the value we use in the packaged [_config/config.yml file](
 
 ## Updating Headers Via Code
 
-The `SecurityHeaderRequestFilter` class has a convenient extension point just before adding a header to the response. You can use this in an `Extension` subclass to alter header values.
+The `SecurityHeaderRequestFilter` class has two convenient extension points before adding headers to the response. You can use these in an `Extension` subclass to alter header values.
+
+The `updateHeaders` extension method provides you with all headers as an array. It is useful for adding or removing headers under specific conditions and has a signature like so:
+```PHP
+public function updateHeaders(&$headers, SS_HTTPRequest $request);
+```
+The `updateHeader` extension method provides you with each header name and value, one header at a time. This method is useful for altering the value for a given header. Its signature looks like this:
+```PHP
+public function updateHeader($header, &$value, SS_HTTPRequest $request);
+```
 
 For example, if you use the [silverstripe/iframe](https://github.com/silverstripe/silverstripe-iframe) module you may want to ensure the URL set on a given IFramePage will be permitted by the CSP on that page, but _only_ on that page. That can be achieved like so:
 
