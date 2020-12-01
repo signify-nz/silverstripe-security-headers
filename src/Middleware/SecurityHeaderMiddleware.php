@@ -77,7 +77,7 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
             $header = 'Content-Security-Policy';
             $headerValue = $headersToSend['Content-Security-Policy'];
             // Set report only mode if appropriate.
-            if ($this->isCSPReportingOnly($request)) {
+            if ($this->isCSPReportingOnly()) {
                 unset($headersToSend['Content-Security-Policy']);
                 $header = 'Content-Security-Policy-Report-Only';
             }
@@ -105,7 +105,7 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
      * Returns true if the Content-Security-Policy-Report-Only header should be used.
      * @return boolean
      */
-    public function isCSPReportingOnly($request)
+    public function isCSPReportingOnly()
     {
         return SiteConfig::current_site_config()->CSPReportingOnly;
     }
