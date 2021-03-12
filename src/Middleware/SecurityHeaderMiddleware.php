@@ -1,12 +1,16 @@
 <?php
-
 namespace Signify\Middleware;
 
+use Signify\Extensions\SecurityHeaderSiteconfigExtension;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\Middleware\HTTPMiddleware;
-use SilverStripe\Core\Config\Configurable;
+use SilverStripe\Core\ClassInfo;
 use SilverStripe\Core\Extensible;
+use SilverStripe\Core\Config\Configurable;
+use SilverStripe\Dev\TestOnly;
+use SilverStripe\ORM\DB;
+use SilverStripe\ORM\DataObject;
 use SilverStripe\SiteConfig\SiteConfig;
 
 class SecurityHeaderMiddleware implements HTTPMiddleware
@@ -59,6 +63,16 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
      */
     private static $report_to_group = 'signify-csp-violation';
 
+    /**
+     * Can isCSPReportingOnly be used safely.
+     *
+     * This is not a config option.
+     *
+     * @var boolean
+     */
+    private static $is_csp_reporting_only_safe = false;
+
+
     public function process(HTTPRequest $request, callable $delegate)
     {
         $response = $delegate($request);
@@ -103,11 +117,12 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
 
     /**
      * Returns true if the Content-Security-Policy-Report-Only header should be used.
+     *
      * @return boolean
      */
     public function isCSPReportingOnly()
     {
-        return SiteConfig::current_site_config()->CSPReportingOnly;
+        return self::isCSPReportingOnlyAvailable() ? SiteConfig::current_site_config()->CSPReportingOnly : false;
     }
 
     protected function getReportURI()
@@ -177,5 +192,53 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
         }
 
         return $cspHeader;
+    }
+
+    /**
+     * Is the CSPReportingOnly field safe to read.
+     *
+     * If the module is installed and the codebase is flushed before the database has been built, accessing SiteConfig causes an error.
+     *
+     * @return boolean
+     */
+    private function isCSPReportingOnlyAvailable()
+    {
+        // Cached true value.
+        if (self::$is_csp_reporting_only_safe) {
+            return self::$is_csp_reporting_only_safe;
+        }
+
+        // Basically SiteConfig, but it could be an injected class.
+        $classes = ClassInfo::classesWithExtension(SecurityHeaderSiteconfigExtension::class);
+
+        // Check if all tables and fields required for the class exist in the database.
+        $requiredClasses = [];
+        foreach ($classes as $class) {
+            $requiredClasses += ClassInfo::dataClassesFor($class);
+        }
+
+        $schema = DataObject::getSchema();
+        foreach ($requiredClasses as $required) {
+            // Skip test classes, as not all test classes are scaffolded at once
+            if (is_a($required, TestOnly::class, true)) {
+                continue;
+            }
+
+            // if any of the tables aren't created in the database
+            $table = $schema->tableName($required);
+            if (!ClassInfo::hasTable($table)) {
+                return false;
+            }
+
+            // if any of the tables don't have all fields mapped as table columns
+            $dbFields = DB::field_list($table);
+            if (!isset($dbFields['CSPReportingOnly'])) {
+                return false;
+            }
+        }
+
+        self::$is_csp_reporting_only_safe = true;
+
+        return true;
     }
 }
