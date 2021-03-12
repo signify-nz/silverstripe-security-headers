@@ -1,4 +1,5 @@
 <?php
+
 namespace Signify\Middleware;
 
 use Signify\Extensions\SecurityHeaderSiteconfigExtension;
@@ -197,7 +198,8 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
     /**
      * Is the CSPReportingOnly field safe to read.
      *
-     * If the module is installed and the codebase is flushed before the database has been built, accessing SiteConfig causes an error.
+     * If the module is installed and the codebase is flushed before the database has been built,
+     * accessing SiteConfig causes an error.
      *
      * @return boolean
      */
