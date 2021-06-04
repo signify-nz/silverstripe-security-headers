@@ -203,7 +203,7 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
      *
      * @return boolean
      */
-    private function isCSPReportingOnlyAvailable()
+    private static function isCSPReportingOnlyAvailable()
     {
         // Cached true value.
         if (self::$is_csp_reporting_only_safe) {
