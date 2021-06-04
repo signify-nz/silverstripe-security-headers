@@ -232,9 +232,16 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
                 return false;
             }
 
-            // if any of the tables don't have all fields mapped as table columns
+            // if any of the tables don't have any fields mapped as table columns
             $dbFields = DB::field_list($table);
-            if (!isset($dbFields['CSPReportingOnly'])) {
+            if (!$dbFields) {
+                return false;
+            }
+
+            // if any of the tables are missing fields mapped as table columns
+            $objFields = $schema->databaseFields($required, false);
+            $missingFields = array_diff_key($objFields, $dbFields);
+            if ($missingFields) {
                 return false;
             }
         }
