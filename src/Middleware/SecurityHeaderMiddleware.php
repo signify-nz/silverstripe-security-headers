@@ -203,24 +203,17 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
      *
      * @return boolean
      */
-    private function isCSPReportingOnlyAvailable()
+    private static function isCSPReportingOnlyAvailable()
     {
         // Cached true value.
         if (self::$is_csp_reporting_only_safe) {
             return self::$is_csp_reporting_only_safe;
         }
 
-        // Basically SiteConfig, but it could be an injected class.
-        $classes = ClassInfo::classesWithExtension(SecurityHeaderSiteconfigExtension::class);
-
         // Check if all tables and fields required for the class exist in the database.
-        $requiredClasses = [];
-        foreach ($classes as $class) {
-            $requiredClasses += ClassInfo::dataClassesFor($class);
-        }
-
+        $requiredClasses = ClassInfo::dataClassesFor(SiteConfig::class);
         $schema = DataObject::getSchema();
-        foreach ($requiredClasses as $required) {
+        foreach (array_unique($requiredClasses) as $required) {
             // Skip test classes, as not all test classes are scaffolded at once
             if (is_a($required, TestOnly::class, true)) {
                 continue;
@@ -232,9 +225,16 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
                 return false;
             }
 
-            // if any of the tables don't have all fields mapped as table columns
+            // if any of the tables don't have any fields mapped as table columns
             $dbFields = DB::field_list($table);
-            if (!isset($dbFields['CSPReportingOnly'])) {
+            if (!$dbFields) {
+                return false;
+            }
+
+            // if any of the tables are missing fields mapped as table columns
+            $objFields = $schema->databaseFields($required, false);
+            $missingFields = array_diff_key($objFields, $dbFields);
+            if ($missingFields) {
                 return false;
             }
         }
