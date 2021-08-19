@@ -143,7 +143,11 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
      */
     public function isCSPReportingOnly()
     {
-        return self::isCSPReportingOnlyAvailable() ? SiteConfig::current_site_config()->CSPReportingOnly : false;
+        if (self::isCSPReportingOnlyAvailable() && SiteConfig::current_site_config()->CSPReportingOnly == '1') {
+            return true;
+        }
+
+        return false;
     }
 
     protected function getReportURI()
