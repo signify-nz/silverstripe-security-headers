@@ -84,6 +84,12 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
         }
 
         $headersToSend = $headersConfig['global'];
+
+        // Disable reporting
+        if ($this->disableReporting()) {
+            $this->config()->set('enable_reporting', false);
+        }
+
         if ($this->config()->get('enable_reporting') && $this->config()->get('use_report_to')) {
             $this->addReportToHeader($headersToSend);
         }
@@ -114,6 +120,20 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
         }
 
         return $response;
+    }
+
+    /**
+     * Return true if the Disable reporting is checked
+     *
+     * @return boolean
+     */
+    public function disableReporting()
+    {
+        if (SiteConfig::current_site_config()->CSPReportingOnly == '2'){
+            return true;
+        }
+
+        return false;
     }
 
     /**
