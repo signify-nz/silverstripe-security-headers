@@ -5,9 +5,14 @@ Both the report-uri directive and the report-to directive/header combination are
 
 If you supply your own endpoint using the report-uri directive, the default will also be added to it. It is expected that browsers will send a report to each endpoint in the report-uri directive.
 
-## Report-Only mode
+## Setting options
 
-You can optionally apply the `SecurityHeaderSiteconfigExtension` extension to SiteConfig. This gives you the option to set the Content Security Policy to report only mode (this swaps from using the `Content-Security-Policy` header to the `Content-Security-Policy-Report-Only` header) so that you can test CSP settings without enforcing them.
+You can optionally apply the `SecurityHeaderSiteconfigExtension` extension to SiteConfig. This gives you four options.
+- Enable Content Security Policy with reporting (recommended). This is the default option.
+- Set Content Security Policy to report-only mode. This gives you the option to set the Content Security Policy to report only mode (this swaps from using the `Content-Security-Policy` header to the `Content-Security-Policy-Report-Only` header) so that you can test CSP settings without enforcing them.
+- Enable Content Security Policy without reporting.
+- Disable Content Security Policy (not recommended).
+
 It also comes with its own permission in case you want some members to have access to the site settings, but not this CSP setting.
 
 ```yml
@@ -50,4 +55,4 @@ Note that this does not disable the endpoint or remove the report from the CMS -
 
 If `enable_reporting` is set to false, the value of `use_report_to` (see above) no longer matters
 
-Note that this also doesn't affect the ability to set the CSP to report-only mode (see [Report-Only mode](#report-only-mode)).
+Note that this also doesn't affect the ability to set the CSP to report-only mode (see [Setting options](#setting-options)).
