@@ -83,6 +83,11 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
             return $response;
         }
 
+        // Disable CSP
+        if ($this->disableCSP()) {
+            return $response;
+        }
+
         $headersToSend = $headersConfig['global'];
 
         // Disable reporting
@@ -120,6 +125,20 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
         }
 
         return $response;
+    }
+
+    /**
+     * Return true if the Disable CSP is checked
+     *
+     * @return boolean
+     */
+    public function disableCSP()
+    {
+        if (SiteConfig::current_site_config()->CSPReportingOnly == '3'){
+            return true;
+        }
+
+        return false;
     }
 
     /**
