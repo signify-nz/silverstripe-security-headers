@@ -134,7 +134,7 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
      */
     public function disableCSP()
     {
-        if (SiteConfig::current_site_config()->CSPReportingOnly == '3'){
+        if (SiteConfig::current_site_config()->CSPReportingOnly == '3') {
             return true;
         }
 
@@ -148,7 +148,7 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
      */
     public function disableReporting()
     {
-        if (SiteConfig::current_site_config()->CSPReportingOnly == '2'){
+        if (SiteConfig::current_site_config()->CSPReportingOnly == '2') {
             return true;
         }
 
