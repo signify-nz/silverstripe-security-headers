@@ -38,7 +38,7 @@ class SecurityHeaderSiteconfigExtension extends DataExtension implements Permiss
                     '1' => 'Set Content Security Policy to report-only mode',
                     '2' => 'Enable Content Security Policy without reporting',
                     '3' => 'Disable Content Security Policy (not recommended)',
-                ],
+                ]
             )
         );
     }
