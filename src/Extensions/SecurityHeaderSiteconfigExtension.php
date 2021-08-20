@@ -10,9 +10,17 @@ use SilverStripe\Security\PermissionProvider;
 
 class SecurityHeaderSiteconfigExtension extends DataExtension implements PermissionProvider
 {
+    // The values are in this order to ensure backwards compatability with the old binary options.
+    public const CSP_WITH_REPORTING = 0;
+
+    public const CSP_WITHOUT_REPORTING = 2;
+
+    public const CSP_REPORTING_ONLY = 1;
+
+    public const CSP_DISABLE = 3;
 
     private static $db = [
-        "CSPReportingOnly" => "Enum('0,1,2,3')",
+        "CSPReportingOnly" => "Enum('0,2,1,3')",
     ];
 
     public function updateCMSFields(FieldList $fields)
@@ -27,10 +35,10 @@ class SecurityHeaderSiteconfigExtension extends DataExtension implements Permiss
                 'CSPReportingOnly',
                 'Content Security Policy',
                 [
-                    '0' => 'Enable Content Security Policy with reporting (recommended)',
-                    '1' => 'Set Content Security Policy to report-only mode',
-                    '2' => 'Enable Content Security Policy without reporting',
-                    '3' => 'Disable Content Security Policy (not recommended)',
+                    self::CSP_WITH_REPORTING => 'Enable Content Security Policy with reporting (recommended)',
+                    self::CSP_WITHOUT_REPORTING => 'Enable Content Security Policy without reporting',
+                    self::CSP_REPORTING_ONLY => 'Set Content Security Policy to report-only mode',
+                    self::CSP_DISABLE => 'Disable Content Security Policy (not recommended)',
                 ]
             )
         );
