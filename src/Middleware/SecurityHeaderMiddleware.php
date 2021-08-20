@@ -148,7 +148,7 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
      */
     public function disableReporting()
     {
-        if (SiteConfig::current_site_config()->CSPReportingOnly == '2') {
+        if (SiteConfig::current_site_config()->CSPReportingOnly == SecurityHeaderSiteconfigExtension::CSP_WITHOUT_REPORTING && $this->config()->get('enable_reporting')) {
             return true;
         }
 
