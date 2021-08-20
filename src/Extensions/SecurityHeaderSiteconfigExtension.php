@@ -15,13 +15,6 @@ class SecurityHeaderSiteconfigExtension extends DataExtension implements Permiss
         "CSPReportingOnly" => "Enum('0,1,2,3')",
     ];
 
-    /**
-     * @var array
-     */
-    private static $defaults = [
-        'CSPReportingOnly' => '0',
-    ];
-
     public function updateCMSFields(FieldList $fields)
     {
         if (!Permission::check('ADMINISTER_CSP')) {
