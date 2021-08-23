@@ -90,11 +90,6 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
 
         $headersToSend = $headersConfig['global'];
 
-        // Disable reporting
-        if ($this->disableReporting()) {
-            $this->config()->set('enable_reporting', false);
-        }
-
         if ($this->config()->get('enable_reporting') && $this->config()->get('use_report_to')) {
             $this->addReportToHeader($headersToSend);
         }
