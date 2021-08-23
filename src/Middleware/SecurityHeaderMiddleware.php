@@ -71,7 +71,7 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
      *
      * @var boolean
      */
-    private static $is_csp_reporting_only_safe = false;
+    private static $is_csp_reporting_safe = false;
 
 
     public function process(HTTPRequest $request, callable $delegate)
@@ -249,8 +249,8 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
     private static function isCSPReportingOnlyAvailable()
     {
         // Cached true value.
-        if (self::$is_csp_reporting_only_safe) {
-            return self::$is_csp_reporting_only_safe;
+        if (self::$is_csp_reporting_safe) {
+            return self::$is_csp_reporting_safe;
         }
 
         // Check if all tables and fields required for the class exist in the database.
@@ -282,7 +282,7 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
             }
         }
 
-        self::$is_csp_reporting_only_safe = true;
+        self::$is_csp_reporting_safe = true;
 
         return true;
     }
