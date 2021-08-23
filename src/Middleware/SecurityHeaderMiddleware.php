@@ -90,9 +90,10 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
 
         $headersToSend = $headersConfig['global'];
 
-        if ($this->config()->get('enable_reporting') && $this->config()->get('use_report_to')) {
+        if (!$this->disableReporting() && $this->config()->get('use_report_to')) {
             $this->addReportToHeader($headersToSend);
         }
+
         // Update CSP header.
         if (array_key_exists('Content-Security-Policy', $headersToSend)) {
             $header = 'Content-Security-Policy';
@@ -215,7 +216,7 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
 
     protected function updateCspHeader($cspHeader)
     {
-        if ($this->config()->get('enable_reporting')) {
+        if (!$this->disableReporting()) {
             // Add or update report-uri directive.
             if (strpos($cspHeader, 'report-uri')) {
                 $cspHeader = str_replace('report-uri', $this->getReportURIDirective(), $cspHeader);
