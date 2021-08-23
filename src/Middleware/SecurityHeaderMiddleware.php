@@ -162,7 +162,7 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
      */
     public function isCSPReportingOnly()
     {
-        if (self::isCSPReportingOnlyAvailable() && SiteConfig::current_site_config()->CSPReportingOnly == SecurityHeaderSiteconfigExtension::CSP_REPORTING_ONLY) {
+        if (self::isCSPReportingAvailable() && SiteConfig::current_site_config()->CSPReportingOnly == SecurityHeaderSiteconfigExtension::CSP_REPORTING_ONLY) {
             return true;
         }
 
@@ -246,7 +246,7 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
      *
      * @return boolean
      */
-    private static function isCSPReportingOnlyAvailable()
+    private static function isCSPReportingAvailable()
     {
         // Cached true value.
         if (self::$is_csp_reporting_safe) {
