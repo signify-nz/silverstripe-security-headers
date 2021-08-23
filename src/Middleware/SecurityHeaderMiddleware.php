@@ -139,12 +139,14 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
     /**
      * Return true if the Disable reporting is checked
      *
+     * The CMS setting can disable reporting even if the 'enable_reporting' is true
+     *
      * @return boolean
      */
     public function disableReporting()
     {
-        if (SiteConfig::current_site_config()->CSPReportingOnly == SecurityHeaderSiteconfigExtension::CSP_WITHOUT_REPORTING && $this->config()->get('enable_reporting')) {
-            return true;
+        if (self::isCSPReportingAvailable()) {
+            return SiteConfig::current_site_config()->CSPReportingOnly == SecurityHeaderSiteconfigExtension::CSP_WITHOUT_REPORTING || !$this->config()->get('enable_reporting');
         }
 
         return false;
