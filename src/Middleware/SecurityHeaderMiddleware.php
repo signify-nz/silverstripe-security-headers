@@ -130,7 +130,8 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
      */
     public function disableCSP()
     {
-        if (self::isCSPReportingAvailable() && SiteConfig::current_site_config()->CSPReportingOnly == SecurityHeaderSiteconfigExtension::CSP_DISABLE) {
+        if (self::isCSPReportingAvailable() &&
+            SiteConfig::current_site_config()->CSPReportingOnly == SecurityHeaderSiteconfigExtension::CSP_DISABLE) {
             return true;
         }
 
@@ -147,7 +148,8 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
     public function disableReporting()
     {
         if (self::isCSPReportingAvailable()) {
-            return SiteConfig::current_site_config()->CSPReportingOnly == SecurityHeaderSiteconfigExtension::CSP_WITHOUT_REPORTING || !$this->config()->get('enable_reporting');
+            return SiteConfig::current_site_config()->CSPReportingOnly == SecurityHeaderSiteconfigExtension::CSP_WITHOUT_REPORTING ||
+            !$this->config()->get('enable_reporting');
         }
 
         return false;
@@ -160,7 +162,8 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
      */
     public function isCSPReportingOnly()
     {
-        if (self::isCSPReportingAvailable() && SiteConfig::current_site_config()->CSPReportingOnly == SecurityHeaderSiteconfigExtension::CSP_REPORTING_ONLY) {
+        if (self::isCSPReportingAvailable() &&
+            SiteConfig::current_site_config()->CSPReportingOnly == SecurityHeaderSiteconfigExtension::CSP_REPORTING_ONLY) {
             return true;
         }
 
