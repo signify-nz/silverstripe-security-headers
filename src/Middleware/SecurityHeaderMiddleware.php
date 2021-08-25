@@ -83,11 +83,6 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
             return $response;
         }
 
-        // Disable CSP
-        if ($this->disableCSP()) {
-            return $response;
-        }
-
         $headersToSend = $headersConfig['global'];
 
         if (!$this->disableReporting() && $this->config()->get('use_report_to')) {
@@ -98,13 +93,20 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
         if (array_key_exists('Content-Security-Policy', $headersToSend)) {
             $header = 'Content-Security-Policy';
             $headerValue = $headersToSend['Content-Security-Policy'];
+
             // Set report only mode if appropriate.
             if ($this->isCSPReportingOnly()) {
                 unset($headersToSend['Content-Security-Policy']);
                 $header = 'Content-Security-Policy-Report-Only';
             }
+
             // Update CSP header value.
             $headersToSend[$header] = $this->updateCspHeader($headerValue);
+
+            // Disable CSP
+            if ($this->disableCSP()) {
+                unset($headersToSend['Content-Security-Policy']);
+            }
         }
         $this->extend('updateHeaders', $headersToSend, $request);
 
