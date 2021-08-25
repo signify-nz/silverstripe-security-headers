@@ -1,13 +1,18 @@
-# Content Security Policy Violations Report
+# Content Security Policy Options
 
 Unless disabled ([see below](#disabling-reporting), content security policy violations will automatically be added to a report in the CMS in the reports section (at `/admin/reports/show/Signify-SecurityHeaders-Reports-CSPViolationsReport`).
 Both the report-uri directive and the report-to directive/header combination are supported, though report-to is currently disabled by default as the implementation for that directive and header are expected to change (see the [working draft](https://www.w3.org/TR/reporting/) and the [editor's draft](https://w3c.github.io/reporting/)).
 
 If you supply your own endpoint using the report-uri directive, the default will also be added to it. It is expected that browsers will send a report to each endpoint in the report-uri directive.
 
-## Report-Only mode
+## Setting options
 
-You can optionally apply the `SecurityHeaderSiteconfigExtension` extension to SiteConfig. This gives you the option to set the Content Security Policy to report only mode (this swaps from using the `Content-Security-Policy` header to the `Content-Security-Policy-Report-Only` header) so that you can test CSP settings without enforcing them.
+You can optionally apply the `SecurityHeaderSiteconfigExtension` extension to SiteConfig. This gives you four options.
+- Enable Content Security Policy with reporting (recommended). This is the default option.
+- Enable Content Security Policy without reporting.
+- Set Content Security Policy to report-only mode. This gives you the option to set the Content Security Policy to report only mode (this swaps from using the `Content-Security-Policy` header to the `Content-Security-Policy-Report-Only` header) so that you can test CSP settings without enforcing them.
+- Disable Content Security Policy (not recommended).
+
 It also comes with its own permission in case you want some members to have access to the site settings, but not this CSP setting.
 
 ```yml
@@ -50,4 +55,4 @@ Note that this does not disable the endpoint or remove the report from the CMS -
 
 If `enable_reporting` is set to false, the value of `use_report_to` (see above) no longer matters
 
-Note that this also doesn't affect the ability to set the CSP to report-only mode (see [Report-Only mode](#report-only-mode)).
+Note that this also doesn't affect the ability to set the CSP to report-only mode (see [Setting options](#setting-options)).

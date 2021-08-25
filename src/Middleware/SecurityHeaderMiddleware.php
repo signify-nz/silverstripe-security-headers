@@ -71,7 +71,7 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
      *
      * @var boolean
      */
-    private static $is_csp_reporting_only_safe = false;
+    private static $is_csp_reporting_safe = false;
 
 
     public function process(HTTPRequest $request, callable $delegate)
@@ -84,20 +84,29 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
         }
 
         $headersToSend = $headersConfig['global'];
-        if ($this->config()->get('enable_reporting') && $this->config()->get('use_report_to')) {
+
+        if (!$this->disableReporting() && $this->config()->get('use_report_to')) {
             $this->addReportToHeader($headersToSend);
         }
+
         // Update CSP header.
         if (array_key_exists('Content-Security-Policy', $headersToSend)) {
             $header = 'Content-Security-Policy';
-            $headerValue = $headersToSend['Content-Security-Policy'];
-            // Set report only mode if appropriate.
-            if ($this->isCSPReportingOnly()) {
+
+            if ($this->disableCSP()) {
                 unset($headersToSend['Content-Security-Policy']);
-                $header = 'Content-Security-Policy-Report-Only';
+            } else {
+                $headerValue = $headersToSend['Content-Security-Policy'];
+
+                // Set report only mode if appropriate.
+                if ($this->isCSPReportingOnly()) {
+                    unset($headersToSend['Content-Security-Policy']);
+                    $header = 'Content-Security-Policy-Report-Only';
+                }
+
+                // Update CSP header value.
+                $headersToSend[$header] = $this->updateCspHeader($headerValue);
             }
-            // Update CSP header value.
-            $headersToSend[$header] = $this->updateCspHeader($headerValue);
         }
         $this->extend('updateHeaders', $headersToSend, $request);
 
@@ -117,13 +126,55 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
     }
 
     /**
+     * Return true if the Disable CSP is checked
+     *
+     * @return boolean
+     */
+    public function disableCSP()
+    {
+        if (
+            self::isCSPReportingAvailable() &&
+            SiteConfig::current_site_config()->CSPReportingOnly == SecurityHeaderSiteconfigExtension::CSP_DISABLE
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Return true if the Disable reporting is checked
+     *
+     * The CMS setting can disable reporting even if the 'enable_reporting' is true
+     *
+     * @return boolean
+     */
+    public function disableReporting()
+    {
+        if (self::isCSPReportingAvailable()) {
+            return SiteConfig::current_site_config()->CSPReportingOnly ==
+            SecurityHeaderSiteconfigExtension::CSP_WITHOUT_REPORTING ||
+            !$this->config()->get('enable_reporting');
+        }
+
+        return false;
+    }
+
+    /**
      * Returns true if the Content-Security-Policy-Report-Only header should be used.
      *
      * @return boolean
      */
     public function isCSPReportingOnly()
     {
-        return self::isCSPReportingOnlyAvailable() ? SiteConfig::current_site_config()->CSPReportingOnly : false;
+        if (
+            self::isCSPReportingAvailable() &&
+            SiteConfig::current_site_config()->CSPReportingOnly == SecurityHeaderSiteconfigExtension::CSP_REPORTING_ONLY
+        ) {
+            return true;
+        }
+
+        return false;
     }
 
     protected function getReportURI()
@@ -175,7 +226,7 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
 
     protected function updateCspHeader($cspHeader)
     {
-        if ($this->config()->get('enable_reporting')) {
+        if (!$this->disableReporting()) {
             // Add or update report-uri directive.
             if (strpos($cspHeader, 'report-uri')) {
                 $cspHeader = str_replace('report-uri', $this->getReportURIDirective(), $cspHeader);
@@ -203,11 +254,11 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
      *
      * @return boolean
      */
-    private static function isCSPReportingOnlyAvailable()
+    private static function isCSPReportingAvailable()
     {
         // Cached true value.
-        if (self::$is_csp_reporting_only_safe) {
-            return self::$is_csp_reporting_only_safe;
+        if (self::$is_csp_reporting_safe) {
+            return self::$is_csp_reporting_safe;
         }
 
         // Check if all tables and fields required for the class exist in the database.
@@ -239,7 +290,7 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
             }
         }
 
-        self::$is_csp_reporting_only_safe = true;
+        self::$is_csp_reporting_safe = true;
 
         return true;
     }
