@@ -93,7 +93,7 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
         if (array_key_exists('Content-Security-Policy', $headersToSend)) {
             $header = 'Content-Security-Policy';
 
-            if ($this->disableCSP()) {
+            if (!$this->hasCSP()) {
                 unset($headersToSend['Content-Security-Policy']);
             } else {
                 $headerValue = $headersToSend['Content-Security-Policy'];
@@ -126,20 +126,14 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
     }
 
     /**
-     * Return true if the Disable CSP is checked
+     * Return true if the Disable CSP is unchecked
      *
      * @return boolean
      */
-    public function disableCSP()
+    public function hasCSP()
     {
-        if (
-            self::isCSPReportingAvailable() &&
-            SiteConfig::current_site_config()->CSPReportingOnly == SecurityHeaderSiteconfigExtension::CSP_DISABLE
-        ) {
-            return true;
-        }
-
-        return false;
+        return self::isCSPReportingAvailable() &&
+            SiteConfig::current_site_config()->CSPReportingOnly != SecurityHeaderSiteconfigExtension::CSP_DISABLE;
     }
 
     /**
