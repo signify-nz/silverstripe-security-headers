@@ -147,7 +147,8 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
     {
         if ($this->hasCSP()) {
             return SiteConfig::current_site_config()->CSPReportingOnly
-                != SecurityHeaderSiteconfigExtension::CSP_WITHOUT_REPORTING && $this->config()->get('enable_reporting');
+                != SecurityHeaderSiteconfigExtension::CSP_WITHOUT_REPORTING
+                && $this->config()->get('enable_reporting');
         }
 
         return false;
