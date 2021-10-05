@@ -93,9 +93,7 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
         if (array_key_exists('Content-Security-Policy', $headersToSend)) {
             $header = 'Content-Security-Policy';
 
-            if (!$this->hasCSP()) {
-                unset($headersToSend['Content-Security-Policy']);
-            } else {
+            if ($this->hasCSP()) {
                 $headerValue = $headersToSend['Content-Security-Policy'];
 
                 // Set report only mode if appropriate.
@@ -106,6 +104,8 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
 
                 // Update CSP header value.
                 $headersToSend[$header] = $this->updateCspHeader($headerValue);
+            } else {
+                unset($headersToSend['Content-Security-Policy']);
             }
         }
         $this->extend('updateHeaders', $headersToSend, $request);
