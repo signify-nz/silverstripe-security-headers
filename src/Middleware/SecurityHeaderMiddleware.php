@@ -85,7 +85,7 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
 
         $headersToSend = $headersConfig['global'];
 
-        if (!$this->disableReporting() && $this->config()->get('use_report_to')) {
+        if ($this->isReporting() && $this->config()->get('use_report_to')) {
             $this->addReportToHeader($headersToSend);
         }
 
@@ -93,9 +93,7 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
         if (array_key_exists('Content-Security-Policy', $headersToSend)) {
             $header = 'Content-Security-Policy';
 
-            if ($this->disableCSP()) {
-                unset($headersToSend['Content-Security-Policy']);
-            } else {
+            if ($this->hasCSP()) {
                 $headerValue = $headersToSend['Content-Security-Policy'];
 
                 // Set report only mode if appropriate.
@@ -106,6 +104,8 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
 
                 // Update CSP header value.
                 $headersToSend[$header] = $this->updateCspHeader($headerValue);
+            } else {
+                unset($headersToSend['Content-Security-Policy']);
             }
         }
         $this->extend('updateHeaders', $headersToSend, $request);
@@ -126,35 +126,29 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
     }
 
     /**
-     * Return true if the Disable CSP is checked
+     * Return true if the Disable CSP is unchecked
      *
      * @return boolean
      */
-    public function disableCSP()
+    public function hasCSP()
     {
-        if (
-            self::isCSPReportingAvailable() &&
-            SiteConfig::current_site_config()->CSPReportingOnly == SecurityHeaderSiteconfigExtension::CSP_DISABLE
-        ) {
-            return true;
-        }
-
-        return false;
+        return self::isCSPReportingAvailable() &&
+            SiteConfig::current_site_config()->CSPReportingOnly != SecurityHeaderSiteconfigExtension::CSP_DISABLE;
     }
 
     /**
-     * Return true if the Disable reporting is checked
+     * Return true if the Disable reporting is unchecked
      *
      * The CMS setting can disable reporting even if the 'enable_reporting' is true
      *
      * @return boolean
      */
-    public function disableReporting()
+    public function isReporting()
     {
-        if (self::isCSPReportingAvailable()) {
-            return SiteConfig::current_site_config()->CSPReportingOnly ==
-            SecurityHeaderSiteconfigExtension::CSP_WITHOUT_REPORTING ||
-            !$this->config()->get('enable_reporting');
+        if ($this->hasCSP()) {
+            return SiteConfig::current_site_config()->CSPReportingOnly
+                != SecurityHeaderSiteconfigExtension::CSP_WITHOUT_REPORTING
+                && $this->config()->get('enable_reporting');
         }
 
         return false;
@@ -226,7 +220,7 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
 
     protected function updateCspHeader($cspHeader)
     {
-        if (!$this->disableReporting()) {
+        if ($this->isReporting()) {
             // Add or update report-uri directive.
             if (strpos($cspHeader, 'report-uri')) {
                 $cspHeader = str_replace('report-uri', $this->getReportURIDirective(), $cspHeader);
