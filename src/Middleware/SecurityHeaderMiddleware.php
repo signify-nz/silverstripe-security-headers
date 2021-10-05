@@ -85,7 +85,7 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
 
         $headersToSend = $headersConfig['global'];
 
-        if (!$this->disableReporting() && $this->config()->get('use_report_to')) {
+        if ($this->isReporting() && $this->config()->get('use_report_to')) {
             $this->addReportToHeader($headersToSend);
         }
 
@@ -137,18 +137,17 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
     }
 
     /**
-     * Return true if the Disable reporting is checked
+     * Return true if the Disable reporting is unchecked
      *
      * The CMS setting can disable reporting even if the 'enable_reporting' is true
      *
      * @return boolean
      */
-    public function disableReporting()
+    public function isReporting()
     {
-        if (self::isCSPReportingAvailable()) {
-            return SiteConfig::current_site_config()->CSPReportingOnly ==
-            SecurityHeaderSiteconfigExtension::CSP_WITHOUT_REPORTING ||
-            !$this->config()->get('enable_reporting');
+        if ($this->hasCSP()) {
+            return SiteConfig::current_site_config()->CSPReportingOnly != SecurityHeaderSiteconfigExtension::CSP_WITHOUT_REPORTING
+                && $this->config()->get('enable_reporting');
         }
 
         return false;
@@ -220,7 +219,7 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
 
     protected function updateCspHeader($cspHeader)
     {
-        if (!$this->disableReporting()) {
+        if ($this->isReporting()) {
             // Add or update report-uri directive.
             if (strpos($cspHeader, 'report-uri')) {
                 $cspHeader = str_replace('report-uri', $this->getReportURIDirective(), $cspHeader);
