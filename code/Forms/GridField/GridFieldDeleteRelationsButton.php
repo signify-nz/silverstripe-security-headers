@@ -272,7 +272,11 @@ class GridFieldDeleteRelationsButton extends SS_Object implements
         }
 
         // Ensure data objects are filtered to only include items in this gridfield.
-        $filters['ID'] = $gridField->getManipulatedList()->column('ID');
+        $list = $gridField->getManipulatedList();
+        if (method_exists($list, 'limit')) {
+            $list = $list->limit(null);
+        }
+        $filters['ID'] = $list->column('ID');
         if (empty($filters['ID'])) {
             $deletions = new ArrayList();
         } else {
