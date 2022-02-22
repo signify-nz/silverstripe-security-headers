@@ -26,7 +26,7 @@ class SecurityHeaderMiddlewareExtensionTest extends FunctionalTest
         ]
     ];
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
 
@@ -38,7 +38,7 @@ class SecurityHeaderMiddlewareExtensionTest extends FunctionalTest
         SiteConfig::add_extension(SecurityHeaderSiteconfigExtension::class);
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         parent::tearDownAfterClass();
         // Reset headers to defaults.
@@ -75,7 +75,6 @@ class SecurityHeaderMiddlewareExtensionTest extends FunctionalTest
     public function testReportURIAdded()
     {
         $defaultUri = Director::absoluteURL(SecurityHeaderMiddleware::config()->get('report_uri'));
-        ;
         $response = $this->getResponse();
         $csp = $response->getHeader('Content-Security-Policy');
 

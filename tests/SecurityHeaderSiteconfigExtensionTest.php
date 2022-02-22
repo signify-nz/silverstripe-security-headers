@@ -13,14 +13,14 @@ class SecurityHeaderSiteconfigExtensionTest extends FunctionalTest
 {
     protected static $fixture_file = 'fixtures.yml';
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
         // Add extension.
         SiteConfig::add_extension(SecurityHeaderSiteconfigExtension::class);
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         parent::tearDownAfterClass();
         // Remove extension.
