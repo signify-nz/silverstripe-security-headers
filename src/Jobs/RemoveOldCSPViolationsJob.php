@@ -44,6 +44,7 @@ class RemoveOldCSPViolationsJob extends AbstractQueuedJob
         $delta = 0;
         /** @var CSPViolation $report */
         foreach ($oldReports as $report) {
+            $report->Documents()->removeAll();
             $report->delete();
             $delta++;
         }
