@@ -8,7 +8,6 @@ use Signify\Reports\CSPViolationsReport;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\ORM\DataList;
 use Symbiote\QueuedJobs\Services\AbstractQueuedJob;
-use Symbiote\QueuedJobs\Services\QueuedJobService;
 
 class RemoveOldCSPViolationsJob extends AbstractQueuedJob
 {
