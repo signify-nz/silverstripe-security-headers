@@ -52,7 +52,7 @@ class RemoveOldCSPViolationsTask extends BuildTask
                 $value = $field === 'f' ? round($retention->$field * 1000000.0, 0, PHP_ROUND_HALF_UP) : $retention->$field;
 
                 // Cheap and nasty pluralisation.
-                $duration_parts[] = $retention->$field . ' ' . $label . ($value === 1 ? '' : 's');
+                $duration_parts[] = $value . ' ' . $label . ($value === 1 ? '' : 's');
             }
         }
 
