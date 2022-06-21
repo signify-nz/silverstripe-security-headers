@@ -6,6 +6,7 @@ use DateTime;
 use Signify\Models\CSPViolation;
 use Signify\Reports\CSPViolationsReport;
 use SilverStripe\Core\Config\Config;
+use SilverStripe\ORM\DB;
 use SilverStripe\ORM\DataList;
 use Symbiote\QueuedJobs\Services\AbstractQueuedJob;
 
@@ -42,11 +43,21 @@ class RemoveOldCSPViolationsJob extends AbstractQueuedJob
         $oldReports = $this->getItemsList()->limit($batchSize);
 
         $delta = 0;
-        /** @var CSPViolation $report */
-        foreach ($oldReports as $report) {
-            $report->Documents()->removeAll();
-            $report->delete();
-            $delta++;
+
+        // Wrapped in a transaction for performance only.
+        try {
+            DB::get_conn()->transactionStart();
+
+            /** @var CSPViolation $report */
+            foreach ($oldReports as $report) {
+                # See https://github.com/silverstripe/silverstripe-framework/issues/1903
+                $report->Documents()->removeAll();
+                $report->delete();
+                $delta++;
+            }
+        }
+        finally {
+            DB::get_conn()->transactionEnd();
         }
 
         $this->jobData->reportsDeleted += $delta;
