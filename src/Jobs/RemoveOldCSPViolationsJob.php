@@ -9,6 +9,7 @@ use SilverStripe\Core\Config\Config;
 use SilverStripe\ORM\DB;
 use SilverStripe\ORM\DataList;
 use Symbiote\QueuedJobs\Services\AbstractQueuedJob;
+use Symbiote\QueuedJobs\Services\QueuedJobService;
 
 class RemoveOldCSPViolationsJob extends AbstractQueuedJob
 {
@@ -65,7 +66,13 @@ class RemoveOldCSPViolationsJob extends AbstractQueuedJob
 
         if ($delta < $batchSize) {
             $this->isComplete = true;
-            print 'Removed ' . number_format($this->jobData->reportsDeleted) . ' reports.';
+            print 'Removed ' . number_format($this->jobData->reportsDeleted) . ' reports.' . "\n";
+
+            $deletionJob = new RemoveUnreferencedCSPDocumentJob();
+            $jobId = singleton(QueuedJobService::class)->queueJob($deletionJob);
+
+            print "Unreferenced CSP Document job queued with ID $jobId\n";
+
         }
     }
 
