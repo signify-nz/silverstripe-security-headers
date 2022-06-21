@@ -9,4 +9,5 @@
     - [Enabling report-to](02_csp-options.md#enabling-report-to)
     - [Disabling reporting](02_csp-options.md#disabling-reporting)
 - [Content-Security-Policy violation report management](03_violation-management.md)
+    - [Available tasks](03_violation-management.md#available-tasks)
     - [Automatically delete older reports](03_violation-management.md#automatically-delete-older-reports)
