@@ -1,11 +1,9 @@
 <?php
 namespace Signify\Tasks;
 
-use SilverStripe\Core\Config\Config;
+use Signify\Jobs\RemoveUnreferencedCSPDocumentJob;
 use SilverStripe\Dev\BuildTask;
 use Symbiote\QueuedJobs\Services\QueuedJobService;
-use Signify\Jobs\RemoveUnreferencedCSPDocumentJob;
-use Signify\Models\CSPDocument;
 
 class RemoveUnreferencedCSPDocumentsTask extends BuildTask
 {

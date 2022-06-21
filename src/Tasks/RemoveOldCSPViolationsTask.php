@@ -3,7 +3,6 @@ namespace Signify\Tasks;
 
 use DateInterval;
 use Signify\Jobs\RemoveOldCSPViolationsJob;
-use Signify\Reports\CSPViolationsReport;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Dev\BuildTask;
 use Symbiote\QueuedJobs\Services\QueuedJobService;
