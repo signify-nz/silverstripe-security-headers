@@ -215,7 +215,7 @@ class CSPViolationsController extends Controller
         }
 
         // If not using report-to, or the origin header is set, only allow same origin requests.
-        return $origin == rtrim(Director::absoluteBaseURL(), '/');
+        return $origin == Director::protocolAndHost();
     }
 
     /**
