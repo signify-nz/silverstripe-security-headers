@@ -15,6 +15,14 @@ use SilverStripe\Forms\ListboxField;
 
 class CSPViolationsReport extends Report
 {
+
+    /**
+     * The number of reports that can be loaded simultaneously when deleting.
+     *
+     * @var integer
+     */
+    private static $deletion_batch_size = 50;
+
     public function title()
     {
         return _t(__CLASS__ . '.TITLE', 'CSP violations');
