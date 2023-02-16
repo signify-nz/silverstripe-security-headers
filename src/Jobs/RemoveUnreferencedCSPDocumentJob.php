@@ -14,8 +14,8 @@ class RemoveUnreferencedCSPDocumentJob extends AbstractQueuedJob
 
     public function setup()
     {
-        $this->jobData->lastSeenID = -1;
-        $this->jobData->documentsDeleted = 0;
+        $this->lastSeenID = -1;
+        $this->documentsDeleted = 0;
         $this->totalSteps = CSPDocument::get()->count();
     }
 
@@ -34,7 +34,7 @@ class RemoveUnreferencedCSPDocumentJob extends AbstractQueuedJob
 
             $lastDocument = $documents->last();
             if ($lastDocument) {
-                $this->jobData->lastSeenID = $lastDocument->ID;
+                $this->lastSeenID = $lastDocument->ID;
                 unset($lastDocument);
             }
 
@@ -54,12 +54,12 @@ class RemoveUnreferencedCSPDocumentJob extends AbstractQueuedJob
             DB::get_conn()->transactionEnd();
         }
 
-        $this->jobData->documentsDeleted += $deleted;
+        $this->documentsDeleted += $deleted;
         $this->currentStep += $delta;
 
         if ($delta < $batchSize) {
             $this->isComplete = true;
-            print 'Removed ' . number_format($this->jobData->documentsDeleted) . ' unreferenced document URIs.';
+            print 'Removed ' . number_format($this->documentsDeleted) . ' unreferenced document URIs.';
         }
     }
 
@@ -71,7 +71,7 @@ class RemoveUnreferencedCSPDocumentJob extends AbstractQueuedJob
     private function getItemsList(): DataList
     {
         return CSPDocument::get()
-            ->filter(['ID:GreaterThan' => $this->jobData->lastSeenID])
+            ->filter(['ID:GreaterThan' => $this->lastSeenID])
             ->sort('ID');
     }
 }
