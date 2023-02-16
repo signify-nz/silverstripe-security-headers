@@ -30,9 +30,9 @@ class RemoveOldCSPViolationsJob extends AbstractQueuedJob
 
         $date = new DateTime();
         $date->sub($retention);
-        $this->jobData->retentionDate = $date->format(DateTime::ATOM);
+        $this->retentionDate = $date->format(DateTime::ATOM);
 
-        $this->jobData->reportsDeleted = 0;
+        $this->reportsDeleted = 0;
 
         $this->totalSteps = $this->getItemsList()->count();
     }
@@ -61,12 +61,12 @@ class RemoveOldCSPViolationsJob extends AbstractQueuedJob
             DB::get_conn()->transactionEnd();
         }
 
-        $this->jobData->reportsDeleted += $delta;
+        $this->reportsDeleted += $delta;
         $this->currentStep += $delta;
 
         if ($delta < $batchSize) {
             $this->isComplete = true;
-            print 'Removed ' . number_format($this->jobData->reportsDeleted) . ' reports.' . "\n";
+            print 'Removed ' . number_format($this->reportsDeleted) . ' reports.' . "\n";
 
             $deletionJob = new RemoveUnreferencedCSPDocumentJob();
             $jobId = singleton(QueuedJobService::class)->queueJob($deletionJob);
@@ -83,7 +83,7 @@ class RemoveOldCSPViolationsJob extends AbstractQueuedJob
 
     private function getItemsList(): DataList
     {
-        return CSPViolation::get()->filter(['ReportedTime:LessThan' => $this->jobData->retentionDate]);
+        return CSPViolation::get()->filter(['ReportedTime:LessThan' => $this->retentionDate]);
     }
 }
 
