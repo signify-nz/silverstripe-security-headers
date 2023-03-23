@@ -23,7 +23,8 @@
   "require": {
     "silverstripe/vendor-plugin": "^1.0",
     "silverstripe/framework": "^4.6",
-    "silverstripe/cms": "^4.0"
+    "silverstripe/cms": "^4.0",
+    "symbiote/silverstripe-queuedjobs": "^4.8"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.5",
@@ -42,6 +43,12 @@
     "psr-4": {
       "Signify\\SecurityHeaders\\": "src/",
       "Signify\\SecurityHeaders\\Tests\\": "tests/"
+    }
+  },
+  "config": {
+    "allow-plugins": {
+      "composer/installers": true,
+      "silverstripe/vendor-plugin": true
     }
   }
 }
