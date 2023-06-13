@@ -21,10 +21,10 @@
     "issues": "https://github.com/signify-nz/silverstripe-security-headers/issues"
   },
   "require": {
-    "silverstripe/vendor-plugin": "^1.0",
-    "silverstripe/framework": "^4.6",
-    "silverstripe/cms": "^4.0",
-    "symbiote/silverstripe-queuedjobs": "^4.8"
+    "silverstripe/vendor-plugin": "^1.0 || ^2.0",
+    "silverstripe/framework": "^4.6 || ^5.0",
+    "silverstripe/cms": "^4.0 || ^5.0",
+    "symbiote/silverstripe-queuedjobs": "^4.8 || ^5.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.5",
