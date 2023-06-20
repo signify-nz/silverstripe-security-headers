@@ -222,12 +222,13 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
     {
         if ($this->isReporting()) {
             // Add or update report-uri directive.
-            if (strpos($cspHeader, 'report-uri')) {
-                $cspHeader = str_replace('report-uri', $this->getReportURIDirective(), $cspHeader);
-            } else {
-                $cspHeader = rtrim($cspHeader, ';') . "; {$this->getReportURIDirective()};";
+            if($cspHeader) {
+                if (strpos($cspHeader, 'report-uri')) {
+                    $cspHeader = str_replace('report-uri', $this->getReportURIDirective(), $cspHeader);
+                } else {
+                    $cspHeader = rtrim($cspHeader, ';') . "; {$this->getReportURIDirective()};";
+                }
             }
-
             // Add report-to directive.
             // Note that unlike report-uri, only the first endpoint is used if multiple are declared.
             if ($this->config()->get('use_report_to')) {
