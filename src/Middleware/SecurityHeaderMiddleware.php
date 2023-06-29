@@ -229,6 +229,9 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
                     $cspHeader = rtrim($cspHeader, ';') . "; {$this->getReportURIDirective()};";
                 }
             }
+            else {
+                $cspHeader = $this->getReportURIDirective() . ';';
+            }
             // Add report-to directive.
             // Note that unlike report-uri, only the first endpoint is used if multiple are declared.
             if ($this->config()->get('use_report_to')) {
