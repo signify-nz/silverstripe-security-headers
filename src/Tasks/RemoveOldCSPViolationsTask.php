@@ -1,4 +1,5 @@
 <?php
+
 namespace Signify\Tasks;
 
 use DateInterval;
@@ -48,7 +49,9 @@ class RemoveOldCSPViolationsTask extends BuildTask
         foreach ($parts as $field => $label) {
             if ($retention->$field != 0) {
                 // Microseconds are a fraction of a second. Everything else is defined in terms of itself.
-                $value = $field === 'f' ? round($retention->$field * 1000000.0, 0, PHP_ROUND_HALF_UP) : $retention->$field;
+                $value = $field === 'f'
+                    ? round($retention->$field * 1000000.0, 0, PHP_ROUND_HALF_UP)
+                    : $retention->$field;
 
                 // Cheap and nasty pluralisation.
                 $duration_parts[] = $value . ' ' . $label . ($value === 1 ? '' : 's');
@@ -59,17 +62,16 @@ class RemoveOldCSPViolationsTask extends BuildTask
         if (count($duration_parts) > 1) {
             $last = array_pop($duration_parts);
             $duration_string = implode(', ', $duration_parts) . ' and ' . $last;
-        }
-        else {
+        } else {
             $duration_string = reset($duration_parts);
         }
 
-        return 'CSP reports that have not been created or modified within the last ' . $duration_string . ' will be removed.';
+        return 'CSP reports that have not been created or modified within the last ' .
+            $duration_string . ' will be removed.';
     }
 
     public function isEnabled()
     {
         return parent::isEnabled() && class_exists(QueuedJobService::class);
     }
-
 }
