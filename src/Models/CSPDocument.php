@@ -7,7 +7,6 @@ use SilverStripe\CMS\Model\SiteTree;
 
 class CSPDocument extends DataObject
 {
-
     private static $table_name = 'Signify_Document';
 
     private static $db = [

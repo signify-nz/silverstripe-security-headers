@@ -1,4 +1,5 @@
 <?php
+
 namespace Signify\Tasks;
 
 use Signify\Jobs\RemoveUnreferencedCSPDocumentJob;
@@ -9,7 +10,8 @@ class RemoveUnreferencedCSPDocumentsTask extends BuildTask
 {
     protected $title = 'Remove unreferenced CSP Document URIs';
 
-    protected $description = 'CSP Document URIs that are not referenced by a CSP violation report can be safely removed.';
+    protected $description =
+    'CSP Document URIs that are not referenced by a CSP violation report can be safely removed.';
 
     /**
      * {@inheritDoc}
@@ -28,5 +30,4 @@ class RemoveUnreferencedCSPDocumentsTask extends BuildTask
     {
         return parent::isEnabled() && class_exists(QueuedJobService::class);
     }
-
 }
