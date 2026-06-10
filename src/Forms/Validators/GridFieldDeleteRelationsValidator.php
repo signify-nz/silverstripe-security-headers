@@ -3,7 +3,7 @@
 namespace Signify\Forms\Validators;
 
 use Signify\Forms\GridField\GridFieldDeleteRelationsButton;
-use SilverStripe\Forms\Validator;
+use SilverStripe\Forms\Validation\Validator;
 
 class GridFieldDeleteRelationsValidator extends Validator
 {
