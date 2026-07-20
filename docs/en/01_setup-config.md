@@ -14,7 +14,7 @@ In the below example, the `X-Frame-Options` header value is changed from the def
 ---
 After: 'signify-security-headers'
 ---
-Signify\Middleware\SecurityHeaderMiddleware:
+Signify\SecurityHeaders\Middleware\SecurityHeaderMiddleware:
   headers:
     global:
       X-Frame-Options: "allow-from https://example.com/"
@@ -29,7 +29,7 @@ Note that either `null` or an empty string will have the same effect.
 ---
 After: 'signify-security-headers'
 ---
-Signify\Middleware\SecurityHeaderMiddleware:
+Signify\SecurityHeaders\Middleware\SecurityHeaderMiddleware:
   headers:
     global:
       Strict-Transport-Security: null
@@ -98,7 +98,7 @@ class UpdateIframeCSPHeaderExtension extends Extension
 ```
 In YAML config:
 ```YAML
-Signify\Middleware\SecurityHeaderMiddleware:
+Signify\SecurityHeaders\Middleware\SecurityHeaderMiddleware:
   extensions:
     - App\Extensions\UpdateIframeCSPHeaderExtension
 ```

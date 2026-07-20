@@ -1,6 +1,6 @@
 <?php
 
-namespace Signify\Models;
+namespace Signify\SecurityHeaders\Models;
 
 use SilverStripe\ORM\DataObject;
 use SilverStripe\CMS\Model\SiteTree;

@@ -18,7 +18,7 @@ It also comes with its own permission in case you want some members to have acce
 ```yml
 SilverStripe\SiteConfig\SiteConfig:
   extensions:
-    - Signify\Extensions\SecurityHeaderSiteconfigExtension
+    - Signify\SecurityHeaders\Extensions\SecurityHeaderSiteconfigExtension
 ```
 
 ## Enabling report-to
@@ -33,7 +33,7 @@ To enable the report-to directive and Report-To header to be used (for browsers 
 ---
 After: 'signify-security-headers'
 ---
-Signify\Middleware\SecurityHeaderMiddleware:
+Signify\SecurityHeaders\Middleware\SecurityHeaderMiddleware:
   use_report_to: true
 ```
 
@@ -47,7 +47,7 @@ If you don't want the CMS reporting endpoint to automatically be added to the CS
 ---
 After: 'signify-security-headers'
 ---
-Signify\Middleware\SecurityHeaderMiddleware:
+Signify\SecurityHeaders\Middleware\SecurityHeaderMiddleware:
   enable_reporting: false
 ```
 

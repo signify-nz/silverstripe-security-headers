@@ -16,7 +16,7 @@ Both tasks simply queue up an appropriate job to run immediately.
 
 ### Remove old CSP violation reports
 
-`dev/tasks/Signify-Tasks-RemoveOldCSPViolationsTask`
+`dev/tasks/Signify-SecurityHeaders-Tasks-RemoveOldCSPViolationsTask`
 
 Delete older reports, to keep the number of stored reports manageable. Any report that
 has not been modified within the retention period will be deleted.
@@ -24,7 +24,7 @@ has not been modified within the retention period will be deleted.
 The retention period (visible in the task description) can be configured as follows:
 
 ```yaml
-Signify\Jobs\RemoveOldCSPViolationsJob:
+Signify\SecurityHeaders\Jobs\RemoveOldCSPViolationsJob:
   retention_period: P1M
 ```
 
@@ -34,7 +34,7 @@ CSP Document  URIs will be queued.
 
 ### Remove unreferenced CSP Document URIs
 
-`dev/tasks/Signify-Tasks-RemoveUnreferencedCSPDocumentsTask`
+`dev/tasks/Signify-SecurityHeaders-Tasks-RemoveUnreferencedCSPDocumentsTask`
 
 Remove all CSP Document URIs (`CSPDocument`) that does not have any linked violation
 report (`CSPViolation`).
@@ -56,7 +56,7 @@ SilverStripe\Core\Injector\Injector:
     properties:
       defaultJobs:
         RemoveOldCSPViolationsJob:
-          type: 'Signify\Jobs\RemoveOldCSPViolationsJob'
+          type: 'Signify\SecurityHeaders\Jobs\RemoveOldCSPViolationsJob'
           filter:
             JobTitle: 'Remove old CSP Violation reports'
           construct:

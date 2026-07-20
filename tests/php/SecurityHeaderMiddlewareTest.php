@@ -1,16 +1,16 @@
 <?php
 
-namespace Signify\Tests;
+namespace Signify\SecurityHeaders\Tests;
 
-use Signify\Extensions\SecurityHeaderSiteconfigExtension;
+use Signify\SecurityHeaders\Extensions\SecurityHeaderSiteconfigExtension;
 use SilverStripe\Dev\FunctionalTest;
-use Signify\Middleware\SecurityHeaderMiddleware;
+use Signify\SecurityHeaders\Middleware\SecurityHeaderMiddleware;
 use SilverStripe\Config\MergeStrategy\Priority;
 use SilverStripe\Control\Director;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\Versioned\Versioned;
 
-class SecurityHeaderMiddlewareExtensionTest extends FunctionalTest
+class SecurityHeaderMiddlewareTest extends FunctionalTest
 {
     protected static $fixture_file = 'fixtures.yml';
 

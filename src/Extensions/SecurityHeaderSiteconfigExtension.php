@@ -1,14 +1,14 @@
 <?php
 
-namespace Signify\Extensions;
+namespace Signify\SecurityHeaders\Extensions;
 
-use SilverStripe\ORM\DataExtension;
+use SilverStripe\Core\Extension;
 use SilverStripe\Security\Permission;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\OptionsetField;
 use SilverStripe\Security\PermissionProvider;
 
-class SecurityHeaderSiteconfigExtension extends DataExtension implements PermissionProvider
+class SecurityHeaderSiteconfigExtension extends Extension implements PermissionProvider
 {
     // The values are in this order to ensure backwards compatability with the old binary options.
     public const CSP_WITH_REPORTING = 0;
