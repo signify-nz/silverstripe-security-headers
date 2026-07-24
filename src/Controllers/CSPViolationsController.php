@@ -51,7 +51,7 @@ class CSPViolationsController extends Controller
         $document = CSPDocument::get_or_create($documentURI);
 
         $violation = CSPViolation::get()->filter([
-            'DocumentID' => $document->ID,
+            'Documents.ID' => [$document->ID],
             'Disposition' => $report['disposition'],
             'BlockedURI' => $blockedURI,
             'EffectiveDirective' => $report['effective-directive'],
@@ -59,11 +59,12 @@ class CSPViolationsController extends Controller
 
         if (!$violation) {
             $violation = CSPViolation::create([
-                'DocumentID' => $document->ID,
                 'Disposition' => $report['disposition'],
                 'BlockedURI' => $blockedURI,
                 'EffectiveDirective' => $report['effective-directive'],
             ]);
+            $violation->write();
+            $violation->Documents()->add($document);
         }
 
         $violation->Violations++;
