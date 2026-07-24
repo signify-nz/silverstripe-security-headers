@@ -49,13 +49,12 @@ class CSPViolationsController extends Controller
         $blockedURI = $this->getRelativeURI($report['blocked-uri']);
 
         $document = CSPDocument::get_or_create($documentURI);
-        
+
         $violation = CSPViolation::get()->filter([
             'DocumentID' => $document->ID,
             'Disposition' => $report['disposition'],
             'BlockedURI' => $blockedURI,
             'EffectiveDirective' => $report['effective-directive'],
-            'ViolationCode' => isset($report['status-code']) ? $report['status-code'] : null,
         ])->first();
 
         if (!$violation) {
@@ -64,7 +63,6 @@ class CSPViolationsController extends Controller
                 'Disposition' => $report['disposition'],
                 'BlockedURI' => $blockedURI,
                 'EffectiveDirective' => $report['effective-directive'],
-                'ViolationCode' => isset($report['status-code']) ? $report['status-code'] : null,
             ]);
         }
 
