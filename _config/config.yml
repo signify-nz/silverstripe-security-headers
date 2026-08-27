@@ -6,9 +6,9 @@ SilverStripe\Core\Injector\Injector:
   SilverStripe\Control\Director:
     properties:
       Middlewares:
-        SecurityHeaderMiddleware: '%$Signify\Middleware\SecurityHeaderMiddleware'
+        SecurityHeaderMiddleware: '%$Signify\SecurityHeaders\Middleware\SecurityHeaderMiddleware'
 
-Signify\Middleware\SecurityHeaderMiddleware:
+Signify\SecurityHeaders\Middleware\SecurityHeaderMiddleware:
   headers:
     global:
       Strict-Transport-Security: "max-age=31536000"
@@ -31,7 +31,7 @@ Signify\Middleware\SecurityHeaderMiddleware:
 Only:
   environment: dev
 ---
-Signify\Middleware\SecurityHeaderMiddleware:
+Signify\SecurityHeaders\Middleware\SecurityHeaderMiddleware:
   headers:
     global:
       # 5 minutes in dev.
@@ -40,7 +40,7 @@ Signify\Middleware\SecurityHeaderMiddleware:
 Only:
   environment: test
 ---
-Signify\Middleware\SecurityHeaderMiddleware:
+Signify\SecurityHeaders\Middleware\SecurityHeaderMiddleware:
   headers:
     global:
       # 1 hour in test.

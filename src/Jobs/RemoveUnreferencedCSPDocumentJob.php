@@ -1,78 +1,46 @@
 <?php
-namespace Signify\Jobs;
+namespace Signify\SecurityHeaders\Jobs;
 
-use Signify\Models\CSPDocument;
-use Signify\Models\CSPViolation;
-use Signify\Reports\CSPViolationsReport;
+use Signify\SecurityHeaders\Models\CSPDocument;
+use Signify\SecurityHeaders\Models\CSPViolation;
+use Signify\SecurityHeaders\Reports\CSPViolationsReport;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\ORM\DataList;
 use Symbiote\QueuedJobs\Services\AbstractQueuedJob;
 use SilverStripe\ORM\DB;
 
+/**
+ * A queued job to remove CSPDocument objects that are no longer referenced by any CSPViolation.
+ */
 class RemoveUnreferencedCSPDocumentJob extends AbstractQueuedJob
 {
-
-    public function setup()
+    public function __construct()
     {
-        $this->lastSeenID = -1;
-        $this->documentsDeleted = 0;
         $this->totalSteps = CSPDocument::get()->count();
-    }
-
-    public function process()
-    {
-        $batchSize = Config::inst()->get(CSPViolationsReport::class, 'deletion_batch_size');
-
-        $deleted = 0;
-        $delta = 0;
-
-        // Wrapped in a transaction for performance only.
-        try {
-            DB::get_conn()->transactionStart();
-
-            $documents = $this->getItemsList()->limit($batchSize);
-
-            $lastDocument = $documents->last();
-            if ($lastDocument) {
-                $this->lastSeenID = $lastDocument->ID;
-                unset($lastDocument);
-            }
-
-            /** @var CSPViolation $document */
-            foreach ($documents as $document) {
-                if (!$document->CSPViolations()->first()) {
-                    # See https://github.com/silverstripe/silverstripe-framework/issues/1903
-                    $document->CSPViolations()->removeAll();
-
-                    $document->delete();
-                    ++$deleted;
-                }
-                ++$delta;
-            }
-        }
-        finally {
-            DB::get_conn()->transactionEnd();
-        }
-
-        $this->documentsDeleted += $deleted;
-        $this->currentStep += $delta;
-
-        if ($delta < $batchSize) {
-            $this->isComplete = true;
-            print 'Removed ' . number_format($this->documentsDeleted) . ' unreferenced document URIs.';
-        }
     }
 
     public function getTitle()
     {
-        return 'Remove unreferenced CSP Document URIs';
+        return _t(
+            __CLASS__ . '.TITLE',
+            'Remove unreferenced CSP documents'
+        );
     }
 
-    private function getItemsList(): DataList
+    public function getJobType()
     {
-        return CSPDocument::get()
-            ->filter(['ID:GreaterThan' => $this->lastSeenID])
-            ->sort('ID');
+        return \Symbiote\QueuedJobs\Services\QueuedJob::QUEUED;
+    }
+
+    public function process()
+    {
+        $documents = CSPDocument::get();
+        foreach ($documents as $document) {
+            $this->currentStep++;
+            if ($document->Violations()->count() == 0) {
+                $document->delete();
+            }
+        }
+        $this->isComplete = true;
     }
 }
-

@@ -1,8 +1,8 @@
 <?php
 
-namespace Signify\Forms\GridField;
+namespace Signify\SecurityHeaders\Forms\GridField;
 
-use Signify\Forms\Validators\GridFieldDeleteRelationsValidator;
+use Signify\SecurityHeaders\Forms\Validators\GridFieldDeleteRelationsValidator;
 use SilverStripe\Forms\GridField\GridField_HTMLProvider;
 use SilverStripe\Forms\GridField\GridField_URLHandler;
 use SilverStripe\Forms\GridField\GridField;
@@ -10,7 +10,7 @@ use SilverStripe\Forms\GridField\GridField_FormAction;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Extensible;
 use SilverStripe\Security\Security;
-use SilverStripe\View\ArrayData;
+use SilverStripe\Model\ArrayData;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\View\SSViewer;
 use SilverStripe\Forms\FieldList;
@@ -23,7 +23,7 @@ use SilverStripe\Forms\FormField;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Core\Manifest\ModuleLoader;
 use SilverStripe\Forms\ReadonlyField;
-use SilverStripe\ORM\ArrayList;
+use SilverStripe\Model\List\ArrayList;
 use SilverStripe\View\Requirements;
 use UncleCheese\DisplayLogic\Forms\Wrapper;
 
@@ -249,7 +249,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
         }
         $form = $this->DeletionForm($gridField);
         $form->loadDataFrom($data);
-        $validationResult = $form->validationResult();
+        $validationResult = $form->validate();
         if (!$validationResult->isValid()) {
             $form->setSessionValidationResult($validationResult);
             $form->setSessionData($data);
@@ -512,7 +512,7 @@ class GridFieldDeleteRelationsButton implements GridField_HTMLProvider, GridFiel
                 $filterFieldTitle,
                 $options[0]
             )->setIncludeHiddenField(true)
-            ->setTemplate('Signify\Forms\ReadonlyField');
+            ->setTemplate('Signify\SecurityHeaders\Forms\ReadonlyField');
         } else {
             $field = DropdownField::create(
                 $filterFieldName,

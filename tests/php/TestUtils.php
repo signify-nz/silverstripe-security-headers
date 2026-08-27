@@ -1,6 +1,6 @@
 <?php
 
-namespace Signify\Tests;
+namespace Signify\SecurityHeaders\Tests;
 
 use SilverStripe\Core\Config\Config;
 
@@ -20,7 +20,7 @@ abstract class TestUtils
         foreach ($configMap as $class => $config) {
             foreach ($config as $key => $value) {
                 $originalConfigValues[$class][$key] = Config::inst()->get($class, $key);
-                Config::inst()->update($class, $key, $value);
+                Config::inst()->merge($class, $key, $value);
             }
         }
 
@@ -30,7 +30,7 @@ abstract class TestUtils
         // Restore original config values.
         foreach ($originalConfigValues as $class => $config) {
             foreach ($config as $key => $value) {
-                Config::inst()->update($class, $key, $value);
+                Config::inst()->merge($class, $key, $value);
             }
         }
     }

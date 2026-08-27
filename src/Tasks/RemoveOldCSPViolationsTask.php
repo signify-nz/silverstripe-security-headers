@@ -1,35 +1,35 @@
 <?php
 
-namespace Signify\Tasks;
+namespace Signify\SecurityHeaders\Tasks;
 
 use DateInterval;
-use Signify\Jobs\RemoveOldCSPViolationsJob;
+use Signify\SecurityHeaders\Jobs\RemoveOldCSPViolationsJob;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Dev\BuildTask;
+use SilverStripe\PolyExecution\PolyOutput;
 use Symbiote\QueuedJobs\Services\QueuedJobService;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
 
 class RemoveOldCSPViolationsTask extends BuildTask
 {
-    protected $title = 'Remove old CSP violation reports';
+    protected string $title = 'Remove old CSP violation reports';
 
-    /**
-     * {@inheritDoc}
-     * @see \SilverStripe\Dev\BuildTask::run()
-     */
-    public function run($request)
+    protected static string $commandName = 'remove-old-csp-violations';
+
+    protected static string $description = 'CSP reports that have not been recently reported will be removed.';
+
+    protected function execute(InputInterface $input, PolyOutput $output): int
     {
         $deletionJob = new RemoveOldCSPViolationsJob();
 
         $jobId = singleton(QueuedJobService::class)->queueJob($deletionJob);
 
-        print "Job queued with ID $jobId\n";
+        $output->writeln("Job queued with ID $jobId");
+        return Command::SUCCESS;
     }
 
-    /**
-     * {@inheritDoc}
-     * @see \SilverStripe\Dev\BuildTask::getDescription()
-     */
-    public function getDescription()
+    public static function getDescription(): string
     {
         // Map DateInterval fields to text names. Order is significant.
         static $parts = [
@@ -43,6 +43,9 @@ class RemoveOldCSPViolationsTask extends BuildTask
         ];
 
         $retention = Config::inst()->get(RemoveOldCSPViolationsJob::class, 'retention_period');
+        if (!$retention) {
+            return parent::getDescription();
+        }
         $retention = new DateInterval($retention);
 
         $duration_parts = [];
@@ -70,7 +73,7 @@ class RemoveOldCSPViolationsTask extends BuildTask
             $duration_string . ' will be removed.';
     }
 
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return parent::isEnabled() && class_exists(QueuedJobService::class);
     }

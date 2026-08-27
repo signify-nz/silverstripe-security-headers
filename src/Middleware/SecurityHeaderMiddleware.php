@@ -1,8 +1,8 @@
 <?php
 
-namespace Signify\Middleware;
+namespace Signify\SecurityHeaders\Middleware;
 
-use Signify\Extensions\SecurityHeaderSiteconfigExtension;
+use Signify\SecurityHeaders\Extensions\SecurityHeaderSiteconfigExtension;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\Middleware\HTTPMiddleware;

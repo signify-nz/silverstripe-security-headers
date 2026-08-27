@@ -1,16 +1,19 @@
 <?php
-namespace Signify\Jobs;
+namespace Signify\SecurityHeaders\Jobs;
 
 use DateInterval;
 use DateTime;
-use Signify\Models\CSPViolation;
-use Signify\Reports\CSPViolationsReport;
+use Signify\SecurityHeaders\Models\CSPViolation;
+use Signify\SecurityHeaders\Reports\CSPViolationsReport;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\ORM\DB;
 use SilverStripe\ORM\DataList;
 use Symbiote\QueuedJobs\Services\AbstractQueuedJob;
 use Symbiote\QueuedJobs\Services\QueuedJobService;
 
+/**
+ * A queued job to remove old CSPViolation objects.
+ */
 class RemoveOldCSPViolationsJob extends AbstractQueuedJob
 {
     /**
@@ -86,4 +89,3 @@ class RemoveOldCSPViolationsJob extends AbstractQueuedJob
         return CSPViolation::get()->filter(['ReportedTime:LessThan' => $this->retentionDate]);
     }
 }
-
