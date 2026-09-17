@@ -3,6 +3,7 @@
 namespace Signify\SecurityHeaders\Middleware;
 
 use Signify\SecurityHeaders\Extensions\SecurityHeaderSiteconfigExtension;
+use Signify\SecurityHeaders\Models\CSPDirective;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\Middleware\HTTPMiddleware;
@@ -73,6 +74,13 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
      */
     private static $is_csp_reporting_safe = false;
 
+    /**
+     * Whether the custom CSP (built from CSPDirective/CSPPolicy records) can be used.
+     *
+     * @config
+     * @var bool
+     */
+    private static $enable_custom_csp = true;
 
     public function process(HTTPRequest $request, callable $delegate)
     {
@@ -90,20 +98,11 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
         }
 
         // Update CSP header.
-        if (array_key_exists('Content-Security-Policy', $headersToSend)) {
-            $header = 'Content-Security-Policy';
-
+        if ($this->config()->get('enable_custom_csp') && $this->hasCustomCSP()) {
+            $this->applyCSPHeader($headersToSend, $this->getCustomCSP());
+        } elseif (array_key_exists('Content-Security-Policy', $headersToSend)) {
             if ($this->hasCSP()) {
-                $headerValue = $headersToSend['Content-Security-Policy'];
-
-                // Set report only mode if appropriate.
-                if ($this->isCSPReportingOnly()) {
-                    unset($headersToSend['Content-Security-Policy']);
-                    $header = 'Content-Security-Policy-Report-Only';
-                }
-
-                // Update CSP header value.
-                $headersToSend[$header] = $this->updateCspHeader($headerValue);
+                $this->applyCSPHeader($headersToSend, $headersToSend['Content-Security-Policy']);
             } else {
                 unset($headersToSend['Content-Security-Policy']);
             }
@@ -123,6 +122,162 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
         }
 
         return $response;
+    }
+
+    /**
+     * Returns true if custom Content-Security-Policy should be built from
+     * CSPDirective/CSPPolicy records.
+     *
+     * @return bool
+     */
+    private function hasCustomCSP(): bool
+    {
+        $allDirectives = CSPDirective::get();
+
+        foreach ($allDirectives as $directive) {
+            $hasCustomDirective = $directive->AllowNone ||
+                $directive->AllowSelf ||
+                $directive->AllowUnsafeInline ||
+                $directive->AllowUnsafeEval ||
+                $directive->AllowDataUri ||
+                $directive->Policies()->exists();
+
+            if ($hasCustomDirective) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Builds a Content-Security-Policy header from CSPDirective/CSPPolicy records,
+     * falling back to the configured CSP value when a directive has no policy.
+     *
+     * @return string
+     */
+    private function getCustomCSP(): string
+    {
+        $directives = CSPDirective::get();
+        $baseDirectives = $this->parseBaseCSPDirectives();
+        $allDirectives = '';
+        $handledDirectives = [];
+
+        foreach ($directives as $directive) {
+            $sources = [];
+
+            if ($directive->AllowNone) {
+                $sources[] = "'none'";
+            } else {
+                $policyValues = $directive->Policies()->column('Value');
+
+                if (empty($policyValues) && isset($baseDirectives[$directive->Name])) {
+                    $policyValues = preg_split(
+                        '/\s+/',
+                        trim($baseDirectives[$directive->Name])
+                    );
+                }
+
+                $hasAnyCheckbox = $directive->AllowSelf
+                    || $directive->AllowUnsafeInline
+                    || $directive->AllowUnsafeEval
+                    || $directive->AllowDataUri;
+
+                if (empty($policyValues) && !$hasAnyCheckbox) {
+                    continue;
+                }
+
+                if ($directive->AllowSelf) {
+                    $sources[] = "'self'";
+                }
+
+                if ($directive->AllowUnsafeInline) {
+                    $sources[] = "'unsafe-inline'";
+                }
+
+                if ($directive->AllowUnsafeEval) {
+                    $sources[] = "'unsafe-eval'";
+                }
+
+                if ($directive->AllowDataUri) {
+                    $sources[] = 'data:';
+                }
+
+                $sources = array_merge($sources, $policyValues);
+            }
+
+            $handledDirectives[] = $directive->Name;
+            $sourcesString = implode(' ', array_unique($sources));
+            $directiveString = trim($directive->Name . ' ' . $sourcesString) . '; ';
+            $allDirectives .= $directiveString;
+        }
+
+        foreach ($baseDirectives as $name => $sourcesString) {
+            if (in_array($name, $handledDirectives) || $name === 'block-all-mixed-content') {
+                continue;
+            }
+
+            $allDirectives .= $name . ' ' . $sourcesString . '; ';
+        }
+
+        $allDirectives .= 'block-all-mixed-content;';
+
+        return $allDirectives;
+    }
+
+    /**
+     * Parses the base Content-Security-Policy header into a source map, used to
+     * fill any gaps left by CSPDirective records.
+     *
+     * @return array
+     */
+    private function parseBaseCSPDirectives(): array
+    {
+        $headersConfig = (array) $this->config()->get('headers');
+        $baseCsp = $headersConfig['global']['Content-Security-Policy'] ?? '';
+
+        if (!$baseCsp) {
+            return [];
+        }
+
+        $directives = [];
+
+        foreach (explode(';', $baseCsp) as $part) {
+            $part = trim($part);
+
+            if ($part === '') {
+                continue;
+            }
+
+            $segments = preg_split('/\s+/', $part, 2);
+
+            $name = $segments[0];
+            $sources = $segments[1] ?? '';
+
+            $directives[$name] = $sources;
+        }
+
+        return $directives;
+    }
+
+    /**
+     * Sets the Content-Security-Policy or Content-Security-Policy-Report-Only
+     * header depending on the current reporting mode.
+     *
+     * @param array $headersToSend
+     * @param string $headerValue
+     * @return void
+     */
+    private function applyCSPHeader(array &$headersToSend, string $headerValue): void
+    {
+        $header = 'Content-Security-Policy';
+
+        if ($this->isCSPReportingOnly()) {
+            unset($headersToSend['Content-Security-Policy']);
+            $header = 'Content-Security-Policy-Report-Only';
+        }
+
+        $headersToSend[$header] = $this->updateCspHeader($headerValue);
     }
 
     /**
@@ -161,10 +316,11 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
      */
     public function isCSPReportingOnly()
     {
-        if (
-            self::isCSPReportingAvailable() &&
-            SiteConfig::current_site_config()->CSPReportingOnly == SecurityHeaderSiteconfigExtension::CSP_REPORTING_ONLY
-        ) {
+        $isCSPReportingAvailable = self::isCSPReportingAvailable();
+        $configReportingOnly = SiteConfig::current_site_config()->CSPReportingOnly;
+        $isCSPReporting = $configReportingOnly == SecurityHeaderSiteconfigExtension::CSP_REPORTING_ONLY;
+
+        if ($isCSPReportingAvailable && $isCSPReporting) {
             return true;
         }
 
@@ -222,14 +378,13 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
     {
         if ($this->isReporting()) {
             // Add or update report-uri directive.
-            if($cspHeader) {
+            if ($cspHeader) {
                 if (strpos($cspHeader, 'report-uri')) {
                     $cspHeader = str_replace('report-uri', $this->getReportURIDirective(), $cspHeader);
                 } else {
                     $cspHeader = rtrim($cspHeader, ';') . "; {$this->getReportURIDirective()};";
                 }
-            }
-            else {
+            } else {
                 $cspHeader = $this->getReportURIDirective() . ';';
             }
             // Add report-to directive.
