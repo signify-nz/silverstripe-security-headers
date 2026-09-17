@@ -59,8 +59,7 @@ class RemoveOldCSPViolationsJob extends AbstractQueuedJob
                 $report->delete();
                 $delta++;
             }
-        }
-        finally {
+        } finally {
             DB::get_conn()->transactionEnd();
         }
 
@@ -75,7 +74,6 @@ class RemoveOldCSPViolationsJob extends AbstractQueuedJob
             $jobId = singleton(QueuedJobService::class)->queueJob($deletionJob);
 
             print "Unreferenced CSP Document job queued with ID $jobId\n";
-
         }
     }
 

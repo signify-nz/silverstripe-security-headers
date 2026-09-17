@@ -20,7 +20,7 @@ abstract class TestUtils
         foreach ($configMap as $class => $config) {
             foreach ($config as $key => $value) {
                 $originalConfigValues[$class][$key] = Config::inst()->get($class, $key);
-                Config::inst()->merge($class, $key, $value);
+                self::applyConfig($class, $key, $value);
             }
         }
 
@@ -30,8 +30,17 @@ abstract class TestUtils
         // Restore original config values.
         foreach ($originalConfigValues as $class => $config) {
             foreach ($config as $key => $value) {
-                Config::inst()->merge($class, $key, $value);
+                self::applyConfig($class, $key, $value);
             }
+        }
+    }
+
+    private static function applyConfig($class, $key, $value)
+    {
+        if (is_array($value)) {
+            Config::inst()->merge($class, $key, $value);
+        } else {
+            Config::inst()->set($class, $key, $value);
         }
     }
 
