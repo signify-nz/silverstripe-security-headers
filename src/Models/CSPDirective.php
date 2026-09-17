@@ -25,7 +25,9 @@ class CSPDirective extends DataObject
     private static $table_name = 'Signify_CSPDirective';
 
     private static $db = [
-        'Name' => 'Enum("default-src,script-src,style-src,img-src,font-src,frame-src,connect-src,object-src,base-uri,form-action,frame-ancestors")',
+        'Name' => 'Enum("default-src,script-src,style-src,'
+            . 'img-src,font-src,frame-src,connect-src,'
+            . 'object-src,base-uri,form-action,frame-ancestors")',
         'AllowSelf' => 'Boolean',
         'AllowUnsafeInline' => 'Boolean',
         'AllowUnsafeEval' => 'Boolean',
@@ -183,7 +185,10 @@ class CSPDirective extends DataObject
             }
 
             if ($this->isInDB() && $this->Policies()->exists()) {
-                $result->addFieldError('AllowNone', "Cannot combine 'None' with linked policies, remove all policies first.");
+                $result->addFieldError(
+                    'AllowNone',
+                    "Cannot combine 'None' with linked policies, remove all policies first."
+                );
             }
         }
 

@@ -79,11 +79,17 @@ class CSPPolicy extends DataObject
         }
 
         if (strpos($value, ',') !== false) {
-            $result->addFieldError('Value', 'Value cannot contain a comma. Use a separate CSPPolicy record for each source.');
+            $result->addFieldError(
+                'Value',
+                'Value cannot contain a comma. Use a separate CSPPolicy record for each source.'
+            );
         }
 
         if (strpos($value, "'") !== false) {
-            $result->addFieldError('Value', 'Value should not contain quotes. Quoted keywords are handled separately.');
+            $result->addFieldError(
+                'Value',
+                'Value should not contain quotes. Quoted keywords are handled separately.'
+            );
         }
 
         return $result;

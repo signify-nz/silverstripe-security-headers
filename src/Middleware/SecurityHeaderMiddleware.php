@@ -135,14 +135,14 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
         $allDirectives = CSPDirective::get();
 
         foreach ($allDirectives as $directive) {
-            if (
-                $directive->AllowNone ||
+            $hasCustomDirective = $directive->AllowNone ||
                 $directive->AllowSelf ||
                 $directive->AllowUnsafeInline ||
                 $directive->AllowUnsafeEval ||
                 $directive->AllowDataUri ||
-                $directive->Policies()->exists()
-            ) {
+                $directive->Policies()->exists();
+
+            if ($hasCustomDirective) {
                 return true;
             }
         }
@@ -316,10 +316,11 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
      */
     public function isCSPReportingOnly()
     {
-        if (
-            self::isCSPReportingAvailable() &&
-            SiteConfig::current_site_config()->CSPReportingOnly == SecurityHeaderSiteconfigExtension::CSP_REPORTING_ONLY
-        ) {
+        $isCSPReportingAvailable = self::isCSPReportingAvailable();
+        $configReportingOnly = SiteConfig::current_site_config()->CSPReportingOnly;
+        $isCSPReporting = $configReportingOnly == SecurityHeaderSiteconfigExtension::CSP_REPORTING_ONLY;
+
+        if ($isCSPReportingAvailable && $isCSPReporting) {
             return true;
         }
 
@@ -377,14 +378,13 @@ class SecurityHeaderMiddleware implements HTTPMiddleware
     {
         if ($this->isReporting()) {
             // Add or update report-uri directive.
-            if($cspHeader) {
+            if ($cspHeader) {
                 if (strpos($cspHeader, 'report-uri')) {
                     $cspHeader = str_replace('report-uri', $this->getReportURIDirective(), $cspHeader);
                 } else {
                     $cspHeader = rtrim($cspHeader, ';') . "; {$this->getReportURIDirective()};";
                 }
-            }
-            else {
+            } else {
                 $cspHeader = $this->getReportURIDirective() . ';';
             }
             // Add report-to directive.
