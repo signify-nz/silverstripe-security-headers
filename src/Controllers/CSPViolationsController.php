@@ -45,24 +45,31 @@ class CSPViolationsController extends Controller
 
     protected function processReport(array $report)
     {
-        $documentURI = $this->getRelativeURI($report['document-uri']);
-        $blockedURI = $this->getRelativeURI($report['blocked-uri']);
+        // Values are truncated before lookup as well as before write so that repeated reports
+        // with over-long values still match the record created by the first report.
+        $documentURI = $this->truncateToFieldSize(
+            CSPDocument::class,
+            'URI',
+            $this->getRelativeURI($report['document-uri'] ?? '')
+        );
+        $fields = [
+            'Disposition' => $report['disposition'] ?? '',
+            'BlockedURI' => $this->getRelativeURI($report['blocked-uri'] ?? ''),
+            'EffectiveDirective' => $report['effective-directive'] ?? '',
+        ];
+        foreach ($fields as $field => $value) {
+            $fields[$field] = $this->truncateToFieldSize(CSPViolation::class, $field, $value);
+        }
 
         $document = CSPDocument::get_or_create($documentURI);
 
-        $violation = CSPViolation::get()->filter([
-            'Documents.ID' => [$document->ID],
-            'Disposition' => $report['disposition'],
-            'BlockedURI' => $blockedURI,
-            'EffectiveDirective' => $report['effective-directive'],
-        ])->first();
+        $violation = CSPViolation::get()->filter(array_merge(
+            ['Documents.ID' => [$document->ID]],
+            $fields
+        ))->first();
 
         if (!$violation) {
-            $violation = CSPViolation::create([
-                'Disposition' => $report['disposition'],
-                'BlockedURI' => $blockedURI,
-                'EffectiveDirective' => $report['effective-directive'],
-            ]);
+            $violation = CSPViolation::create($fields);
             $violation->write();
             $violation->Documents()->add($document);
         }
@@ -70,6 +77,19 @@ class CSPViolationsController extends Controller
         $violation->Violations++;
         $violation->ReportedTime = DBDatetime::now()->getValue();
         $violation->write();
+    }
+
+    /**
+     * Truncate a value to fit the size of a Varchar field, since writing a longer value
+     * fails DataObject validation.
+     */
+    protected function truncateToFieldSize(string $class, string $field, string $value): string
+    {
+        $dbField = singleton($class)->dbObject($field);
+        if ($dbField && method_exists($dbField, 'getSize')) {
+            return mb_substr($value, 0, $dbField->getSize());
+        }
+        return $value;
     }
 
     protected function getRelativeURI($uri)

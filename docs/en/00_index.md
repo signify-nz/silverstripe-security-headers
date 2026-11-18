@@ -3,6 +3,7 @@
 - [Setup and Basic Configuration](01_setup-config.md)
     - [Configure the headers](01_setup-config.md#configure-the-headers)
     - [Changing the Content Security Policy](01_setup-config.md#changing-the-content-security-policy)
+    - [Managing the Content Security Policy via the CMS](01_setup-config.md#managing-the-content-security-policy-via-the-cms)
     - [Updating Headers Via Code](01_setup-config.md#updating-headers-via-code)
 - [Content Security Policy Options](02_csp-options.md)
     - [Setting options](02_csp-options.md#setting-options)
